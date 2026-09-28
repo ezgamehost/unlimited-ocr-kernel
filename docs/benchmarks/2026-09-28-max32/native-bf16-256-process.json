@@ -1,0 +1,17 @@
+{
+  "command": [
+    "target/release/uocr",
+    "--image",
+    "docs/benchmarks/2026-09-28-max32/portrait32.png",
+    "--prompt",
+    "<image>\ndocument parsing.",
+    "--threads",
+    "8",
+    "--max-tokens",
+    "256",
+    "--json"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 38.325471792020835,
+  "purpose": "Short diagnostic, not completed OCR or a benchmark"
+}

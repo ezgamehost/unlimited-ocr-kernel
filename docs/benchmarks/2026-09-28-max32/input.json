@@ -1,0 +1,15 @@
+{
+  "width": 640,
+  "height": 20480,
+  "expected_crop_grid": [
+    1,
+    32
+  ],
+  "expected_image_tokens": 3793,
+  "sha256": "4fe946abc026998f6e1a06f878fd7a309aae1d8785fea5d51cc6a25d4a63d01e",
+  "font": "/System/Library/Fonts/Menlo.ttc",
+  "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+  "font_size": 22,
+  "pillow_version": "12.1.1",
+  "description": "Synthetic extreme-aspect memory/ordering check, not a representative document corpus."
+}

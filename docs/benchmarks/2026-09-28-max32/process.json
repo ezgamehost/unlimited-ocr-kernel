@@ -1,0 +1,37 @@
+{
+  "command": [
+    "target/release/uocr",
+    "--image",
+    "docs/benchmarks/2026-09-28-max32/portrait32.png",
+    "--prompt",
+    "<image>\ndocument parsing.",
+    "--threads",
+    "8",
+    "--max-tokens",
+    "8192",
+    "--int8-weights",
+    "artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations",
+    "--json"
+  ],
+  "binary_sha256": "4451dc2620e28a3df912b8a2bf5dc158b03249a48b11e796dd7165ec1c71324c",
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "purpose": "Single fresh-process maximum-crop resource/quality check; not a repeated latency benchmark.",
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 7129841664,
+    "user_cpu_seconds": 424.702565,
+    "system_cpu_seconds": 93.224744,
+    "major_faults": 1001,
+    "minor_faults": 1070985
+  },
+  "wall_seconds": 104.46253691700986,
+  "image_tokens": 3793,
+  "finish_reason": "token_limit",
+  "emitted_tokens": 8192,
+  "cer": 7.184860120680198
+}
