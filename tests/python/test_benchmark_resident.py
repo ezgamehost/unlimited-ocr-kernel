@@ -36,6 +36,13 @@ class ResidentBenchmarkTests(unittest.TestCase):
                 self.assertIn(kind.name, actual['label'])
 
     def test_native_driver_records_resources_and_repeated_independent_requests(self):
+        self.native_driver_case()
+
+    def test_native_driver_accepts_declared_single_view_and_rejects_mismatch(self):
+        self.native_driver_case(273, 273)
+        self.native_driver_case(273, 1513, expect_error=True)
+
+    def native_driver_case(self, expected_tokens=None, actual_tokens=1513, expect_error=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             image = root / 'image.png'
@@ -43,6 +50,10 @@ class ResidentBenchmarkTests(unittest.TestCase):
             manifest = root / 'manifest.json'
             manifest.write_text(json.dumps({'images': [{'id': 'sample', 'path': 'image.png',
                 'text': 'OK', 'sha256': hashlib.sha256(image.read_bytes()).hexdigest()}]}))
+            if expected_tokens is not None:
+                data = json.loads(manifest.read_text())
+                data['images'][0]['expected_image_tokens'] = expected_tokens
+                manifest.write_text(json.dumps(data))
             binary = root / 'fake-native'
             binary.write_text('#!' + sys.executable + '\n' + """
 import json, sys
@@ -51,21 +62,38 @@ for line in sys.stdin:
     request = json.loads(line)
     assert request['prompt'] == '<image>\\ndocument parsing.'
     result = dict(text='OK', token_ids=[17, 42], finish_reason='eos', precision='fixture',
-                  image_tokens=1513, timings=dict(first_token_seconds=.01, decode_seconds=.01,
+                  image_tokens=EXPECTED_TOKENS, timings=dict(first_token_seconds=.01, decode_seconds=.01,
                   decode_steps=2, vision_seconds=.01, prefill_seconds=.01))
     print(json.dumps(dict(status='ok', result=result)), flush=True)
-""")
+""".replace('EXPECTED_TOKENS', str(actual_tokens)))
             binary.chmod(0o755)
             args = SimpleNamespace(engine='native', binary=binary, model=root,
                     int8_weights=None, int8_activations=False, threads=1, blas_threads=1,
                     manifest=manifest, output=root / 'result', warmups=1, repetitions=1,
                     seed=42, max_tokens=8192, timeout=1, startup_timeout=.5)
+            if expect_error:
+                with self.assertRaisesRegex(RuntimeError, 'unexpected image token count'):
+                    run(args)
+                return
             summary = run(args)
             self.assertTrue(summary['complete'])
             self.assertEqual(summary['per_image']['sample']['completed'], 1)
             process = json.loads((args.output / 'process.json').read_text())
             self.assertGreater(process['resources']['peak_rss_bytes'], 0)
             self.assertEqual(process['resources']['exit_code'], 0)
+            expected = 1513 if expected_tokens is None else expected_tokens
+            self.assertEqual(process['expected_tokens_by_image']['sample'],
+                             {'image_tokens': expected, 'prefix_tokens': expected + 5})
+            self.assertEqual(process['prefix_tokens'], expected + 5)
+
+    def test_server_timing_rejects_wrong_prefix_and_cache_reuse(self):
+        import tools.benchmark_resident as resident
+        self.assertTrue(hasattr(resident, 'validate_server_timing'))
+        resident.validate_server_timing({'cache_n': 0, 'prompt_n': 278}, 278)
+        for timing in ({'cache_n': 0, 'prompt_n': 1518},
+                       {'cache_n': 1, 'prompt_n': 278}):
+            with self.assertRaises(ValueError):
+                resident.validate_server_timing(timing, 278)
 
     def test_actual_stream_preserves_tokens_and_requires_terminal_event(self):
         state = StreamAccumulator()

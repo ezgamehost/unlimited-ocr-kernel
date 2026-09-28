@@ -159,13 +159,24 @@ def http_json(url, timeout):
         return json.load(response)
 
 
+def validate_server_timing(timing, expected_prefix_tokens):
+    if timing['cache_n'] != 0 or timing['prompt_n'] != expected_prefix_tokens:
+        raise ValueError('cached or mismatched prompt in server response')
+
+
 def run(args):
     env = benchmark_environment(args.threads, args.blas_threads)
     manifest = json.loads(args.manifest.read_text())
     images = {item['id']: item for item in manifest['images']}
     if len(images) != len(manifest['images']):
         raise ValueError('duplicate image IDs')
+    expectations = {}
     for item in images.values():
+        count = item.get('expected_image_tokens', 1513)
+        if type(count) is not int or count <= 0:
+            raise ValueError('expected_image_tokens must be a positive integer')
+        # The fixed matched prompt contributes five non-image tokens.
+        expectations[item['id']] = dict(image_tokens=count, prefix_tokens=count + 5)
         item['resolved_path'] = str((args.manifest.parent / item['path']).resolve())
         validate_image(Path(item['resolved_path']), item['sha256'])
     jobs = schedule(list(images), args.warmups, args.repetitions, args.seed)
@@ -183,6 +194,7 @@ def run(args):
             command += ['--int8-weights', str(args.int8_weights.resolve())]
         if args.int8_activations:
             command += ['--int8-activations']
+    prefix_counts = {v['prefix_tokens'] for v in expectations.values()}
     metadata = dict(engine=args.engine, command=command, process_mode='resident-independent-requests',
                     started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     system=platform.platform(), schedule=jobs, max_tokens=args.max_tokens,
@@ -190,7 +202,9 @@ def run(args):
                     binary_sha256=hashlib.sha256(args.binary.read_bytes()).hexdigest(),
                     runner_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                     warmups_per_image=args.warmups, measured_per_image=args.repetitions,
-                    seed=args.seed, manifest=manifest, prefix_tokens=1518,
+                    seed=args.seed, manifest=manifest,
+                    prefix_tokens=next(iter(prefix_counts)) if len(prefix_counts) == 1 else None,
+                    expected_tokens_by_image=expectations,
                     native_prompt='<image>\ndocument parsing.',
                     attention_note='native preserved prefix plus 128 generated; llama full attention',
                     first_token_note='native internal clock; llama first streamed content/token arrival')
@@ -247,6 +261,7 @@ def run(args):
                                   startup_seconds=metadata['startup_wall_seconds'])), flush=True)
             for index, job in enumerate(jobs):
                 item = images[job['image_id']]
+                expected = expectations[job['image_id']]
                 prefix = args.output / f'{index:03}-{job["image_id"]}'
                 record = dict(job, index=index, image_sha256=item['sha256'], status='error',
                               finish_reason='error', first_token_seconds=None)
@@ -270,7 +285,7 @@ def run(args):
                                       first_token_seconds=timing['first_token_seconds'],
                                       decode_seconds=timing['decode_seconds'], decode_steps=timing['decode_steps'],
                                       vision_seconds=timing['vision_seconds'], prefill_seconds=timing['prefill_seconds'])
-                        if result['image_tokens'] != 1513:
+                        if result['image_tokens'] != expected['image_tokens']:
                             raise ValueError('unexpected image token count')
                     else:
                         payload = dict(prompt=dict(prompt_string=props['media_marker'] + 'document parsing.',
@@ -305,8 +320,7 @@ def run(args):
                         save(prefix.with_suffix('.raw.json'), result)
                         text, tokens = completion_text_without_eos(result, props['eos_token'])
                         timing = result['timings']
-                        if timing['cache_n'] != 0 or timing['prompt_n'] != 1518:
-                            raise ValueError('cached or mismatched prompt in server response')
+                        validate_server_timing(timing, expected['prefix_tokens'])
                         finish = 'context_limit' if result['truncated'] else result['stop_type']
                         record.update(finish_reason='token_limit' if finish == 'limit' else finish,
                                       decode_seconds=timing['predicted_ms'] / 1000,
