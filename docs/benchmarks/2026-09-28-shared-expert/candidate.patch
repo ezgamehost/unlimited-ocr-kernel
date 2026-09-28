@@ -1,0 +1,75 @@
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index db63d3c..ba7fc65 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -139,7 +139,6 @@ impl<'a> Decoder<'a> {
+                 assignments[expert].push((row, probability));
+             }
+         }
+-        let mut result = self.feed_forward(x, &format!("{prefix}.shared_experts"), cpu)?;
+         if x.shape[0] == 1 && cpu.threads() > 1 {
+             let selected: Vec<_> = assignments
+                 .iter()
+@@ -149,27 +148,42 @@ impl<'a> Decoder<'a> {
+             // Reserve conservatively for expanded F16/F32 matrices as well as
+             // dynamic activation quantization. Low-memory requests keep the
+             // serial-expert path instead of acquiring a stricter failure mode.
+-            let width = self.config.moe_intermediate_size;
++            let task_count = selected.len() + 1;
++            let width = self
++                .config
++                .moe_intermediate_size
++                .checked_mul(self.config.n_shared_experts.max(1));
+             let scratch = width
+-                .checked_add(hidden)
+-                .and_then(|n| n.checked_mul(3))
+-                .and_then(|n| {
++                .and_then(|width| {
+                     width
+-                        .checked_mul(hidden)
+-                        .and_then(|matrix| n.checked_add(matrix))
++                        .checked_add(hidden)
++                        .and_then(|n| n.checked_mul(3))
++                        .and_then(|n| {
++                            width
++                                .checked_mul(hidden)
++                                .and_then(|matrix| n.checked_add(matrix))
++                        })
+                 })
+-                .and_then(|n| n.checked_mul(selected.len()));
++                .and_then(|n| n.checked_mul(task_count));
++
+             if !selected.is_empty() && scratch.is_some_and(|n| cpu.check_elements(n).is_ok()) {
+                 let pool = std::sync::Arc::clone(&cpu.pool);
+                 let outputs: Vec<_> = pool.install(|| {
+-                    selected
+-                        .par_iter()
+-                        .map(|&(expert, _)| {
+-                            let mut worker = cpu.serial_worker(selected.len());
+-                            self.feed_forward(x, &format!("{prefix}.experts.{expert}"), &mut worker)
++                    (0..task_count)
++                        .into_par_iter()
++                        .map(|task| {
++                            let mut worker = cpu.serial_worker(task_count);
++                            let name = if task == 0 {
++                                format!("{prefix}.shared_experts")
++                            } else {
++                                format!("{prefix}.experts.{}", selected[task - 1].0)
++                            };
++                            self.feed_forward(x, &name, &mut worker)
+                         })
+                         .collect()
+                 });
++                let mut outputs = outputs.into_iter();
++                let mut result = outputs.next().expect("shared expert task exists")?;
+                 // Indexed collection and ordered accumulation preserve the original
+                 // expert reduction order regardless of task completion order.
+                 for ((_, probability), output) in selected.into_iter().zip(outputs) {
+@@ -180,6 +194,7 @@ impl<'a> Decoder<'a> {
+                 return Ok(result);
+             }
+         }
++        let mut result = self.feed_forward(x, &format!("{prefix}.shared_experts"), cpu)?;
+         for (expert, rows) in assignments.into_iter().enumerate() {
+             if rows.is_empty() {
+                 continue;

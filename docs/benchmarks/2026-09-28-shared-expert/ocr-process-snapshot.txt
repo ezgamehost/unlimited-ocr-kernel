@@ -1,0 +1,12 @@
+  PID  %CPU COMM
+66536 127.2 bun
+67965  30.2 target/release/uocr
+62041  24.8 /usr/libexec/spotlightknowledged.updater
+61915  10.7 /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine
+ 7676   7.2 /Applications/Ghostty.app/Contents/MacOS/ghostty
+ 3527   5.7 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+  158   5.1 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer
+  930   4.8 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/corespotlightd
+ 1021   4.4 /System/Library/CoreServices/WindowManager.app/Contents/MacOS/WindowManager
+ 7242   4.4 /Applications/Spotify.app/Contents/Frameworks/Spotify Helper (Renderer).app/Contents/MacOS/Spotify Helper (Renderer)
+28299   4.0 claude
