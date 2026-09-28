@@ -72,3 +72,16 @@ not a process-memory ceiling. Inspection gives the following more precise scope:
 These are source-derived payload calculations, not observed peak RSS. The
 32-crop acceptance run and resource comparison must still measure actual child
 RSS after the current timing run finishes.
+
+
+## Window-shape follow-up
+
+Item 1 is now addressed for the two public window functions: derived window
+counts and output shapes use checked multiplication before indexing or allocation;
+allocation uses fallible reservation; unpartition rejects empty tensor dimensions.
+Regression tests reproduced an overflow panic and inconsistent empty-input
+acceptance before the change. Full Rust tests and clippy pass. All six release
+vision tests pass when the three original artifact-dependent fixtures are included,
+including full multi-crop pixels and image embeddings. Logs are retained in
+[window-bounds](window-bounds/). This is not a global scratch-memory bound and does
+not resolve the remaining prepared-image/config/checkpoint descriptor findings.

@@ -1,7 +1,16 @@
 use crate::{
     error::{OcrError, Result},
-    tensor::Tensor,
+    tensor::{Tensor, element_count},
 };
+
+fn zeroed_window_storage(shape: &[usize]) -> Result<Vec<f32>> {
+    let count = element_count(shape)?;
+    let mut data = Vec::new();
+    data.try_reserve_exact(count)
+        .map_err(|e| OcrError::Resource(format!("window allocation: {e}")))?;
+    data.resize(count, 0.);
+    Ok(data)
+}
 
 pub fn window_partition(x: &Tensor, window: usize) -> Result<Tensor> {
     x.validate()?;
@@ -10,7 +19,9 @@ pub fn window_partition(x: &Tensor, window: usize) -> Result<Tensor> {
     }
     let (batch, h, w, c) = (x.shape[0], x.shape[1], x.shape[2], x.shape[3]);
     let (ny, nx) = (h.div_ceil(window), w.div_ceil(window));
-    let mut data = vec![0.; batch * ny * nx * window * window * c];
+    let windows = element_count(&[batch, ny, nx])?;
+    let shape = vec![windows, window, window, c];
+    let mut data = zeroed_window_storage(&shape)?;
     for b in 0..batch {
         for y in 0..h {
             for xx in 0..w {
@@ -23,12 +34,13 @@ pub fn window_partition(x: &Tensor, window: usize) -> Result<Tensor> {
             }
         }
     }
-    Tensor::new(vec![batch * ny * nx, window, window, c], data)
+    Tensor::new(shape, data)
 }
 
 pub fn window_unpartition(x: &Tensor, h: usize, w: usize, window: usize) -> Result<Tensor> {
     x.validate()?;
     if x.shape.len() != 4
+        || x.shape.contains(&0)
         || h == 0
         || w == 0
         || window == 0
@@ -38,12 +50,14 @@ pub fn window_unpartition(x: &Tensor, h: usize, w: usize, window: usize) -> Resu
         return Err(OcrError::Shape("window output layout".into()));
     }
     let (ny, nx) = (h.div_ceil(window), w.div_ceil(window));
-    if !x.shape[0].is_multiple_of(ny * nx) {
+    let windows = element_count(&[ny, nx])?;
+    if !x.shape[0].is_multiple_of(windows) {
         return Err(OcrError::Shape("window batch mismatch".into()));
     }
-    let batch = x.shape[0] / (ny * nx);
+    let batch = x.shape[0] / windows;
     let c = x.shape[3];
-    let mut data = vec![0.; batch * h * w * c];
+    let shape = vec![batch, h, w, c];
+    let mut data = zeroed_window_storage(&shape)?;
     for b in 0..batch {
         for y in 0..h {
             for xx in 0..w {
@@ -56,7 +70,7 @@ pub fn window_unpartition(x: &Tensor, h: usize, w: usize, window: usize) -> Resu
             }
         }
     }
-    Tensor::new(vec![batch, h, w, c], data)
+    Tensor::new(shape, data)
 }
 
 fn cubic(x: f32) -> f32 {

@@ -8,6 +8,23 @@ use uocr::{
 };
 
 #[test]
+fn window_shapes_reject_overflow_before_allocation() {
+    let one = Tensor::new(vec![1, 1, 1, 1], vec![1.]).unwrap();
+    for size in [usize::MAX, 1usize << (usize::BITS / 2)] {
+        assert!(window_partition(&one, size).is_err());
+        assert!(window_unpartition(&one, size, size, 1).is_err());
+    }
+}
+
+#[test]
+fn unpartition_rejects_empty_window_storage() {
+    for shape in [vec![0, 1, 1, 1], vec![1, 1, 1, 0]] {
+        let empty = Tensor::new(shape, vec![]).unwrap();
+        assert!(window_unpartition(&empty, 1, 1, 1).is_err());
+    }
+}
+
+#[test]
 fn padded_window_partition_is_reversible() {
     let x = Tensor::new(vec![1, 3, 5, 2], (0..30).map(|x| x as f32).collect()).unwrap();
     let windows = window_partition(&x, 2).unwrap();
