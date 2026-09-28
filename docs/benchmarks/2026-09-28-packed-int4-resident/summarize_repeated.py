@@ -123,7 +123,7 @@ def main():
     result = dict(audited_requests=96, all_eos=True, engines=engines, comparison=comparison,
         notes=['ABBA process order; two warmups and ten measurements per image/engine.',
                'Nearest-rank p95 with ten measurements is the maximum; all outliers retained.',
-               'Hybrid Q4/Q8-head vs llama Q8_0, differing vision storage and attention/repetition policies.',
+               f'Native {native_precision} vs llama Q8_0, differing vision storage and attention/repetition policies.',
                'CER and generation length differences are reported; these are system-level results.',
                'TTFT/decode clock boundaries differ by engine; raw timings retained.',
                'Startup and exact-child lifetime RSS are per-process observations, not per-page measurements.',

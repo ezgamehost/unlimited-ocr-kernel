@@ -10,9 +10,9 @@ competitor, not a runtime dependency.
 This is an active performance project. Portable scalar fallbacks exist, but
 other CPU platforms have not received equivalent optimization or benchmarking.
 On the four primary synthetic pages, the latest repeated resident comparison
-measures a **1.26–1.44× median full-page speedup over llama.cpp** with the hybrid
-Q4/Q8-head decoder. Standalone token decoding remains slower. See the
-[full-page results and limits](docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-2/README.md).
+measures a **1.30–1.54× median full-page speedup over llama.cpp Q8** with the
+native dynamic-activation Q8 decoder. Standalone token decoding remains slower.
+See the [Q8 full-page results and limits](docs/benchmarks/2026-09-28-current-q8/README.md).
 The hybrid has a confirmed accuracy regression on the
 [32-crop stress input](docs/benchmarks/2026-09-28-hybrid-max32/README.md); the
 four-page speedup does not establish general quantization accuracy.

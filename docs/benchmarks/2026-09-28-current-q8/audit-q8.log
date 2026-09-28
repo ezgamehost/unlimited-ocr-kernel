@@ -1,0 +1,46 @@
+{
+  "table": {
+    "median_speed_ratio_llama_over_native": 1.4938612707352448,
+    "cer_equal": true,
+    "emitted_tokens_equal": true,
+    "native_cer": [
+      0.00398406374501992
+    ],
+    "llama_cer": [
+      0.00398406374501992
+    ]
+  },
+  "chinese": {
+    "median_speed_ratio_llama_over_native": 1.5262185043226835,
+    "cer_equal": true,
+    "emitted_tokens_equal": true,
+    "native_cer": [
+      0.0
+    ],
+    "llama_cer": [
+      0.0
+    ]
+  },
+  "dense": {
+    "median_speed_ratio_llama_over_native": 1.3020393237768966,
+    "cer_equal": true,
+    "emitted_tokens_equal": true,
+    "native_cer": [
+      0.0
+    ],
+    "llama_cer": [
+      0.0
+    ]
+  },
+  "english": {
+    "median_speed_ratio_llama_over_native": 1.5441589209833049,
+    "cer_equal": true,
+    "emitted_tokens_equal": true,
+    "native_cer": [
+      0.0
+    ],
+    "llama_cer": [
+      0.0
+    ]
+  }
+}
