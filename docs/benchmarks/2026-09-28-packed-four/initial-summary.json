@@ -1,0 +1,10 @@
+{
+  "baseline": {
+    "decode_with_checksum_seconds": 3.738125646,
+    "prefill_seconds": 1.4526964164999998
+  },
+  "candidate": {
+    "decode_with_checksum_seconds": 3.6214515835,
+    "prefill_seconds": 1.978875896
+  }
+}

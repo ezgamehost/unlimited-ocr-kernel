@@ -1,0 +1,409 @@
+diff --git a/src/cpu/neon.rs b/src/cpu/neon.rs
+index e35d265..7e5d3ed 100644
+--- a/src/cpu/neon.rs
++++ b/src/cpu/neon.rs
+@@ -238,10 +238,176 @@ pub(super) unsafe fn dot_int8_four_rows(
+     result
+ }
+ 
++/// Four rows stored as consecutive 32-byte blocks with interleaved scales.
++#[cfg(target_arch = "aarch64")]
++#[target_feature(enable = "dotprod")]
++pub(super) unsafe fn dot_int8_packed_four(
++    weights: &[i8],
++    x: &[i8],
++    scales: &[f32],
++    xs: &[f32],
++) -> [f32; 4] {
++    use std::arch::aarch64::*;
++    assert!(x.len().is_multiple_of(32));
++    assert_eq!(weights.len().checked_div(4), Some(x.len()));
++    assert!(weights.len().is_multiple_of(4));
++    assert_eq!(xs.len(), x.len() / 32);
++    assert_eq!(scales.len(), xs.len() * 4);
++    let mut total = vdupq_n_f32(0.);
++    for (b, &scale) in xs.iter().enumerate() {
++        // SAFETY: caller checks dotprod. The validated packed block holds
++        // four complete rows of 32 bytes and four contiguous scales.
++        unsafe {
++            let x0 = vld1q_s8(x.as_ptr().add(b * 32));
++            let x1 = vld1q_s8(x.as_ptr().add(b * 32 + 16));
++            let mut sums = [vdupq_n_s32(0); 4];
++            for (row, sum) in sums.iter_mut().enumerate() {
++                let w = weights.as_ptr().add(b * 128 + row * 32);
++                *sum = vdotq_s32(vdotq_s32(*sum, vld1q_s8(w), x0), vld1q_s8(w.add(16)), x1);
++            }
++            let sums = vpaddq_s32(vpaddq_s32(sums[0], sums[1]), vpaddq_s32(sums[2], sums[3]));
++            let scaled = vmulq_n_f32(
++                vmulq_f32(vcvtq_f32_s32(sums), vld1q_f32(scales.as_ptr().add(b * 4))),
++                scale,
++            );
++            total = vaddq_f32(total, scaled);
++        }
++    }
++    let mut result = [0.; 4];
++    // SAFETY: four writable output floats.
++    unsafe {
++        vst1q_f32(result.as_mut_ptr(), total);
++    }
++    result
++}
++
+ #[cfg(all(test, target_arch = "aarch64"))]
+ mod tests {
+     use super::*;
+ 
++    fn pack_four(weights: &[i8], scales: &[f32], cols: usize) -> (Vec<i8>, Vec<f32>) {
++        let blocks = cols / 32;
++        let mut packed = Vec::with_capacity(weights.len());
++        let mut packed_scales = Vec::with_capacity(scales.len());
++        for group in 0..weights.len() / (4 * cols) {
++            for block in 0..blocks {
++                for row in 0..4 {
++                    let offset = (group * 4 + row) * cols + block * 32;
++                    packed.extend_from_slice(&weights[offset..offset + 32]);
++                    packed_scales.push(scales[(group * 4 + row) * blocks + block]);
++                }
++            }
++        }
++        (packed, packed_scales)
++    }
++
++    #[test]
++    fn packed_four_preserves_scalar_block_products() {
++        if !std::arch::is_aarch64_feature_detected!("dotprod") {
++            return;
++        }
++        // Wrong packed strides, lane order, or fused accumulation must fail.
++        for cols in [32usize, 64, 896, 1280, 1792, 6848] {
++            let blocks = cols / 32;
++            let w: Vec<i8> = (0..cols * 8)
++                .map(|i| ((i * 53 % 256) as i16 - 128) as i8)
++                .collect();
++            let x: Vec<i8> = (0..cols)
++                .map(|i| ((i * 71 % 256) as i16 - 128) as i8)
++                .collect();
++            let ws: Vec<f32> = (0..blocks * 8)
++                .map(|i| [0., 0.00317, 0.7, 1e-10, 17.][i % 5])
++                .collect();
++            let xs: Vec<f32> = (0..blocks).map(|i| (i % 17 + 1) as f32 / 123.).collect();
++            let (pw, ps) = pack_four(&w, &ws, cols);
++            let mut unaligned = vec![0i8];
++            unaligned.extend_from_slice(&pw);
++            for group in 0..2 {
++                // SAFETY: detected ISA, complete rows and matching scale counts.
++                let actual = unsafe {
++                    dot_int8_packed_four(
++                        &unaligned[1 + group * 4 * cols..1 + (group + 1) * 4 * cols],
++                        &x,
++                        &ps[group * 4 * blocks..(group + 1) * 4 * blocks],
++                        &xs,
++                    )
++                };
++                for (r, actual) in actual.iter().enumerate() {
++                    let row = group * 4 + r;
++                    let mut expected = 0f32;
++                    for b in 0..blocks {
++                        let sum: i32 = (0..32)
++                            .map(|j| w[row * cols + b * 32 + j] as i32 * x[b * 32 + j] as i32)
++                            .sum();
++                        expected += sum as f32 * ws[row * blocks + b] * xs[b];
++                    }
++                    assert_eq!(
++                        actual.to_bits(),
++                        expected.to_bits(),
++                        "cols={cols} row={row}"
++                    );
++                }
++            }
++        }
++    }
++
++    #[test]
++    #[ignore = "isolated single-thread packed-layout experiment"]
++    fn benchmark_dot_int8_packed_four() {
++        if !std::arch::is_aarch64_feature_detected!("dotprod") {
++            return;
++        }
++        for (rows, cols, repeats) in [
++            (896usize, 1280usize, 8192),
++            (1280, 896, 8192),
++            (129280, 1280, 128),
++        ] {
++            let blocks = cols / 32;
++            let w: Vec<i8> = (0..rows * cols)
++                .map(|i| ((i * 53 % 255) as i16 - 127) as i8)
++                .collect();
++            let x: Vec<i8> = (0..cols)
++                .map(|i| ((i * 71 % 255) as i16 - 127) as i8)
++                .collect();
++            let ws: Vec<f32> = (0..rows * blocks)
++                .map(|i| (i % 17 + 1) as f32 / 123.)
++                .collect();
++            let xs = vec![0.013; blocks];
++            let packing = std::time::Instant::now();
++            let (pw, ps) = pack_four(&w, &ws, cols);
++            let packing_seconds = packing.elapsed().as_secs_f64();
++            for (round, packed) in [false, true, true, false, false, true]
++                .into_iter()
++                .enumerate()
++            {
++                let start = std::time::Instant::now();
++                let mut checksum = 0u64;
++                for _ in 0..repeats {
++                    for row in (0..rows).step_by(4) {
++                        let (weights, scales) = if packed { (&pw, &ps) } else { (&w, &ws) };
++                        let weights = std::hint::black_box(&weights[row * cols..(row + 4) * cols]);
++                        let scales = &scales[row * blocks..(row + 4) * blocks];
++                        // SAFETY: ISA detected; complete groups and block-aligned width.
++                        let output = unsafe {
++                            if packed {
++                                dot_int8_packed_four(weights, &x, scales, &xs)
++                            } else {
++                                dot_int8_four_rows(weights, &x, scales, &xs)
++                            }
++                        };
++                        for v in output {
++                            checksum = checksum.wrapping_add(v.to_bits() as u64);
++                        }
++                    }
++                }
++                println!(
++                    "{}",
++                    serde_json::json!({"rows":rows,"cols":cols,"repeats":repeats,"packed":packed,"round":round,"seconds":start.elapsed().as_secs_f64(),"packing_seconds":packing_seconds,"checksum":std::hint::black_box(checksum)})
++                );
++            }
++        }
++    }
++
+     #[test]
+     fn four_rows_match_single_row_dot_bits() {
+         if !std::arch::is_aarch64_feature_detected!("dotprod") {
+diff --git a/src/cpu/quantized.rs b/src/cpu/quantized.rs
+index 1b3ea59..3e3bf47 100644
+--- a/src/cpu/quantized.rs
++++ b/src/cpu/quantized.rs
+@@ -13,8 +13,34 @@ pub struct Int8Matrix {
+     cols: usize,
+     weights: Vec<i8>,
+     scales: Vec<f32>,
++    packed: bool,
+ }
+ impl Int8Matrix {
++    /// Reorder complete four-row blocks in place for dynamic INT8 decoding.
++    pub fn pack_for_decode(&mut self) {
++        if self.packed || !self.rows.is_multiple_of(4) || !self.cols.is_multiple_of(BLOCK) {
++            return;
++        }
++        let blocks = self.cols / BLOCK;
++        // Only one four-row scratch group; never duplicate the whole model.
++        let mut weights = vec![0i8; self.cols * 4];
++        let mut scales = vec![0f32; blocks * 4];
++        for group in 0..self.rows / 4 {
++            let base = group * self.cols * 4;
++            let scale_base = group * blocks * 4;
++            weights.copy_from_slice(&self.weights[base..base + self.cols * 4]);
++            scales.copy_from_slice(&self.scales[scale_base..scale_base + blocks * 4]);
++            for b in 0..blocks {
++                for row in 0..4 {
++                    let src = row * self.cols + b * BLOCK;
++                    let dest = base + (b * 4 + row) * BLOCK;
++                    self.weights[dest..dest + BLOCK].copy_from_slice(&weights[src..src + BLOCK]);
++                    self.scales[scale_base + b * 4 + row] = scales[row * blocks + b];
++                }
++            }
++        }
++        self.packed = true;
++    }
+     pub fn from_parts(
+         rows: usize,
+         cols: usize,
+@@ -38,6 +64,7 @@ impl Int8Matrix {
+             cols,
+             weights,
+             scales,
++            packed: false,
+         })
+     }
+     pub fn quantize(matrix: &Tensor) -> Result<Self> {
+@@ -75,6 +102,18 @@ impl Int8Matrix {
+     pub fn dequantize(&self) -> Result<Tensor> {
+         let blocks = self.cols.div_ceil(BLOCK);
+         let mut data = vec![0.; self.weights.len()];
++        if self.packed {
++            for row in 0..self.rows {
++                for b in 0..blocks {
++                    let (weights, scale) = self.packed_block(row, b);
++                    let start = row * self.cols + b * BLOCK;
++                    for (dest, &w) in data[start..start + BLOCK].iter_mut().zip(weights) {
++                        *dest = w as f32 * scale;
++                    }
++                }
++            }
++            return Tensor::new(vec![self.rows, self.cols], data);
++        }
+         for ((weights, scales), output) in self
+             .weights
+             .chunks_exact(self.cols)
+@@ -96,6 +135,10 @@ impl Int8Matrix {
+     pub fn storage_bytes(&self) -> usize {
+         self.weights.len() + self.scales.len() * 4
+     }
++    fn packed_block(&self, row: usize, block: usize) -> (&[i8], f32) {
++        let b = row / 4 * (self.cols / BLOCK) * 4 + block * 4 + row % 4;
++        (&self.weights[b * BLOCK..(b + 1) * BLOCK], self.scales[b])
++    }
+     pub fn linear(&self, x: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
+         x.validate()?;
+         if x.shape.last() != Some(&self.cols) {
+@@ -117,6 +160,14 @@ impl Int8Matrix {
+         }
+         let blocks = self.cols.div_ceil(BLOCK);
+         let dot = |row: usize| {
++            if self.packed {
++                return (0..self.cols)
++                    .map(|j| {
++                        let (weights, scale) = self.packed_block(row, j / BLOCK);
++                        weights[j % BLOCK] as f32 * scale * x.data[j]
++                    })
++                    .sum();
++            }
+             let w = &self.weights[row * self.cols..(row + 1) * self.cols];
+             let scales = &self.scales[row * blocks..(row + 1) * blocks];
+             #[cfg(target_arch = "aarch64")]
+@@ -172,6 +223,20 @@ impl Int8Matrix {
+         let dotprod =
+             cpu.backend != Backend::Scalar && std::arch::is_aarch64_feature_detected!("dotprod");
+         let dot = |row: usize| {
++            if self.packed {
++                return (0..blocks)
++                    .map(|b| {
++                        let (weights, scale) = self.packed_block(row, b);
++                        let input = &activation.weights[b * BLOCK..(b + 1) * BLOCK];
++                        let sum: i32 = weights
++                            .iter()
++                            .zip(input)
++                            .map(|(&w, &x)| w as i32 * x as i32)
++                            .sum();
++                        sum as f32 * scale * activation.scales[b]
++                    })
++                    .sum();
++            }
+             let weights = &self.weights[row * self.cols..(row + 1) * self.cols];
+             let scales = &self.scales[row * blocks..(row + 1) * blocks];
+             #[cfg(target_arch = "aarch64")]
+@@ -205,12 +270,23 @@ impl Int8Matrix {
+                 // SAFETY: feature detection above; four complete validated rows
+                 // with columns divisible by the kernel's 32-element block.
+                 let result = unsafe {
+-                    super::neon::dot_int8_four_rows(
+-                        &self.weights[first * self.cols..(first + 4) * self.cols],
+-                        &activation.weights,
+-                        &self.scales[first * blocks..(first + 4) * blocks],
+-                        &activation.scales,
+-                    )
++                    let weights = &self.weights[first * self.cols..(first + 4) * self.cols];
++                    let scales = &self.scales[first * blocks..(first + 4) * blocks];
++                    if self.packed {
++                        super::neon::dot_int8_packed_four(
++                            weights,
++                            &activation.weights,
++                            scales,
++                            &activation.scales,
++                        )
++                    } else {
++                        super::neon::dot_int8_four_rows(
++                            weights,
++                            &activation.weights,
++                            scales,
++                            &activation.scales,
++                        )
++                    }
+                 };
+                 output.copy_from_slice(&result);
+                 return;
+@@ -303,6 +379,11 @@ fn eligible(name: &str) -> bool {
+ }
+ 
+ impl QuantizedWeights {
++    pub(crate) fn pack_for_decode(&mut self) {
++        for matrix in self.matrices.values_mut() {
++            matrix.pack_for_decode();
++        }
++    }
+     pub fn load(path: &std::path::Path, source: &crate::checkpoint::Checkpoint) -> Result<Self> {
+         use crate::checkpoint::{Checkpoint, DType};
+         let manifest: Manifest =
+diff --git a/src/model/mod.rs b/src/model/mod.rs
+index a3fc872..7d6c266 100644
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -93,9 +93,14 @@ impl Model {
+         let config = config::ModelConfig::load(&directory.join("config.json"))?;
+         let checkpoint = Checkpoint::open(&directory.join("model-00001-of-000001.safetensors"))?;
+         Decoder::new(&checkpoint, config.clone())?;
+-        let quantized = overlay
++        let mut quantized = overlay
+             .map(|path| crate::cpu::quantized::QuantizedWeights::load(path, &checkpoint))
+             .transpose()?;
++        if mode == crate::cpu::quantized::QuantizationMode::DynamicActivations
++            && let Some(weights) = &mut quantized
++        {
++            weights.pack_for_decode();
++        }
+         let vision = Vision::new(&checkpoint)?;
+         let tokenizer = PromptEncoder::load(&directory.join("tokenizer.json"))?;
+         Ok(Self {
+diff --git a/tests/quantized.rs b/tests/quantized.rs
+index ad7ca84..05e6f23 100644
+--- a/tests/quantized.rs
++++ b/tests/quantized.rs
+@@ -3,6 +3,48 @@ use uocr::{
+     tensor::Tensor,
+ };
+ 
++#[test]
++fn packed_storage_preserves_dequantization_prefill_and_dynamic_decode() {
++    for (rows, cols) in [(8, 32), (132, 1280), (12, 896), (9, 33), (7, 64)] {
++        let original = Tensor::new(
++            vec![rows, cols],
++            (0..rows * cols).map(|i| (i as f32 * 0.37).sin()).collect(),
++        )
++        .unwrap();
++        let reference = Int8Matrix::quantize(&original).unwrap();
++        let mut packed = Int8Matrix::quantize(&original).unwrap();
++        let bytes = packed.storage_bytes();
++        packed.pack_for_decode();
++        packed.pack_for_decode(); // Idempotence must not scramble the layout.
++        assert_eq!(packed.storage_bytes(), bytes);
++        assert_eq!(
++            packed.dequantize().unwrap().data,
++            reference.dequantize().unwrap().data
++        );
++        for backend in [Backend::Scalar, Backend::Auto] {
++            let mut cpu = CpuContext::new(backend, 3, 1 << 24).unwrap();
++            let x = Tensor::new(
++                vec![1, cols],
++                (0..cols).map(|i| (i as f32 * 0.17).cos()).collect(),
++            )
++            .unwrap();
++            assert_eq!(
++                packed.linear_dynamic_int8(&x, &mut cpu).unwrap().data,
++                reference.linear_dynamic_int8(&x, &mut cpu).unwrap().data
++            );
++            let x = Tensor::new(
++                vec![3, cols],
++                (0..cols * 3).map(|i| (i as f32 * 0.17).cos()).collect(),
++            )
++            .unwrap();
++            assert_eq!(
++                packed.linear(&x, &mut cpu).unwrap().data,
++                reference.linear(&x, &mut cpu).unwrap().data
++            );
++        }
++    }
++}
++
+ #[test]
+ fn dequantization_matches_correctly_rounded_products_across_row_tails() {
+     for cols in [1usize, 31, 32, 33, 513, 1280] {

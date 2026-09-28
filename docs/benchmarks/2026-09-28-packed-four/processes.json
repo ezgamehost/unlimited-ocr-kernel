@@ -1,0 +1,54 @@
+[
+  {
+    "index": 0,
+    "variant": "baseline",
+    "command": [
+      "artifacts/packed-four-baseline",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "84d412c0ae998a600faede0189b53cf3325c3fd9d44eba30ddb2a2268346a3e8",
+    "exit_code": 0
+  },
+  {
+    "index": 1,
+    "variant": "candidate",
+    "command": [
+      "artifacts/packed-four-candidate",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "91bfef43743a15189f725f25057f85f7e4d43199d117b9bd09529cd24e624fd0",
+    "exit_code": 0
+  },
+  {
+    "index": 2,
+    "variant": "candidate",
+    "command": [
+      "artifacts/packed-four-candidate",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "91bfef43743a15189f725f25057f85f7e4d43199d117b9bd09529cd24e624fd0",
+    "exit_code": 0
+  },
+  {
+    "index": 3,
+    "variant": "baseline",
+    "command": [
+      "artifacts/packed-four-baseline",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "84d412c0ae998a600faede0189b53cf3325c3fd9d44eba30ddb2a2268346a3e8",
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,19 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.73s
+     Running tests/quantized.rs (target/debug/deps/quantized-1f65773f488e1896)
+
+running 1 test
+
+thread 'packed_storage_preserves_dequantization_prefill_and_dynamic_decode' (3832325) panicked at src/cpu/quantized.rs:20:9:
+not yet implemented: packed matrix storage
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test packed_storage_preserves_dequantization_prefill_and_dynamic_decode ... FAILED
+
+failures:
+
+failures:
+    packed_storage_preserves_dequantization_prefill_and_dynamic_decode
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test quantized`
