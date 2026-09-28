@@ -1,0 +1,125 @@
+{
+  "native": {
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 6013911040,
+      "user_cpu_seconds": 109.647077,
+      "system_cpu_seconds": 31.546958,
+      "major_faults": 797,
+      "minor_faults": 934540
+    },
+    "images": {
+      "bilingual_notice": {
+        "emitted_tokens": 384,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 7.8085184170049615,
+        "precision": "int8_weights_dynamic_activations"
+      },
+      "wide_report": {
+        "emitted_tokens": 355,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 5.45609091699589,
+        "precision": "int8_weights_dynamic_activations"
+      },
+      "archive_register": {
+        "emitted_tokens": 1790,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 17.672659332980402,
+        "precision": "int8_weights_dynamic_activations"
+      },
+      "receipt": {
+        "emitted_tokens": 0,
+        "cer": 1.0,
+        "finish_reason": "eos",
+        "wall_seconds": 2.0820585830078926,
+        "precision": "int8_weights_dynamic_activations"
+      }
+    }
+  },
+  "native-bf16": {
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 8621490176,
+      "user_cpu_seconds": 148.921966,
+      "system_cpu_seconds": 29.294841,
+      "major_faults": 394913,
+      "minor_faults": 349173
+    },
+    "images": {
+      "bilingual_notice": {
+        "emitted_tokens": 384,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 15.762250291008968,
+        "precision": "bf16_weights_fp32"
+      },
+      "wide_report": {
+        "emitted_tokens": 355,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 6.8573597079957835,
+        "precision": "bf16_weights_fp32"
+      },
+      "archive_register": {
+        "emitted_tokens": 1790,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 24.19330087499111,
+        "precision": "bf16_weights_fp32"
+      },
+      "receipt": {
+        "emitted_tokens": 0,
+        "cer": 1.0,
+        "finish_reason": "eos",
+        "wall_seconds": 2.3421001249807887,
+        "precision": "bf16_weights_fp32"
+      }
+    }
+  },
+  "llama": {
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 9062039552,
+      "user_cpu_seconds": 283.00271,
+      "system_cpu_seconds": 7.682222,
+      "major_faults": 193407,
+      "minor_faults": 968341
+    },
+    "images": {
+      "bilingual_notice": {
+        "emitted_tokens": 384,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 7.834748459019465,
+        "precision": "F32+Q8_0 decoder, F16+F32 projector (storage)"
+      },
+      "wide_report": {
+        "emitted_tokens": 355,
+        "cer": 0.0,
+        "finish_reason": "eos",
+        "wall_seconds": 5.387287416990148,
+        "precision": "F32+Q8_0 decoder, F16+F32 projector (storage)"
+      },
+      "archive_register": {
+        "emitted_tokens": 2497,
+        "cer": 0.43879533678756477,
+        "finish_reason": "eos",
+        "wall_seconds": 20.454432583996095,
+        "precision": "F32+Q8_0 decoder, F16+F32 projector (storage)"
+      },
+      "receipt": {
+        "emitted_tokens": 0,
+        "cer": 1.0,
+        "finish_reason": "eos",
+        "wall_seconds": 2.4122796659939922,
+        "precision": "F32+Q8_0 decoder, F16+F32 projector (storage)"
+      }
+    }
+  }
+}

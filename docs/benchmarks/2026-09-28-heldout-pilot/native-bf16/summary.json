@@ -1,0 +1,36 @@
+{
+  "complete": true,
+  "protocol_complete": true,
+  "expected_requests": 4,
+  "collected_requests": 4,
+  "per_image": {
+    "receipt": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 2.3421001249807887,
+      "p95_seconds": 2.3421001249807887
+    },
+    "wide_report": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 6.8573597079957835,
+      "p95_seconds": 6.8573597079957835
+    },
+    "bilingual_notice": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 15.762250291008968,
+      "p95_seconds": 15.762250291008968
+    },
+    "archive_register": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 24.19330087499111,
+      "p95_seconds": 24.19330087499111
+    }
+  }
+}

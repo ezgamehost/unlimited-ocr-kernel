@@ -1,0 +1,869 @@
+{
+  "engine": "llama",
+  "command": [
+    "/private/tmp/unlimited-ocr-baseline/bin/llama-b11223/llama-server",
+    "-m",
+    "/private/tmp/unlimited-ocr-baseline/models/model.gguf",
+    "--mmproj",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf",
+    "-ngl",
+    "0",
+    "--device",
+    "none",
+    "--no-mmproj-offload",
+    "--no-op-offload",
+    "--no-kv-offload",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-c",
+    "32768",
+    "-n",
+    "8192",
+    "--temp",
+    "0",
+    "--seed",
+    "42",
+    "--repeat-penalty",
+    "1",
+    "--no-warmup",
+    "--special",
+    "--jinja",
+    "-lv",
+    "4",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "55722",
+    "--parallel",
+    "1",
+    "--no-cache-prompt",
+    "--cache-ram",
+    "0",
+    "--no-cache-idle-slots",
+    "--no-context-shift",
+    "--offline"
+  ],
+  "process_mode": "resident-independent-requests",
+  "started_utc": "2026-09-28T13:08:29.995616+00:00",
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "schedule": [
+    {
+      "image_id": "bilingual_notice",
+      "iteration": 0,
+      "warmup": false
+    },
+    {
+      "image_id": "wide_report",
+      "iteration": 0,
+      "warmup": false
+    },
+    {
+      "image_id": "archive_register",
+      "iteration": 0,
+      "warmup": false
+    },
+    {
+      "image_id": "receipt",
+      "iteration": 0,
+      "warmup": false
+    }
+  ],
+  "max_tokens": 8192,
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "binary_sha256": "6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6",
+  "runner_sha256": "23dc01766a93bb244aafab8b96fc5478e409de55e67315bac407e1e7104b4334",
+  "warmups_per_image": 0,
+  "measured_per_image": 1,
+  "seed": 42,
+  "manifest": {
+    "schema_version": 1,
+    "pillow_version": "12.1.1",
+    "description": "Frozen synthetic validation pages, unused by prior kernel tuning. Not representative production scans. Do not revise content in response to OCR output.",
+    "images": [
+      {
+        "id": "receipt",
+        "path": "receipt.png",
+        "text": "HARBOR STATIONERY\nReceipt R-08421\n2026-09-28 09:35\n\nDescription          Qty    Total\nPocket notebook        3    9.75\nBlue ink pen           5    7.50\nDocument folder        2    4.20\n\nSubtotal                   21.45\nTax                         1.72\nAmount paid                23.17\nCard ending                 6038\n\nItems may be returned within\n30 days with this receipt.\nThank you for your visit.",
+        "sha256": "c321d851be414272b01626a291def6b16aca47c004e889b771e66cbc2da0c3ac",
+        "width": 480,
+        "height": 640,
+        "expected_crop_grid": [
+          1,
+          1
+        ],
+        "expected_image_tokens": 273,
+        "line_bounds": [
+          [
+            32,
+            35,
+            202,
+            47
+          ],
+          [
+            32,
+            60,
+            182,
+            75
+          ],
+          [
+            32,
+            85,
+            192,
+            97
+          ],
+          [
+            32,
+            107,
+            32,
+            107
+          ],
+          [
+            32,
+            135,
+            362,
+            150
+          ],
+          [
+            32,
+            160,
+            352,
+            172
+          ],
+          [
+            32,
+            185,
+            352,
+            200
+          ],
+          [
+            32,
+            210,
+            352,
+            222
+          ],
+          [
+            32,
+            232,
+            32,
+            232
+          ],
+          [
+            32,
+            260,
+            352,
+            272
+          ],
+          [
+            32,
+            285,
+            352,
+            297
+          ],
+          [
+            32,
+            310,
+            352,
+            325
+          ],
+          [
+            32,
+            335,
+            352,
+            350
+          ],
+          [
+            32,
+            357,
+            32,
+            357
+          ],
+          [
+            32,
+            385,
+            312,
+            400
+          ],
+          [
+            32,
+            410,
+            292,
+            425
+          ],
+          [
+            32,
+            435,
+            282,
+            450
+          ]
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 16,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/receipt.png"
+      },
+      {
+        "id": "wide_report",
+        "path": "wide_report.png",
+        "text": "WATER QUALITY FIELD REPORT\nStation: Willow Creek East     Survey: WC-1186     Date: 28 September 2026\n\nThe morning survey covered the upstream bridge and the southern footpath.\nThree sealed samples were collected before the first scheduled discharge.\nSample A: 08:15, temperature 18.4 C, pH 7.2, conductivity 412 uS/cm.\nSample B: 08:27, temperature 18.6 C, pH 7.1, conductivity 409 uS/cm.\nSample C: 08:42, temperature 18.5 C, pH 7.3, conductivity 415 uS/cm.\n\nNo visible surface film was observed. The water appeared clear at all locations.\nEach sample bottle was labelled, photographed, and placed in the transport case.\nLaboratory results are pending; these observations are not a safety certification.\n\nPrepared by: Field Operations     Reviewed by: Laboratory Services",
+        "sha256": "a9bb7f5678b6935e040fa2054cbbf1f291ca45e405eb9744a7713cbe917165d1",
+        "width": 1280,
+        "height": 640,
+        "expected_crop_grid": [
+          2,
+          1
+        ],
+        "expected_image_tokens": 483,
+        "line_bounds": [
+          [
+            39,
+            46,
+            402,
+            66
+          ],
+          [
+            40,
+            80,
+            810,
+            102
+          ],
+          [
+            40,
+            110,
+            40,
+            110
+          ],
+          [
+            40,
+            150,
+            813,
+            172
+          ],
+          [
+            40,
+            185,
+            776,
+            207
+          ],
+          [
+            40,
+            220,
+            752,
+            242
+          ],
+          [
+            40,
+            255,
+            756,
+            277
+          ],
+          [
+            40,
+            290,
+            754,
+            312
+          ],
+          [
+            40,
+            320,
+            40,
+            320
+          ],
+          [
+            40,
+            360,
+            838,
+            382
+          ],
+          [
+            40,
+            395,
+            863,
+            417
+          ],
+          [
+            40,
+            430,
+            850,
+            452
+          ],
+          [
+            40,
+            460,
+            40,
+            460
+          ],
+          [
+            40,
+            500,
+            716,
+            522
+          ]
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Georgia.ttf",
+        "font_sha256": "4f54eb299fccea7f103edeb0d92437359bfd4441811d53222b82b335369f6218",
+        "font_size": 23,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/wide_report.png"
+      },
+      {
+        "id": "bilingual_notice",
+        "path": "bilingual_notice.png",
+        "text": "社区图书馆开放通知\nCOMMUNITY LIBRARY NOTICE\n\n开放日期：二零二六年十月五日\nOpening date: 5 October 2026\n\n周一至周五：上午九点至下午六点\nSaturday: 10:00 to 16:00\n星期日闭馆。\n\n一楼设有借阅服务台和报刊阅读区。\n二楼提供自习座位和小组讨论室。\n请保持安静，并将手机调至静音。\n\nBorrow up to six books for three weeks.\nReturn books at the main entrance desk.\nPlease bring your library card.\n\n咨询电话：010-5550-2186\n服务邮箱：library@example.org\n欢迎居民和访客使用图书馆服务。",
+        "sha256": "5cde119fff9d3b2a30ada522613db7ce5ecdf6472ca398095a396eca6d8b7b56",
+        "width": 960,
+        "height": 960,
+        "expected_crop_grid": [
+          2,
+          2
+        ],
+        "expected_image_tokens": 693,
+        "line_bounds": [
+          [
+            40,
+            46,
+            265,
+            69
+          ],
+          [
+            40,
+            88,
+            410,
+            106
+          ],
+          [
+            40,
+            118,
+            40,
+            118
+          ],
+          [
+            40,
+            163,
+            390,
+            186
+          ],
+          [
+            40,
+            205,
+            378,
+            228
+          ],
+          [
+            40,
+            235,
+            40,
+            235
+          ],
+          [
+            40,
+            280,
+            415,
+            304
+          ],
+          [
+            40,
+            322,
+            316,
+            345
+          ],
+          [
+            40,
+            358,
+            190,
+            381
+          ],
+          [
+            40,
+            391,
+            40,
+            391
+          ],
+          [
+            40,
+            435,
+            440,
+            459
+          ],
+          [
+            40,
+            475,
+            415,
+            499
+          ],
+          [
+            40,
+            513,
+            415,
+            538
+          ],
+          [
+            40,
+            547,
+            40,
+            547
+          ],
+          [
+            40,
+            595,
+            482,
+            618
+          ],
+          [
+            40,
+            634,
+            495,
+            652
+          ],
+          [
+            40,
+            673,
+            376,
+            696
+          ],
+          [
+            40,
+            703,
+            40,
+            703
+          ],
+          [
+            40,
+            748,
+            335,
+            771
+          ],
+          [
+            40,
+            786,
+            398,
+            813
+          ],
+          [
+            40,
+            826,
+            415,
+            850
+          ]
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+        "font_sha256": "876af2cd4854644e7f3e7feb2f688997fdb3343c6df6693611209c9dfb47ccec",
+        "font_size": 25,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/bilingual_notice.png"
+      },
+      {
+        "id": "archive_register",
+        "path": "archive_register.png",
+        "text": "ARCHIVE TRANSFER REGISTER\nBatch AT-5603 / Storage room B7\n\n01. File AX-7311: 24 sheets; destination: sealed cabinet.\n    Seal 92017; received at 14:01; condition checked by clerk 2.\n02. File AX-7312: 37 sheets; destination: review desk.\n    Seal 92034; received at 14:02; condition checked by clerk 3.\n03. File AX-7313: 50 sheets; destination: map drawer.\n    Seal 92051; received at 14:03; condition checked by clerk 1.\n04. File AX-7314: 63 sheets; destination: north shelf.\n    Seal 92068; received at 14:04; condition checked by clerk 2.\n05. File AX-7315: 76 sheets; destination: sealed cabinet.\n    Seal 92085; received at 14:05; condition checked by clerk 3.\n06. File AX-7316: 89 sheets; destination: review desk.\n    Seal 92102; received at 14:06; condition checked by clerk 1.\n07. File AX-7317: 23 sheets; destination: map drawer.\n    Seal 92119; received at 14:07; condition checked by clerk 2.\n08. File AX-7318: 36 sheets; destination: north shelf.\n    Seal 92136; received at 14:08; condition checked by clerk 3.\n09. File AX-7319: 49 sheets; destination: sealed cabinet.\n    Seal 92153; received at 14:09; condition checked by clerk 1.\n10. File AX-7320: 62 sheets; destination: review desk.\n    Seal 92170; received at 14:10; condition checked by clerk 2.\n11. File AX-7321: 75 sheets; destination: map drawer.\n    Seal 92187; received at 14:11; condition checked by clerk 3.\n12. File AX-7322: 88 sheets; destination: north shelf.\n    Seal 92204; received at 14:12; condition checked by clerk 1.\n13. File AX-7323: 22 sheets; destination: sealed cabinet.\n    Seal 92221; received at 14:13; condition checked by clerk 2.\n14. File AX-7324: 35 sheets; destination: review desk.\n    Seal 92238; received at 14:14; condition checked by clerk 3.\n15. File AX-7325: 48 sheets; destination: map drawer.\n    Seal 92255; received at 14:15; condition checked by clerk 1.\n16. File AX-7326: 61 sheets; destination: north shelf.\n    Seal 92272; received at 14:16; condition checked by clerk 2.\n17. File AX-7327: 74 sheets; destination: sealed cabinet.\n    Seal 92289; received at 14:17; condition checked by clerk 3.\n18. File AX-7328: 87 sheets; destination: review desk.\n    Seal 92306; received at 14:18; condition checked by clerk 1.\n19. File AX-7329: 21 sheets; destination: map drawer.\n    Seal 92323; received at 14:19; condition checked by clerk 2.\n20. File AX-7330: 34 sheets; destination: north shelf.\n    Seal 92340; received at 14:20; condition checked by clerk 3.\n21. File AX-7331: 47 sheets; destination: sealed cabinet.\n    Seal 92357; received at 14:21; condition checked by clerk 1.\n22. File AX-7332: 60 sheets; destination: review desk.\n    Seal 92374; received at 14:22; condition checked by clerk 2.\n23. File AX-7333: 73 sheets; destination: map drawer.\n    Seal 92391; received at 14:23; condition checked by clerk 3.\n24. File AX-7334: 86 sheets; destination: north shelf.\n    Seal 92408; received at 14:24; condition checked by clerk 1.\n25. File AX-7335: 20 sheets; destination: sealed cabinet.\n    Seal 92425; received at 14:25; condition checked by clerk 2.\n26. File AX-7336: 33 sheets; destination: review desk.\n    Seal 92442; received at 14:26; condition checked by clerk 3.",
+        "sha256": "9fc07f3e2fcd3579149c9549232d68242f050d6e91e5e7e8f827aa25966d055a",
+        "width": 1024,
+        "height": 1536,
+        "expected_crop_grid": [
+          2,
+          3
+        ],
+        "expected_image_tokens": 903,
+        "line_bounds": [
+          [
+            39,
+            44,
+            302,
+            56
+          ],
+          [
+            40,
+            68,
+            296,
+            85
+          ],
+          [
+            40,
+            90,
+            40,
+            90
+          ],
+          [
+            40,
+            118,
+            453,
+            134
+          ],
+          [
+            40,
+            143,
+            499,
+            160
+          ],
+          [
+            40,
+            168,
+            437,
+            184
+          ],
+          [
+            40,
+            193,
+            504,
+            210
+          ],
+          [
+            40,
+            218,
+            441,
+            235
+          ],
+          [
+            40,
+            243,
+            498,
+            260
+          ],
+          [
+            40,
+            268,
+            433,
+            284
+          ],
+          [
+            40,
+            293,
+            506,
+            310
+          ],
+          [
+            40,
+            318,
+            456,
+            334
+          ],
+          [
+            40,
+            343,
+            503,
+            360
+          ],
+          [
+            40,
+            368,
+            439,
+            384
+          ],
+          [
+            40,
+            393,
+            500,
+            410
+          ],
+          [
+            40,
+            418,
+            441,
+            435
+          ],
+          [
+            40,
+            443,
+            499,
+            460
+          ],
+          [
+            40,
+            468,
+            433,
+            484
+          ],
+          [
+            40,
+            493,
+            501,
+            510
+          ],
+          [
+            40,
+            518,
+            459,
+            534
+          ],
+          [
+            40,
+            543,
+            498,
+            560
+          ],
+          [
+            40,
+            568,
+            439,
+            584
+          ],
+          [
+            40,
+            593,
+            499,
+            610
+          ],
+          [
+            40,
+            618,
+            436,
+            635
+          ],
+          [
+            40,
+            643,
+            495,
+            660
+          ],
+          [
+            40,
+            668,
+            434,
+            684
+          ],
+          [
+            40,
+            693,
+            500,
+            710
+          ],
+          [
+            40,
+            718,
+            457,
+            734
+          ],
+          [
+            40,
+            743,
+            499,
+            760
+          ],
+          [
+            40,
+            768,
+            437,
+            784
+          ],
+          [
+            40,
+            793,
+            501,
+            810
+          ],
+          [
+            40,
+            818,
+            442,
+            835
+          ],
+          [
+            40,
+            843,
+            497,
+            860
+          ],
+          [
+            40,
+            868,
+            431,
+            884
+          ],
+          [
+            40,
+            893,
+            502,
+            910
+          ],
+          [
+            40,
+            918,
+            456,
+            934
+          ],
+          [
+            40,
+            943,
+            501,
+            960
+          ],
+          [
+            40,
+            968,
+            438,
+            984
+          ],
+          [
+            40,
+            993,
+            499,
+            1010
+          ],
+          [
+            40,
+            1018,
+            441,
+            1035
+          ],
+          [
+            40,
+            1043,
+            501,
+            1060
+          ],
+          [
+            40,
+            1068,
+            435,
+            1084
+          ],
+          [
+            40,
+            1093,
+            504,
+            1110
+          ],
+          [
+            40,
+            1118,
+            454,
+            1134
+          ],
+          [
+            40,
+            1143,
+            497,
+            1160
+          ],
+          [
+            40,
+            1168,
+            441,
+            1184
+          ],
+          [
+            40,
+            1193,
+            504,
+            1210
+          ],
+          [
+            40,
+            1218,
+            442,
+            1235
+          ],
+          [
+            40,
+            1243,
+            500,
+            1260
+          ],
+          [
+            40,
+            1268,
+            436,
+            1284
+          ],
+          [
+            40,
+            1293,
+            503,
+            1310
+          ],
+          [
+            40,
+            1318,
+            459,
+            1334
+          ],
+          [
+            40,
+            1343,
+            504,
+            1360
+          ],
+          [
+            40,
+            1368,
+            439,
+            1384
+          ],
+          [
+            40,
+            1393,
+            505,
+            1410
+          ]
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Georgia.ttf",
+        "font_sha256": "4f54eb299fccea7f103edeb0d92437359bfd4441811d53222b82b335369f6218",
+        "font_size": 17,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/archive_register.png"
+      }
+    ]
+  },
+  "prefix_tokens": null,
+  "expected_tokens_by_image": {
+    "receipt": {
+      "image_tokens": 273,
+      "prefix_tokens": 278
+    },
+    "wide_report": {
+      "image_tokens": 483,
+      "prefix_tokens": 488
+    },
+    "bilingual_notice": {
+      "image_tokens": 693,
+      "prefix_tokens": 698
+    },
+    "archive_register": {
+      "image_tokens": 903,
+      "prefix_tokens": 908
+    }
+  },
+  "native_prompt": "<image>\ndocument parsing.",
+  "attention_note": "native preserved prefix plus 128 generated; llama full attention",
+  "first_token_note": "native internal clock; llama first streamed content/token arrival",
+  "gguf_storage": {
+    "decoder": {
+      "label": "F32+Q8_0",
+      "tensor_types": {
+        "Q8_0": 119,
+        "F32": 36
+      },
+      "elements_by_type": {
+        "Q8_0": 2933800960,
+        "F32": 933120
+      },
+      "declared_file_type": 7
+    },
+    "projector": {
+      "label": "F16+F32",
+      "tensor_types": {
+        "F32": 330,
+        "F16": 146
+      },
+      "elements_by_type": {
+        "F32": 11236352,
+        "F16": 390135808
+      },
+      "declared_file_type": 1
+    }
+  },
+  "precision": "F32+Q8_0 decoder, F16+F32 projector (storage)",
+  "startup_wall_seconds": 4.925098708976293,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 9062039552,
+    "user_cpu_seconds": 283.00271,
+    "system_cpu_seconds": 7.682222,
+    "major_faults": 193407,
+    "minor_faults": 968341
+  },
+  "process_wall_seconds": 42.544245666998904,
+  "failure": null
+}
