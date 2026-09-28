@@ -27,6 +27,10 @@ def main():
     parser.add_argument('--input-root', type=Path, default=ROOT)
     root = parser.parse_args().input_root
     identity = read(root / 'repeated-identity.json')
+    native_precision = {
+        'uocr-q4-q8head-block32-v1': 'int4_body_int8_head_dynamic_int8_activations',
+        'uocr-q8-block32-v1': 'int8_weights_dynamic_activations',
+    }[identity['overlay_manifest']['format']]
     phases = []
     all_rows = {'native': [], 'llama': []}
     decoded = {'native': {}, 'llama': {}}
@@ -70,7 +74,7 @@ def main():
             if engine == 'native':
                 result = raw['result']
                 assert raw['status'] == 'ok' and result['finish_reason'] == 'eos'
-                assert result['precision'] == row['precision'] == 'int4_body_int8_head_dynamic_int8_activations'
+                assert result['precision'] == row['precision'] == native_precision
                 assert result['timings'] == row['timings']
                 expected_text, expected_tokens = result['text'], result['token_ids']
             else:

@@ -1,0 +1,16 @@
+{
+  "command": [
+    ".venv/bin/python",
+    "docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py",
+    "--native-precision",
+    "int8",
+    "--quality-proof",
+    "docs/benchmarks/2026-09-28-kv-layout-probe/quality",
+    "--output-root",
+    "docs/benchmarks/2026-09-28-current-q8/guard-rejected"
+  ],
+  "exit_code": 1,
+  "stderr": "Traceback (most recent call last):\n  File \"/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py\", line 88, in <module>\n    main()\n  File \"/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py\", line 52, in main\n    assert overlay_manifest == quality_process['overlay_manifest'], 'quality proof overlay does not match requested precision'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: quality proof overlay does not match requested precision\n",
+  "output_created": false,
+  "purpose": "Reject hybrid quality proof for requested Q8 precision before inference."
+}

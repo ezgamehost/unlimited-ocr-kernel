@@ -21,6 +21,7 @@ def require_ac_power():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-root', type=Path, required=True, help='New directory for this complete ABBA series')
+    parser.add_argument('--native-precision', choices=['hybrid', 'int8'], default='hybrid')
     parser.add_argument('--quality-proof', type=Path,
                         default=ROOT.parent / '2026-09-28-hybrid-int4/packed-equivalence',
                         help='Completed exact 12-case OCR proof for the native executable')
@@ -42,9 +43,14 @@ def main():
     llama = Path('/tmp/unlimited-ocr-baseline/bin/llama-b11223/llama-server')
     model = Path('/tmp/unlimited-ocr-baseline/models/model.gguf')
     projector = Path('artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf')
-    overlay = Path('artifacts/unlimited-ocr-q4-q8head-block32.safetensors')
+    overlay_name, overlay_sha = {
+        'hybrid': ('unlimited-ocr-q4-q8head-block32.safetensors', '6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae'),
+        'int8': ('unlimited-ocr-q8-block32.safetensors', 'b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441'),
+    }[options.native_precision]
+    overlay = Path('artifacts') / overlay_name
     overlay_manifest = json.loads(overlay.with_suffix('.json').read_text())
-    assert overlay_manifest == quality_process['overlay_manifest']
+    assert overlay_manifest == quality_process['overlay_manifest'], 'quality proof overlay does not match requested precision'
+    assert overlay_manifest['output_sha256'] == overlay_sha
     expected = {llama: '6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6',
                 model: '149574e63ec2681bbfb3d0f83ca1064e041fd6f3a97a62382d3168ad64289848',
                 projector: '75dcbeafd883b3f27bee1a3d95c3ef57a6305c16758912af7cf62e6cf4c009a6',
@@ -54,6 +60,7 @@ def main():
         assert hashes[str(path.resolve())] == digest, path
     assert hashes[str(native.resolve())] == quality_process['binary_sha256']
     identity = dict(hashes=hashes, overlay_manifest=overlay_manifest, initial_power=initial_power,
+                    native_precision=options.native_precision,
                     quality_proof=dict(path=str(quality_root), comparison_sha256=sha256(quality_root / 'comparison.json'),
                                        process_sha256=sha256(quality_root / 'process.json')),
                     source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
