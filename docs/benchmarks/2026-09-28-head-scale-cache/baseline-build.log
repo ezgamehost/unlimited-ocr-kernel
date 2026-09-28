@@ -1,0 +1,3 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 15.19s
+  Executable unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)

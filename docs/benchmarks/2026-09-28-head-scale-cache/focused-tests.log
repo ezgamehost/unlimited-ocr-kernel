@@ -1,0 +1,30 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 16.19s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 11 tests
+test cpu::cache_probe::compare_kv_strides ... ignored, isolated attention layout timing probe; macOS Accelerate required
+test model::benchmark::fixed_work_decoder_benchmark ... ignored, requires original weights, INT8 overlay, and English vision reference
+test model::benchmark::table_prompt_quantization_diagnostic ... ignored, requires pinned model, overlays and table page
+test cpu::neon::tests::four_rows_match_single_row_dot_bits ... ok
+test cpu::neon::tests::interleaved_scales_match_row_major_bits_on_unaligned_inputs ... ok
+test cpu::neon::tests::packed_four_rows_match_i8_simulation_bits ... ok
+test cpu::tests::expert_worker_reuses_pool_but_limits_inner_parallelism_and_memory ... ok
+test model::tests::image_scatter_validates_shape_and_positions_before_mutation ... ok
+test cpu::blas_threads::tests::single_thread_guard_restores_nested_and_unwound_policy ... ok
+test vision::sam::tests::relative_bias_rows_preserve_indexed_formula ... ok
+test cpu::neon_gelu::tests::gelu_matches_libm_bits_for_boundaries_mixed_lanes_alignment_and_tails ... ok
+
+test result: ok. 8 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/quantized.rs (target/release/deps/quantized-21e3b1163353c50f)
+
+running 5 tests
+test invalid_int8_storage_scales_and_weights_are_rejected ... ok
+test dequantization_matches_correctly_rounded_products_across_row_tails ... ok
+test prepared_decode_scales_preserve_outputs_and_account_for_memory ... ok
+test dynamic_int8_activation_dot_matches_explicit_quantized_reference ... ok
+test int8_blocks_roundtrip_zero_rows_tails_and_linear ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

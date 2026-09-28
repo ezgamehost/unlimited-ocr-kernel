@@ -1,0 +1,9 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `dot_int8_four_rows_interleaved_scales` in this scope
+   --> src/cpu/neon.rs:316:37
+    |
+316 | ...   let actual=unsafe { dot_int8_four_rows_interleaved_scales(&w[offset..],&x[offset..],&packed[offset..],&xs[offset..]) };
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 1 previous error
