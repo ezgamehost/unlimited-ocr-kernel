@@ -1,0 +1,7 @@
+/.tools/
+/.venv/
+/artifacts/
+/target/
+/.superpowers/
+__pycache__/
+*.pyc

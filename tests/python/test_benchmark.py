@@ -1,0 +1,60 @@
+"""Catch biased aggregation, corrupt fixture acceptance and inaccurate scoring."""
+import tempfile
+import unittest
+from pathlib import Path
+
+from tools.benchmark import aggregate, validate_image
+from tools.score import character_error_rate, normalize_ocr
+
+
+class BenchmarkTests(unittest.TestCase):
+    def test_failure_and_truncation_cannot_improve_latency(self):
+        records = [
+            dict(status="ok", finish_reason="eos", wall_seconds=4.0),
+            dict(status="ok", finish_reason="eos", wall_seconds=6.0),
+            dict(status="error", finish_reason="error", wall_seconds=0.01),
+            dict(status="ok", finish_reason="token_limit", wall_seconds=0.1),
+        ]
+        summary = aggregate(records)
+        self.assertEqual(summary["completed"], 2)
+        self.assertEqual(summary["failed"], 1)
+        self.assertEqual(summary["truncated"], 1)
+        self.assertEqual(summary["median_seconds"], 5.0)
+        self.assertEqual(summary["p95_seconds"], 6.0)
+
+    def test_empty_and_failed_benchmark_has_no_throughput_claim(self):
+        self.assertIsNone(aggregate([])["median_seconds"])
+        self.assertIsNone(aggregate([dict(status="error")])["p95_seconds"])
+
+    def test_nonfinite_and_negative_durations_rejected(self):
+        for value in [float("nan"), float("inf"), -1.0]:
+            with self.assertRaises(ValueError):
+                aggregate([dict(status="ok", finish_reason="eos", wall_seconds=value)])
+
+    def test_corrupt_fixture_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "image.png"
+            image.write_bytes(b"changed")
+            with self.assertRaises(ValueError):
+                validate_image(image, "0" * 64)
+
+    def test_character_edits_and_empty_reference(self):
+        self.assertEqual(character_error_rate("ABCD", "ABCD"), 0.0)
+        self.assertEqual(character_error_rate("ABCD", "ABXD"), 0.25)
+        self.assertEqual(character_error_rate("中文识别", "中文识别"), 0.0)
+        self.assertEqual(character_error_rate("abcd", "abc"), 0.25)
+        self.assertEqual(character_error_rate("", ""), 0.0)
+        with self.assertRaises(ValueError):
+            character_error_rate("", "invented")
+
+    def test_normalization_preserves_recognized_numbers(self):
+        raw = "<|det|>text [0, 1, 20, 30]<|/det|>Invoice 123\nTotal 42.50"
+        self.assertEqual(normalize_ocr(raw), "Invoice 123 Total 42.50")
+
+    def test_html_table_cells_are_scored_as_recognized_text(self):
+        raw = '<table><tr><td>A &amp; B</td><td>12.50</td></tr><tr><td>Total</td><td>12.50</td></tr></table>'
+        self.assertEqual(normalize_ocr(raw), 'A & B 12.50 Total 12.50')
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,176 @@
+//! Read-only safetensors storage. Files must not be modified while mapped.
+use crate::error::{OcrError, Result};
+use memmap2::{Mmap, MmapOptions};
+use serde::Deserialize;
+use std::{collections::BTreeMap, fs::File, path::Path};
+
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+pub enum DType {
+    BF16,
+    F16,
+    F32,
+    I64,
+}
+
+impl DType {
+    fn bytes(self) -> usize {
+        match self {
+            Self::BF16 | Self::F16 => 2,
+            Self::F32 => 4,
+            Self::I64 => 8,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct Descriptor {
+    dtype: DType,
+    shape: Vec<usize>,
+    data_offsets: [usize; 2],
+}
+
+pub struct Checkpoint {
+    mapping: Mmap,
+    data_start: usize,
+    tensors: BTreeMap<String, Descriptor>,
+}
+
+#[derive(Clone, Copy)]
+pub struct WeightView<'a> {
+    pub dtype: DType,
+    pub shape: &'a [usize],
+    pub bytes: &'a [u8],
+}
+
+impl WeightView<'_> {
+    pub fn validate(&self) -> Result<()> {
+        let size = self
+            .shape
+            .iter()
+            .try_fold(1usize, |n, &d| n.checked_mul(d))
+            .and_then(|n| n.checked_mul(self.dtype.bytes()));
+        if size != Some(self.bytes.len()) {
+            return Err(OcrError::Shape("weight view byte length".into()));
+        }
+        Ok(())
+    }
+    pub fn len(&self) -> usize {
+        self.bytes.len() / self.dtype.bytes()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.bytes.is_empty()
+    }
+
+    pub fn to_f32(&self) -> Vec<f32> {
+        match self.dtype {
+            DType::BF16 => self
+                .bytes
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .map(|b| f32::from_bits(u32::from(u16::from_le_bytes([b[0], b[1]])) << 16))
+                .collect(),
+            DType::F16 => self
+                .bytes
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .map(|b| half::f16::from_bits(u16::from_le_bytes([b[0], b[1]])).to_f32())
+                .collect(),
+            DType::F32 => self
+                .bytes
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|b| f32::from_le_bytes(*b))
+                .collect(),
+            DType::I64 => self
+                .bytes
+                .as_chunks::<8>()
+                .0
+                .iter()
+                .map(|b| i64::from_le_bytes(*b) as f32)
+                .collect(),
+        }
+    }
+}
+
+impl Checkpoint {
+    /// The caller must ensure no process truncates or changes `path` during use.
+    /// Artifacts should be downloaded atomically to a versioned immutable path.
+    pub fn open(path: &Path) -> Result<Self> {
+        let file = File::open(path)?;
+        if file.metadata()?.len() < 8 {
+            return Err(OcrError::Format("missing header length".into()));
+        }
+        // SAFETY: read-only mapping retained for the lifetime of borrowed views.
+        // No typed references are formed from possibly unaligned payload bytes.
+        // External file mutation is forbidden by the documented file contract.
+        let mapping = unsafe { MmapOptions::new().map(&file)? };
+        let header_len = u64::from_le_bytes(mapping[..8].try_into().unwrap());
+        let header_len = usize::try_from(header_len)
+            .map_err(|_| OcrError::Format("header length overflow".into()))?;
+        if header_len > 100_000_000 {
+            return Err(OcrError::Format("header exceeds 100 MB".into()));
+        }
+        let data_start = header_len
+            .checked_add(8)
+            .filter(|&n| n <= mapping.len())
+            .ok_or_else(|| OcrError::Format("truncated header".into()))?;
+        let mut header: BTreeMap<String, serde_json::Value> =
+            serde_json::from_slice(&mapping[8..data_start])?;
+        header.remove("__metadata__");
+        let mut tensors = BTreeMap::new();
+        for (name, value) in header {
+            let descriptor: Descriptor = serde_json::from_value(value)?;
+            let count = descriptor
+                .shape
+                .iter()
+                .try_fold(1usize, |a, &b| a.checked_mul(b))
+                .and_then(|n| n.checked_mul(descriptor.dtype.bytes()))
+                .ok_or_else(|| OcrError::Format(format!("tensor size overflow: {name}")))?;
+            let [start, end] = descriptor.data_offsets;
+            if end < start || end - start != count || end > mapping.len() - data_start {
+                return Err(OcrError::Format(format!("invalid tensor offsets: {name}")));
+            }
+            tensors.insert(name, descriptor);
+        }
+        let mut spans: Vec<_> = tensors.values().map(|d| d.data_offsets).collect();
+        spans.sort_unstable();
+        let mut cursor = 0;
+        for [start, end] in spans {
+            if start != cursor {
+                return Err(OcrError::Format(
+                    "payload gaps or overlapping tensors".into(),
+                ));
+            }
+            cursor = end;
+        }
+        if cursor != mapping.len() - data_start {
+            return Err(OcrError::Format("unclaimed trailing payload".into()));
+        }
+        Ok(Self {
+            mapping,
+            data_start,
+            tensors,
+        })
+    }
+
+    pub fn tensor(&self, name: &str) -> Result<WeightView<'_>> {
+        let d = self
+            .tensors
+            .get(name)
+            .ok_or_else(|| OcrError::Format(format!("missing tensor: {name}")))?;
+        Ok(WeightView {
+            dtype: d.dtype,
+            shape: &d.shape,
+            bytes: &self.mapping
+                [self.data_start + d.data_offsets[0]..self.data_start + d.data_offsets[1]],
+        })
+    }
+
+    pub fn names(&self) -> impl Iterator<Item = &str> {
+        self.tensors.keys().map(String::as_str)
+    }
+}

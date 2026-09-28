@@ -1,0 +1,16 @@
+MEETING NOTES
+
+Date: September 27, 2026
+
+The research team reviewed the new document recognition system.
+Every result must include the original input and a clear transcript.
+We measure complete page latency, memory use, and character errors.
+Faster processing is useful only when the output remains accurate.
+
+Actions for next week:
+1. Check English and Chinese documents.
+2. Test tables, small print, and unusual page dimensions.
+3. Save failures and incomplete outputs with the successful results.
+4. Compare identical inputs on the same computer.
+
+Approved by: Research Operations

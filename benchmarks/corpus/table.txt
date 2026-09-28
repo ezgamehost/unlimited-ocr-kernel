@@ -1,0 +1,16 @@
+PURCHASE ORDER
+
+Order: PO-2026-0927
+Currency: USD
+
+Item              Qty    Unit price      Amount
+Paper reams        12         6.25       75.00
+Ink cartridges      4        32.50      130.00
+Archive boxes      18         4.75       85.50
+Shipping            1        12.00       12.00
+
+Subtotal                               302.50
+Tax                                     24.20
+Total                                  326.70
+
+Payment due: October 27, 2026
