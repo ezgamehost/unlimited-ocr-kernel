@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import platform
 import re
 import statistics
@@ -11,6 +12,26 @@ import time
 from pathlib import Path
 
 from tools.score import character_error_rate, normalize_ocr
+
+
+def benchmark_environment(threads: int, blas_threads: int) -> dict:
+    """Configure only the child, before Accelerate can cache its thread policy."""
+    if threads < 1 or blas_threads < 1 or blas_threads > threads:
+        raise ValueError("require 1 <= BLAS threads <= worker threads")
+    environment = os.environ.copy()
+    environment["VECLIB_MAXIMUM_THREADS"] = str(blas_threads)
+    environment["OMP_NUM_THREADS"] = str(threads)
+    return environment
+
+
+def completion_text_without_eos(response: dict, eos_piece: str, eos_id: int = 1) -> tuple:
+    """Adapt --special native server output; preserve raw response and literal text."""
+    text, tokens = response["content"], response["tokens"]
+    if response["stop_type"] == "eos" and tokens and tokens[-1] == eos_id:
+        if not eos_piece or not text.endswith(eos_piece):
+            raise ValueError("EOS token and rendered terminal marker disagree")
+        return text[:-len(eos_piece)], tokens[:-1]
+    return text, list(tokens)
 
 
 def validate_image(path: Path, expected_sha256: str) -> None:
@@ -39,7 +60,8 @@ def aggregate(records: list) -> dict:
     }
 
 
-def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: float) -> dict:
+def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: float,
+              *, environment: dict | None = None) -> dict:
     """Measure a fresh process; preserve partial logs on failures/timeouts."""
     output_prefix.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -47,8 +69,9 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
     with output_prefix.with_suffix(".stdout.txt").open("wb") as out, \
             output_prefix.with_suffix(".stderr.txt").open("wb") as err:
         try:
+            options = {} if environment is None else {"env": environment}
             process = subprocess.run(["/usr/bin/time", "-l"] + command,
-                                     stdout=out, stderr=err, timeout=timeout)
+                                     stdout=out, stderr=err, timeout=timeout, **options)
             code = process.returncode
         except subprocess.TimeoutExpired:
             code, timed_out = None, True
@@ -70,6 +93,8 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
         "vision_seconds": sum(map(int, vision)) / 1000 if vision else None,
         "peak_rss_bytes": int(rss[1]) if rss else None,
         "output": output, "command": command,
+        "thread_environment": {key: (os.environ if environment is None else environment).get(key)
+                               for key in ("VECLIB_MAXIMUM_THREADS", "OMP_NUM_THREADS")},
     }
 
 
@@ -81,6 +106,8 @@ def main() -> None:
     parser.add_argument("--mmproj", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--threads", type=int, default=10)
+    parser.add_argument("--blas-threads", type=int, default=1,
+                        help="child Accelerate thread limit; default 1 prevents nested BLAS workers")
     parser.add_argument("--warmups", type=int, default=2)
     parser.add_argument("--repetitions", type=int, default=10)
     parser.add_argument("--max-tokens", type=int, default=8192)
@@ -88,6 +115,10 @@ def main() -> None:
     args = parser.parse_args()
     if args.threads < 1 or args.repetitions < 1 or args.warmups < 0 or args.max_tokens < 1:
         parser.error("threads, repetitions and max-tokens must be positive; warmups nonnegative")
+    try:
+        environment = benchmark_environment(args.threads, args.blas_threads)
+    except ValueError as error:
+        parser.error(str(error))
     manifest = json.loads(args.manifest.read_text())
     args.output.mkdir(parents=True, exist_ok=False)
     records = []
@@ -103,7 +134,8 @@ def main() -> None:
                        "-t", str(args.threads), "-tb", str(args.threads),
                        "-c", "32768", "-n", str(args.max_tokens), "--temp", "0",
                        "--seed", "42", "--repeat-penalty", "1.0", "--no-warmup", "--jinja", "-lv", "4"]
-            record = run_llama(command, args.output / label, args.max_tokens, args.timeout)
+            record = run_llama(command, args.output / label, args.max_tokens, args.timeout,
+                               environment=environment)
             record.update(image_id=item["id"], iteration=iteration, warmup=iteration < 0,
                           image_sha256=item["sha256"], process_mode="fresh-process-warm-files")
             record["cer"] = character_error_rate(normalize_ocr(item["text"]), normalize_ocr(record["output"]))

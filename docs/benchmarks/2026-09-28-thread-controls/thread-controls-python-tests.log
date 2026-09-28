@@ -1,0 +1,8 @@
+..............Writing:   0%|          | 0.00/48.0 [00:00<?, ?byte/s]Writing: 100%|██████████| 48.0/48.0 [00:00<00:00, 127kbyte/s]
+.....s/Users/matthewzhao/vibe/unlimited-ocr-kernel/.venv/lib/python3.12/site-packages/torch/jit/_script.py:1480: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+.s
+----------------------------------------------------------------------
+Ran 22 tests in 0.830s
+
+OK (skipped=2)

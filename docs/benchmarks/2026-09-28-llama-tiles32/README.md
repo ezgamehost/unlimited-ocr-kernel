@@ -1,5 +1,13 @@
 # llama.cpp pilot with upstream crop limit
 
+Later audit: the pinned MTMD code adds a text newline after image embeddings.
+These llama runs therefore have a 1,518-token prefix, while earlier native
+pilots used 1,517. The [matched resident pilot](../2026-09-28-thread-controls/README.md)
+corrects the comparison input and records the consequences. Raw historical
+outputs and timings here remain unchanged. These commands also predate explicit
+BLAS environment controls; the tool at `48ac31b` preserves that older behavior,
+whereas the current helper records an explicit BLAS limit.
+
 The original community projector omitted the Unlimited-OCR crop limit, causing the pinned llama.cpp loader to default to 9 tiles. This derivative adds `clip.vision.preproc_max_tiles = 32`. Every one of its 476 tensor payloads was checked byte-for-byte by SHA256; all other metadata is unchanged. The source is untouched. `projector-manifest.json` records both file hashes and tensor hashes.
 
 Preparation (requires the pinned Python reference environment):

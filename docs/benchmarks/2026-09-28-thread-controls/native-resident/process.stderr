@@ -1,0 +1,19 @@
+{"backend":"auto","event":"loaded","load_seconds":7.405152208,"precision":"int8_weights_dynamic_activations","threads":8}
+       72.80 real       158.33 user        47.51 sys
+          6270877696  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1611871  page reclaims
+               41782  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  50  voluntary context switches
+             4459056  involuntary context switches
+       1830841552827  instructions retired
+        745769371122  cycles elapsed
+          5580036144  peak memory footprint

@@ -1,0 +1,62 @@
+[
+  {
+    "image": "english",
+    "index": 0,
+    "native_seconds": 12.537077082990436,
+    "llama_seconds": 15.061628499999642,
+    "native_emitted_tokens": 250,
+    "llama_emitted_tokens": 250,
+    "same_token_ids": false,
+    "native_cer": 0.0,
+    "llama_cer": 0.0,
+    "llama_cached_prompt_tokens": 0
+  },
+  {
+    "image": "english",
+    "index": 1,
+    "native_seconds": 12.607566792023135,
+    "llama_seconds": 15.33774024999002,
+    "native_emitted_tokens": 250,
+    "llama_emitted_tokens": 250,
+    "same_token_ids": false,
+    "native_cer": 0.0,
+    "llama_cer": 0.0,
+    "llama_cached_prompt_tokens": 0
+  },
+  {
+    "image": "chinese",
+    "index": 2,
+    "native_seconds": 12.908256750000874,
+    "llama_seconds": 15.663835540995933,
+    "native_emitted_tokens": 289,
+    "llama_emitted_tokens": 289,
+    "same_token_ids": false,
+    "native_cer": 0.0,
+    "llama_cer": 0.0,
+    "llama_cached_prompt_tokens": 0
+  },
+  {
+    "image": "table",
+    "index": 3,
+    "native_seconds": 11.511901541991392,
+    "llama_seconds": 19.541063083015615,
+    "native_emitted_tokens": 248,
+    "llama_emitted_tokens": 248,
+    "same_token_ids": false,
+    "native_cer": 0.00398406374501992,
+    "llama_cer": 0.00398406374501992,
+    "llama_cached_prompt_tokens": 0
+  },
+  {
+    "image": "dense",
+    "index": 4,
+    "native_seconds": 14.646708167012548,
+    "llama_seconds": 20.152201416989556,
+    "native_emitted_tokens": 768,
+    "llama_emitted_tokens": 768,
+    "same_token_ids": true,
+    "native_cer": 0.0,
+    "llama_cer": 0.0,
+    "llama_cached_prompt_tokens": 0
+  }
+]

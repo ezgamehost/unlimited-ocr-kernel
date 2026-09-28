@@ -108,3 +108,9 @@ and [design](docs/superpowers/specs/2026-09-27-rust-unlimited-ocr-design.md) des
 the remaining scope. Benchmark reports retain raw output and disclose differing
 precision, attention policies, generation lengths and process lifetimes. The
 final repeated benchmark and resource/API hardening remain unfinished.
+
+For the pinned llama.cpp comparison, use an explicit newline after `<image>`:
+its image processor inserts that newline automatically. The [matched-prompt
+pilot](docs/benchmarks/2026-09-28-thread-controls/README.md) records the exact
+thread settings, raw outputs and why the earlier dense-page token counts differed.
+This comparison setting does not change the runtime's default prompt.

@@ -1,0 +1,18 @@
+E
+======================================================================
+ERROR: test_benchmark (unittest.loader._FailedTest.test_benchmark)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_benchmark
+Traceback (most recent call last):
+  File "/Users/matthewzhao/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/tests/python/test_benchmark.py", line 11, in <module>
+    from tools.benchmark import aggregate, validate_image, run_llama, benchmark_environment, completion_text_without_eos
+ImportError: cannot import name 'completion_text_without_eos' from 'tools.benchmark' (/Users/matthewzhao/vibe/unlimited-ocr-kernel/tools/benchmark.py)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

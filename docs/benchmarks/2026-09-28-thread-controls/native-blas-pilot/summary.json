@@ -1,0 +1,92 @@
+[
+  {
+    "cap": "1",
+    "wall_seconds": 21.056521291,
+    "timings": {
+      "preprocess_seconds": 0.121125375,
+      "vision_seconds": 9.324728375,
+      "prefill_seconds": 2.286402584,
+      "decode_seconds": 1.8277355859999997,
+      "first_token_seconds": 11.732332208,
+      "total_seconds": 13.581178208,
+      "decode_steps": 250
+    },
+    "same_token_ids": true,
+    "finish": "eos",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/english.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "8192",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ]
+  },
+  {
+    "cap": "8",
+    "wall_seconds": 17.535967999999997,
+    "timings": {
+      "preprocess_seconds": 0.120488875,
+      "vision_seconds": 7.56071825,
+      "prefill_seconds": 2.01397125,
+      "decode_seconds": 1.9458358660000017,
+      "first_token_seconds": 9.695262875,
+      "total_seconds": 11.662427916,
+      "decode_steps": 250
+    },
+    "same_token_ids": true,
+    "finish": "eos",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/english.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "8192",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ]
+  },
+  {
+    "cap": null,
+    "wall_seconds": 17.303848707999997,
+    "timings": {
+      "preprocess_seconds": 0.121024125,
+      "vision_seconds": 7.608461625,
+      "prefill_seconds": 2.036269584,
+      "decode_seconds": 1.8534204190000003,
+      "first_token_seconds": 9.765838833,
+      "total_seconds": 11.640612708,
+      "decode_steps": 250
+    },
+    "same_token_ids": true,
+    "finish": "eos",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/english.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "8192",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ]
+  }
+]

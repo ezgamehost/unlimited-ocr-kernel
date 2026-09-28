@@ -1,15 +1,52 @@
 """Catch biased aggregation, corrupt fixture acceptance and inaccurate scoring."""
+import json
+import os
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 from types import SimpleNamespace
 from pathlib import Path
 
-from tools.benchmark import aggregate, validate_image, run_llama
+from tools.benchmark import aggregate, validate_image, run_llama, benchmark_environment, completion_text_without_eos
 from tools.score import character_error_rate, normalize_ocr
 
 
 class BenchmarkTests(unittest.TestCase):
+    def test_terminal_eos_is_removed_only_with_matching_token_evidence(self):
+        eos = "<｜end of sentence｜>"
+        response = {"content": "quoted " + eos + " value" + eos,
+                    "tokens": [17, 42, 1], "stop_type": "eos"}
+        text, tokens = completion_text_without_eos(response, eos)
+        self.assertEqual(text, "quoted " + eos + " value")
+        self.assertEqual(tokens, [17, 42])
+        self.assertEqual(response["tokens"], [17, 42, 1])
+        for stopped, ids in [("limit", [17, 42, 1]), ("eos", [17, 42])]:
+            other = dict(response, stop_type=stopped, tokens=ids)
+            self.assertEqual(completion_text_without_eos(other, eos), (other["content"], ids))
+        with self.assertRaises(ValueError):
+            completion_text_without_eos(dict(response, content="missing marker"), eos)
+        with self.assertRaises(ValueError):
+            completion_text_without_eos(response, "")
+
+    def test_thread_environment_is_validated_and_passed_to_child(self):
+        original = os.environ.copy()
+        with patch.dict(os.environ, {"VECLIB_MAXIMUM_THREADS": "99"}):
+            environment = benchmark_environment(8, 1)
+            self.assertEqual(os.environ["VECLIB_MAXIMUM_THREADS"], "99")
+            self.assertEqual(environment["VECLIB_MAXIMUM_THREADS"], "1")
+            self.assertEqual(environment["OMP_NUM_THREADS"], "8")
+            with tempfile.TemporaryDirectory() as directory:
+                code = "import os,json; print(json.dumps({k:os.environ[k] for k in ['VECLIB_MAXIMUM_THREADS','OMP_NUM_THREADS']}))"
+                result = run_llama([sys.executable, "-c", code], Path(directory) / "child", 10, 30,
+                                   environment=environment)
+            self.assertEqual(json.loads(result["output"]), {"VECLIB_MAXIMUM_THREADS": "1", "OMP_NUM_THREADS": "8"})
+            self.assertEqual(result["thread_environment"], json.loads(result["output"]))
+        self.assertEqual(dict(os.environ), original)
+        for workers, blas in [(0, 1), (8, 0), (8, -1), (8, 9)]:
+            with self.assertRaises(ValueError):
+                benchmark_environment(workers, blas)
+
     def test_all_vision_batches_are_counted(self):
         def process(command, stdout, stderr, timeout):
             stderr.write(b"mtmd batch encoding done in 7103 ms\n"
