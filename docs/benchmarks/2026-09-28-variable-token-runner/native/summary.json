@@ -1,0 +1,22 @@
+{
+  "complete": true,
+  "protocol_complete": true,
+  "expected_requests": 2,
+  "collected_requests": 2,
+  "per_image": {
+    "logo": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 2.194520791992545,
+      "p95_seconds": 2.194520791992545
+    },
+    "english": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 11.527840624999953,
+      "p95_seconds": 11.527840624999953
+    }
+  }
+}

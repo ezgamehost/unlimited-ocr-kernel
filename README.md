@@ -57,6 +57,14 @@ include raw text, token IDs, finish reason, precision, image-token count and
 phase timings. Load time is emitted separately on stderr. Resident inference
 timings exclude load; fresh-process comparisons must include it.
 
+The resident benchmark runner accepts `expected_image_tokens` on each manifest
+image. It defaults to 1513 for the original four-page corpus. For other crop
+layouts, declare the independently expected count; native responses and llama
+prompt lengths are checked against it. The fixed matched prompt adds five
+non-image tokens. Per-image expectations are saved in process metadata; a mixed
+manifest has no single `prefix_tokens` value. See the
+[real-runtime adapter check](docs/benchmarks/2026-09-28-variable-token-runner/README.md).
+
 ## Optional INT8 decoder
 
 Prepare an overlay in the offline Python environment:

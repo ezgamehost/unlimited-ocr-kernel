@@ -1,0 +1,7 @@
+{
+  "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-variable-token-runner/logo.png",
+  "prompt": "<image>\ndocument parsing.",
+  "generation": {
+    "max_tokens": 8192
+  }
+}

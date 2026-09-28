@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "description": "Variable-token adapter smoke check using known inputs; not held-out or performance acceptance.",
+  "images": [
+    {
+      "id": "logo",
+      "path": "logo.png",
+      "text": "Baidu 百度",
+      "sha256": "3342dd06c42f0abc227adf8e3a3602eda301adfb9af1371f22b9f40c6b5f3339",
+      "width": 440,
+      "height": 133,
+      "expected_image_tokens": 273
+    },
+    {
+      "id": "english",
+      "path": "../../../benchmarks/corpus/english.png",
+      "text": "MEETING NOTES\n\nDate: September 27, 2026\n\nThe research team reviewed the new document recognition system.\nEvery result must include the original input and a clear transcript.\nWe measure complete page latency, memory use, and character errors.\nFaster processing is useful only when the output remains accurate.\n\nActions for next week:\n1. Check English and Chinese documents.\n2. Test tables, small print, and unusual page dimensions.\n3. Save failures and incomplete outputs with the successful results.\n4. Compare identical inputs on the same computer.\n\nApproved by: Research Operations",
+      "sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+      "width": 1024,
+      "height": 1400,
+      "text_bounds": [
+        48,
+        48,
+        796,
+        444
+      ],
+      "font": "/System/Library/Fonts/Menlo.ttc",
+      "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+      "font_size": 18
+    }
+  ]
+}

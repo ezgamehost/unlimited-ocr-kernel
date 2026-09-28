@@ -1,0 +1,106 @@
+{
+  "engine": "native",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr",
+    "--model",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/upstream",
+    "--jsonl",
+    "--threads",
+    "8",
+    "--int8-weights",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations"
+  ],
+  "process_mode": "resident-independent-requests",
+  "started_utc": "2026-09-28T13:04:08.723080+00:00",
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "schedule": [
+    {
+      "image_id": "english",
+      "iteration": 0,
+      "warmup": false
+    },
+    {
+      "image_id": "logo",
+      "iteration": 0,
+      "warmup": false
+    }
+  ],
+  "max_tokens": 8192,
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "binary_sha256": "4ead24a9d6c2901a470d51fd2316b9e11b3c70b934f5e8463bfdf13dd78d7e85",
+  "runner_sha256": "23dc01766a93bb244aafab8b96fc5478e409de55e67315bac407e1e7104b4334",
+  "warmups_per_image": 0,
+  "measured_per_image": 1,
+  "seed": 42,
+  "manifest": {
+    "schema_version": 1,
+    "description": "Variable-token adapter smoke check using known inputs; not held-out or performance acceptance.",
+    "images": [
+      {
+        "id": "logo",
+        "path": "logo.png",
+        "text": "Baidu 百度",
+        "sha256": "3342dd06c42f0abc227adf8e3a3602eda301adfb9af1371f22b9f40c6b5f3339",
+        "width": 440,
+        "height": 133,
+        "expected_image_tokens": 273,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-variable-token-runner/logo.png"
+      },
+      {
+        "id": "english",
+        "path": "../../../benchmarks/corpus/english.png",
+        "text": "MEETING NOTES\n\nDate: September 27, 2026\n\nThe research team reviewed the new document recognition system.\nEvery result must include the original input and a clear transcript.\nWe measure complete page latency, memory use, and character errors.\nFaster processing is useful only when the output remains accurate.\n\nActions for next week:\n1. Check English and Chinese documents.\n2. Test tables, small print, and unusual page dimensions.\n3. Save failures and incomplete outputs with the successful results.\n4. Compare identical inputs on the same computer.\n\nApproved by: Research Operations",
+        "sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          796,
+          444
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 18,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png"
+      }
+    ]
+  },
+  "prefix_tokens": null,
+  "expected_tokens_by_image": {
+    "logo": {
+      "image_tokens": 273,
+      "prefix_tokens": 278
+    },
+    "english": {
+      "image_tokens": 1513,
+      "prefix_tokens": 1518
+    }
+  },
+  "native_prompt": "<image>\ndocument parsing.",
+  "attention_note": "native preserved prefix plus 128 generated; llama full attention",
+  "first_token_note": "native internal clock; llama first streamed content/token arrival",
+  "load_event": {
+    "backend": "auto",
+    "event": "loaded",
+    "load_seconds": 5.831226625,
+    "precision": "int8_weights_dynamic_activations",
+    "threads": 8
+  },
+  "startup_wall_seconds": 6.254126042011194,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 6188711936,
+    "user_cpu_seconds": 34.721677,
+    "system_cpu_seconds": 9.726137,
+    "major_faults": 323,
+    "minor_faults": 939638
+  },
+  "process_wall_seconds": 20.09596916701412,
+  "failure": null
+}
