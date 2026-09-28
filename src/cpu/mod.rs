@@ -1,4 +1,5 @@
 use crate::error::{OcrError, Result};
+use std::sync::Arc;
 mod accelerate;
 mod neon;
 pub mod ops;
@@ -15,7 +16,7 @@ pub struct CpuContext {
     pub backend: Backend,
     threads: usize,
     scratch_limit: usize,
-    pub(crate) pool: rayon::ThreadPool,
+    pub(crate) pool: Arc<rayon::ThreadPool>,
 }
 
 impl CpuContext {
@@ -35,15 +36,24 @@ impl CpuContext {
             backend,
             threads,
             scratch_limit,
-            pool: rayon::ThreadPoolBuilder::new()
-                .num_threads(threads)
-                .build()
-                .map_err(|e| OcrError::Resource(format!("CPU worker pool: {e}")))?,
+            pool: Arc::new(
+                rayon::ThreadPoolBuilder::new()
+                    .num_threads(threads)
+                    .build()
+                    .map_err(|e| OcrError::Resource(format!("CPU worker pool: {e}")))?,
+            ),
         })
     }
 
     pub fn threads(&self) -> usize {
         self.threads
+    }
+
+    /// Keep a sequence of small parallel kernels on one pool worker, avoiding
+    /// an external-thread handoff for every matrix. Nested calls are supported.
+    pub fn run<R: Send>(&mut self, operation: impl FnOnce(&mut Self) -> R + Send) -> R {
+        let pool = Arc::clone(&self.pool);
+        pool.install(|| operation(self))
     }
 
     pub(crate) fn check_elements(&self, count: usize) -> Result<()> {

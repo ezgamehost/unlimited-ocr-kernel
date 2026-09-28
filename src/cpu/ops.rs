@@ -101,13 +101,14 @@ pub fn linear_weight(
                 .sum::<f32>()
                 + bias.map_or(0., |b| b[row])
         };
-        if cpu.backend == Backend::Scalar || cpu.threads() == 1 {
+        if cpu.backend == Backend::Scalar || cpu.threads() == 1 || weight.len() <= 128 * 1024 {
             for (row, y) in data.iter_mut().enumerate() {
                 *y = compute(row);
             }
         } else {
             cpu.pool.install(|| {
                 data.par_iter_mut()
+                    .with_min_len(n.div_ceil(cpu.threads()))
                     .enumerate()
                     .for_each(|(row, y)| *y = compute(row))
             });

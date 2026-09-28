@@ -319,6 +319,15 @@ impl<'a> Decoder<'a> {
         state: &mut DecodeState,
         cpu: &mut CpuContext,
     ) -> Result<Tensor> {
+        cpu.run(|cpu| self.step_on_worker(token, state, cpu))
+    }
+
+    fn step_on_worker(
+        &self,
+        token: u32,
+        state: &mut DecodeState,
+        cpu: &mut CpuContext,
+    ) -> Result<Tensor> {
         if state.layers.len() != self.config.num_hidden_layers {
             return Err(OcrError::Shape("decoder state mismatch".into()));
         }

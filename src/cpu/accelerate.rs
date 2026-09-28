@@ -1,4 +1,4 @@
-//! Checked row-major SGEMM. No call occurs inside another worker pool.
+//! Checked row-major SGEMM, strided SGEMV, and vector exponentials.
 use crate::error::{OcrError, Result};
 
 #[cfg(target_os = "macos")]
