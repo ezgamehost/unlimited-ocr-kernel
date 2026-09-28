@@ -17,10 +17,12 @@ The hybrid has a confirmed accuracy regression on the
 [32-crop stress input](docs/benchmarks/2026-09-28-hybrid-max32/README.md); the
 four-page speedup does not establish general quantization accuracy.
 
-A subsequent shared-expert scheduling change reduces native fixed-work Q8
-**decode time by 2.22%** on AC, preserving every checked logit and all 24 Q8/hybrid
-OCR outputs. This separate decoder result is not included in the full-page
-numbers above. See the [scheduling comparison](docs/benchmarks/2026-09-28-shared-expert-workers/README.md).
+Subsequent scheduling changes reduce native fixed-work Q8 decode time:
+[shared-expert worker allocation](docs/benchmarks/2026-09-28-shared-expert-workers/README.md)
+by **2.22%**, then [concurrent Q/K/V projections](docs/benchmarks/2026-09-28-concurrent-qkv/README.md)
+by a further **8.28%** against that accepted runtime. Each AC comparison preserves
+every checked logit and all 24 Q8/hybrid OCR outputs. These separate decoder
+results are not included in the full-page numbers above.
 
 ## Build and run
 

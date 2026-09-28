@@ -116,6 +116,48 @@ impl<'a> Decoder<'a> {
         ops::linear_weight(x, self.weights.tensor(name)?, None, cpu)
     }
 
+    fn qkv(
+        &self,
+        x: &Tensor,
+        prefix: &str,
+        cpu: &mut CpuContext,
+    ) -> Result<(Tensor, Tensor, Tensor)> {
+        let names = ["q", "k", "v"].map(|part| format!("{prefix}.self_attn.{part}_proj.weight"));
+        let width = self.config.hidden_size;
+        // Conservatively allow a full F16/F32 weight expansion and activation
+        // scratch for each concurrent projection. Small budgets keep the old path.
+        let scratch = width
+            .checked_mul(width)
+            .and_then(|matrix| width.checked_mul(5).and_then(|n| matrix.checked_add(n)))
+            .and_then(|n| n.checked_mul(3));
+        if x.shape.first() == Some(&1)
+            && cpu.threads() >= 3
+            && scratch.is_some_and(|n| cpu.check_elements(n).is_ok())
+        {
+            let mut q_cpu = cpu.serial_worker(3);
+            let mut k_cpu = cpu.serial_worker(3);
+            let mut v_cpu = cpu.serial_worker(3);
+            let pool = std::sync::Arc::clone(&cpu.pool);
+            let (q, (k, v)) = pool.install(|| {
+                rayon::join(
+                    || self.projection(x, &names[0], &mut q_cpu),
+                    || {
+                        rayon::join(
+                            || self.projection(x, &names[1], &mut k_cpu),
+                            || self.projection(x, &names[2], &mut v_cpu),
+                        )
+                    },
+                )
+            });
+            return Ok((q?, k?, v?));
+        }
+        Ok((
+            self.projection(x, &names[0], cpu)?,
+            self.projection(x, &names[1], cpu)?,
+            self.projection(x, &names[2], cpu)?,
+        ))
+    }
+
     fn feed_forward(&self, x: &Tensor, prefix: &str, cpu: &mut CpuContext) -> Result<Tensor> {
         let mut gate = self.projection(x, &format!("{prefix}.gate_proj.weight"), cpu)?;
         let up = self.projection(x, &format!("{prefix}.up_proj.weight"), cpu)?;
@@ -278,21 +320,7 @@ impl<'a> Decoder<'a> {
             .tensor(&format!("{prefix}.input_layernorm.weight"))?
             .to_f32();
         let normalized = ops::rms_norm(x, &norm, self.config.rms_norm_eps)?;
-        let mut q = self.projection(
-            &normalized,
-            &format!("{prefix}.self_attn.q_proj.weight"),
-            cpu,
-        )?;
-        let mut k = self.projection(
-            &normalized,
-            &format!("{prefix}.self_attn.k_proj.weight"),
-            cpu,
-        )?;
-        let v = self.projection(
-            &normalized,
-            &format!("{prefix}.self_attn.v_proj.weight"),
-            cpu,
-        )?;
+        let (mut q, mut k, v) = self.qkv(&normalized, &prefix, cpu)?;
         let heads = self.config.num_attention_heads;
         let dim = hidden / heads;
         for row in 0..rows {
@@ -442,5 +470,71 @@ impl<'a> Decoder<'a> {
             hidden = self.layer(index, &hidden, cache, cpu)?;
         }
         self.logits(&hidden, cpu)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[ignore = "requires pinned original model weights"]
+    fn qkv_matches_independent_projections_across_worker_and_memory_budgets() {
+        use crate::cpu::Backend;
+        use std::path::Path;
+        let weights = Checkpoint::open(Path::new(
+            "artifacts/upstream/model-00001-of-000001.safetensors",
+        ))
+        .unwrap();
+        let config = ModelConfig::load(Path::new("artifacts/upstream/config.json")).unwrap();
+        let decoder = Decoder::new(&weights, config).unwrap();
+        for rows in [1, 2] {
+            let x = Tensor::new(
+                vec![rows, 1280],
+                (0..rows * 1280).map(|i| (i as f32 * 0.01).sin()).collect(),
+            )
+            .unwrap();
+            let mut serial = CpuContext::new(Backend::Auto, 1, 1 << 30).unwrap();
+            let expected: Vec<_> = ["q", "k", "v"]
+                .iter()
+                .map(|part| {
+                    decoder
+                        .projection(
+                            &x,
+                            &format!("model.layers.1.self_attn.{part}_proj.weight"),
+                            &mut serial,
+                        )
+                        .unwrap()
+                })
+                .collect();
+            for (threads, budget) in [
+                (1, 1 << 30),
+                (2, 1 << 30),
+                (3, 1 << 30),
+                (4, 1 << 30),
+                (8, 1 << 30),
+                (8, 32768),
+            ] {
+                if rows > 1 && budget == 32768 {
+                    continue;
+                }
+                let mut cpu = CpuContext::new(Backend::Auto, threads, budget).unwrap();
+                let (q, k, v) = cpu
+                    .run(|cpu| decoder.qkv(&x, "model.layers.1", cpu))
+                    .unwrap();
+                for (actual, expected) in [q, k, v].into_iter().zip(&expected) {
+                    assert_eq!(actual.shape, expected.shape);
+                    assert_eq!(
+                        actual.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
+                        expected
+                            .data
+                            .iter()
+                            .map(|v| v.to_bits())
+                            .collect::<Vec<_>>(),
+                        "rows={rows}, threads={threads}, budget={budget}"
+                    );
+                }
+            }
+        }
     }
 }

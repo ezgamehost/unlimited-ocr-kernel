@@ -1,0 +1,123 @@
+[
+  {
+    "name": "fmt",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "fmt",
+      "--check"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 42565632,
+      "user_cpu_seconds": 0.08101599999999999,
+      "system_cpu_seconds": 0.055590999999999995,
+      "major_faults": 2469,
+      "minor_faults": 6583
+    }
+  },
+  {
+    "name": "rust-tests",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "test",
+      "--release"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 492126208,
+      "user_cpu_seconds": 265.430998,
+      "system_cpu_seconds": 11.07117,
+      "major_faults": 18805,
+      "minor_faults": 2153192
+    }
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "clippy",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 446939136,
+      "user_cpu_seconds": 31.51692,
+      "system_cpu_seconds": 13.33151,
+      "major_faults": 18829,
+      "minor_faults": 2340229
+    }
+  },
+  {
+    "name": "expert-reference",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "test",
+      "--release",
+      "--test",
+      "decoder",
+      "actual_expert_scheduling",
+      "--",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 80216064,
+      "user_cpu_seconds": 0.076708,
+      "system_cpu_seconds": 0.06809899999999999,
+      "major_faults": 4167,
+      "minor_faults": 14972
+    }
+  },
+  {
+    "name": "decoder-reference",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "test",
+      "--release",
+      "--test",
+      "decoder",
+      "actual_decoder_layers",
+      "--",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 1159200768,
+      "user_cpu_seconds": 5.272978,
+      "system_cpu_seconds": 2.622636,
+      "major_faults": 57784,
+      "minor_faults": 19892
+    }
+  },
+  {
+    "name": "build",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "build",
+      "--release",
+      "--bin",
+      "uocr"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 783843328,
+      "user_cpu_seconds": 32.296589,
+      "system_cpu_seconds": 0.82575,
+      "major_faults": 1649,
+      "minor_faults": 167786
+    }
+  }
+]
