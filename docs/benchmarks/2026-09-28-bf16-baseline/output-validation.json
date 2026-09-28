@@ -1,0 +1,72 @@
+{
+  "completed_requests_audited": 48,
+  "expected_requests": 48,
+  "images": {
+    "english": {
+      "requests_audited": 12,
+      "bf16_outputs_identical": true,
+      "bf16_emitted_tokens": 250,
+      "q8_emitted_tokens": 250,
+      "bf16_cer": [
+        0.0
+      ],
+      "q8_cer": [
+        0.0
+      ],
+      "exact_raw_text_match": false,
+      "normalized_transcript_match": true,
+      "token_id_differences": 1
+    },
+    "chinese": {
+      "requests_audited": 12,
+      "bf16_outputs_identical": true,
+      "bf16_emitted_tokens": 289,
+      "q8_emitted_tokens": 289,
+      "bf16_cer": [
+        0.0
+      ],
+      "q8_cer": [
+        0.0
+      ],
+      "exact_raw_text_match": false,
+      "normalized_transcript_match": true,
+      "token_id_differences": 3
+    },
+    "table": {
+      "requests_audited": 12,
+      "bf16_outputs_identical": true,
+      "bf16_emitted_tokens": 248,
+      "q8_emitted_tokens": 248,
+      "bf16_cer": [
+        0.00398406374501992
+      ],
+      "q8_cer": [
+        0.00398406374501992
+      ],
+      "exact_raw_text_match": true,
+      "normalized_transcript_match": true,
+      "token_id_differences": 0
+    },
+    "dense": {
+      "requests_audited": 12,
+      "bf16_outputs_identical": true,
+      "bf16_emitted_tokens": 768,
+      "q8_emitted_tokens": 768,
+      "bf16_cer": [
+        0.0
+      ],
+      "q8_cer": [
+        0.0
+      ],
+      "exact_raw_text_match": false,
+      "normalized_transcript_match": true,
+      "token_id_differences": 2
+    }
+  },
+  "benchmark_complete": true,
+  "notes": [
+    "All completed requests are audited, including warmups; no timing estimates here.",
+    "Normalized text equality does not imply matching layout labels or coordinates.",
+    "This snapshot is partial until benchmark_complete is true; rerun after termination."
+  ]
+}

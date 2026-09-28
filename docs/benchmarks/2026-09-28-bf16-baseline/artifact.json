@@ -6,7 +6,7 @@
   "expected_sha256": "777d9adbcc5dda6b4496708e06116ac1389556b430d6478abd49379a417665c5",
   "metadata_source": "https://huggingface.co/api/models/vimalnakrani/unlimited-ocr-gguf/tree/45cd66ec6b46a7c4de49f376084ecec2b8d3c59a?recursive=true&expand=false",
   "download_url": "https://huggingface.co/vimalnakrani/unlimited-ocr-gguf/resolve/45cd66ec6b46a7c4de49f376084ecec2b8d3c59a/unlimited-ocr-BF16.gguf",
-  "status": "Payload downloaded and SHA256 verified; runtime comparison pending.",
+  "status": "Payload SHA256 verified; 48-request llama.cpp CPU resident run completed normally. Native BF16 comparison remains pending.",
   "projector_policy": "Use the same existing F16 tiles32 projector as the Q8 baseline; BF16 label applies to decoder GGUF storage, not all computation.",
   "local_path": "/tmp/unlimited-ocr-baseline/models/model-bf16.gguf",
   "verified_sha256": "777d9adbcc5dda6b4496708e06116ac1389556b430d6478abd49379a417665c5",
