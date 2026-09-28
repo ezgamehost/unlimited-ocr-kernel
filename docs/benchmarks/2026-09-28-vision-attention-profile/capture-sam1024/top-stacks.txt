@@ -1,0 +1,79 @@
+Sort by top of stack, same collapsed (when >= 5):
+        __psynch_cvwait  (in libsystem_kernel.dylib)        25271
+        __workq_kernreturn  (in libsystem_kernel.dylib)        8864
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2068  [0x1816c0068]        1202
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops4gelu  (in uocr)        1109
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops15softmax_backend  (in uocr)        809
+        VVEXPF  (in libvMisc.dylib)        720
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a207c  [0x1816c007c]        429
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops4norm  (in uocr)        428
+        _RNvNtNtCsgXDUyvWqpNB_4libm4math4erff5erfc2  (in uocr)        427
+        swtch_pri  (in libsystem_kernel.dylib)        389
+        _RNCNvNtNtCsiDNU5144K5k_4uocr6vision3sam17add_relative_bias0B7_  (in uocr)        350
+        _RNvNtNtCsgXDUyvWqpNB_4libm4math4expf4expf  (in uocr)        228
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1de8  [0x1816bfde8]        226
+        _RINvNtNtCsiDNU5144K5k_4uocr3cpu3ops22attention_bias_blockedNCNvMNtNtB6_6vision3samNtB12_6Vision13sam_attention0EB6_  (in uocr)        205
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4ca8  [0x1815d2ca8]        163
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops6linear  (in uocr)        114
+        _platform_memmove  (in libsystem_platform.dylib)        112
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c3c  [0x1815d2c3c]        98
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c64  [0x1815d2c64]        98
+        __ulock_wait  (in libsystem_kernel.dylib)        97
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d5c  [0x1815d2d5c]        95
+        expf  (in libsystem_m.dylib)        87
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab318  [0x1816c9318]        81
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4ce4  [0x1815d2ce4]        80
+        __bzero  (in libsystem_platform.dylib)        79
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1dfc  [0x1816bfdfc]        71
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2078  [0x1816c0078]        61
+        _RNvNtNtCsiDNU5144K5k_4uocr6vision7spatial16interpolate_grid  (in uocr)        59
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d20  [0x1815d2d20]        56
+        __psynch_mutexwait  (in libsystem_kernel.dylib)        54
+        madvise  (in libsystem_kernel.dylib)        52
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2084  [0x1816c0084]        51
+        _RNvMNtCsiDNU5144K5k_4uocr6visionNtB2_6Vision17encode_view_debug  (in uocr)        44
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops6conv2d  (in uocr)        40
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab260  [0x1816c9260]        34
+        __bsdthread_ctl  (in libsystem_kernel.dylib)        34
+        _RNvNtCsiDNU5144K5k_4uocr6vision8residual  (in uocr)        31
+        __psynch_cvsignal  (in libsystem_kernel.dylib)        30
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2070  [0x1816c0070]        24
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a20a4  [0x1816c00a4]        23
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2088  [0x1816c0088]        22
+        DYLD-STUB$$expf  (in uocr)        22
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4cc0  [0x1815d2cc0]        21
+        _RNvMs8_NtCs9E1KPU9LuJA_15crossbeam_deque5dequeINtB5_7StealerNtNtCs5fJiRc5JJ2V_10rayon_core3job6JobRefE5stealB10_  (in uocr)        21
+        _RNvMs8_NtCs5fJiRc5JJ2V_10rayon_core8registryNtB5_12WorkerThread9find_work  (in uocr)        19
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d9c  [0x1815d2d9c]        18
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4cdc  [0x1815d2cdc]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1df8  [0x1816bfdf8]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5aaa80  [0x1816c8a80]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab274  [0x1816c9274]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2080  [0x1816c0080]        12
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab324  [0x1816c9324]        10
+        start_wqthread  (in libsystem_pthread.dylib)        10
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c7c  [0x1815d2c7c]        9
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4ca0  [0x1815d2ca0]        9
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1e04  [0x1816bfe04]        9
+        _RINvNtCsbKUPuMBiEmA_15crossbeam_epoch7default11with_handleNCNvB2_3pin0NtNtB4_5guard5GuardECs5fJiRc5JJ2V_10rayon_core  (in uocr)        9
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1df0  [0x1816bfdf0]        8
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2090  [0x1816c0090]        8
+        __psynch_mutexdrop  (in libsystem_kernel.dylib)        8
+        mach_absolute_time  (in libsystem_kernel.dylib)        8
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d54  [0x1815d2d54]        7
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b57d0  [0x1815d37d0]        7
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5aa9c0  [0x1816c89c0]        7
+        xzm_segment_group_alloc_chunk  (in libsystem_malloc.dylib)        7
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c5c  [0x1815d2c5c]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c84  [0x1815d2c84]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab3a4  [0x1816c93a4]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab410  [0x1816c9410]        6
+        __psynch_cvbroad  (in libsystem_kernel.dylib)        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d18  [0x1815d2d18]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d4c  [0x1815d2d4c]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1e08  [0x1816bfe08]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab270  [0x1816c9270]        5
+        DYLD-STUB$$memcpy  (in uocr)        5
+        _RNvMs8_NtCs5fJiRc5JJ2V_10rayon_core8registryNtB5_12WorkerThread15wait_until_cold  (in uocr)        5
+        __ulock_wake  (in libsystem_kernel.dylib)        5
+

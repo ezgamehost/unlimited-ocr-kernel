@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--comparison', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--quality', type=Path, help='Exact 12-case quality proof for a newer binary')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output exists; preserve previous captures')
@@ -24,13 +25,26 @@ def main():
     baseline = args.comparison / 'repeated-0-native'
     process = json.loads((baseline / 'process.json').read_text())
     command = process['command']
-    assert sha256(Path(command[0])) == process['binary_sha256']
+    quality_process = None
+    expected_binary = process['binary_sha256']
+    if args.quality:
+        comparison = json.loads((args.quality / 'comparison.json').read_text())
+        assert len(comparison) == 12 and all(all(row[key] for key in
+            ['exact_text', 'exact_tokens', 'eos', 'image_tokens_equal']) for row in comparison)
+        quality_process = json.loads((args.quality / 'process.json').read_text())
+        assert quality_process['resources']['exit_code'] == 0
+        assert not quality_process['resources']['forced_kill']
+        expected_binary = quality_process['binary_sha256']
+    assert sha256(Path(command[0])) == expected_binary
     request_path = next(baseline.glob('*-english.request.json'))
     request = json.loads(request_path.read_text())
+    if quality_process:
+        assert any(case['image'] == request['image'] and case['prompt'] == request['prompt']
+                   for case in quality_process['cases'])
     expected = json.loads(request_path.with_suffix('').with_suffix('.raw.json').read_text())['result']
     args.output.mkdir(parents=True, exist_ok=False)
     save(args.output / 'request.json', request)
-    metadata = dict(command=command, binary_sha256=process['binary_sha256'],
+    metadata = dict(command=command, binary_sha256=expected_binary, quality_process=quality_process,
                     comparison=str(args.comparison.resolve()), power=power,
                     sampling_delay_seconds=0.2, sampling_duration_seconds=5,
                     note='Profile overhead included. Inspect stacks for stage attribution; aggregate thread samples are not wall-time percentages.')

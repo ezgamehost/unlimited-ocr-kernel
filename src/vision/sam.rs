@@ -66,7 +66,7 @@ impl Vision {
         x = residual(x, position)?;
         for layer in 0..12 {
             let prefix = format!("model.sam_model.blocks.{layer}");
-            let norm = self.norm(&x, &format!("{prefix}.norm1"), 1e-6)?;
+            let norm = self.norm(&x, &format!("{prefix}.norm1"), 1e-6, cpu)?;
             let windowed = ![2, 5, 8, 11].contains(&layer);
             let normalized = if windowed {
                 window_partition(&norm, 14)?
@@ -80,15 +80,15 @@ impl Vision {
                 attended
             };
             x = residual(x, attended)?;
-            let norm = self.norm(&x, &format!("{prefix}.norm2"), 1e-6)?;
+            let norm = self.norm(&x, &format!("{prefix}.norm2"), 1e-6, cpu)?;
             let mut up = self.linear(&norm, &format!("{prefix}.mlp.lin1"), cpu)?;
             ops::gelu_parallel(&mut up.data, cpu);
             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.lin2"), cpu)?)?;
         }
         x = self.conv(&x, "model.sam_model.neck.0", 1, 0, cpu)?;
-        x = self.norm(&x, "model.sam_model.neck.1", 1e-6)?;
+        x = self.norm(&x, "model.sam_model.neck.1", 1e-6, cpu)?;
         x = self.conv(&x, "model.sam_model.neck.2", 1, 1, cpu)?;
-        x = self.norm(&x, "model.sam_model.neck.3", 1e-6)?;
+        x = self.norm(&x, "model.sam_model.neck.3", 1e-6, cpu)?;
         x = self.conv(&x, "model.sam_model.net_2", 2, 1, cpu)?;
         self.conv(&x, "model.sam_model.net_3", 2, 1, cpu)
     }

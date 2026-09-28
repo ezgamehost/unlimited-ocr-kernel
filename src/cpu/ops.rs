@@ -384,6 +384,7 @@ fn norm(
     bias: Option<&[f32]>,
     eps: f32,
     center: bool,
+    cpu: Option<&CpuContext>,
 ) -> Result<Tensor> {
     x.validate()?;
     let width = *x
@@ -407,7 +408,7 @@ fn norm(
         return Err(OcrError::Numerical("normalization".into()));
     }
     let mut data = vec![0.; x.data.len()];
-    for (input, output) in x.data.chunks_exact(width).zip(data.chunks_exact_mut(width)) {
+    let normalize = |(input, output): (&[f32], &mut [f32])| {
         if center {
             // Wide, nearly constant rows lose their mean under sequential FP32
             // summation. Retain precision through centering and variance.
@@ -422,7 +423,7 @@ fn norm(
                 output[i] = ((input[i] as f64 - mean) * scale * weight[i] as f64
                     + bias.map_or(0., |b| b[i]) as f64) as f32;
             }
-            continue;
+            return;
         }
         let mean = 0.;
         let variance = input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / width as f32;
@@ -430,15 +431,42 @@ fn norm(
         for i in 0..width {
             output[i] = (input[i] - mean) * scale * weight[i] + bias.map_or(0., |b| b[i]);
         }
+    };
+    if let Some(cpu) = cpu
+        .filter(|cpu| cpu.backend != Backend::Scalar && cpu.threads() > 1 && x.data.len() >= 16384)
+    {
+        let rows_per_task = (x.data.len() / width).div_ceil(cpu.threads());
+        cpu.pool.install(|| {
+            x.data
+                .par_chunks_exact(width)
+                .zip(data.par_chunks_exact_mut(width))
+                .with_min_len(rows_per_task)
+                .for_each(normalize)
+        });
+    } else {
+        x.data
+            .chunks_exact(width)
+            .zip(data.chunks_exact_mut(width))
+            .for_each(normalize);
     }
     Tensor::new(x.shape.clone(), data)
 }
 
 pub fn layer_norm(x: &Tensor, w: &[f32], b: Option<&[f32]>, eps: f32) -> Result<Tensor> {
-    norm(x, w, b, eps, true)
+    norm(x, w, b, eps, true, None)
+}
+/// Distribute independent rows without changing each row's reduction order.
+pub fn layer_norm_parallel(
+    x: &Tensor,
+    w: &[f32],
+    b: Option<&[f32]>,
+    eps: f32,
+    cpu: &CpuContext,
+) -> Result<Tensor> {
+    norm(x, w, b, eps, true, Some(cpu))
 }
 pub fn rms_norm(x: &Tensor, w: &[f32], eps: f32) -> Result<Tensor> {
-    norm(x, w, None, eps, false)
+    norm(x, w, None, eps, false, None)
 }
 
 pub fn rope(values: &mut [f32], head_dim: usize, position: usize, theta: f32) -> Result<()> {

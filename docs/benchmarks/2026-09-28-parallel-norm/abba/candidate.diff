@@ -1,0 +1,153 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index b06cc80..274ff63 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -384,6 +384,7 @@ fn norm(
+     bias: Option<&[f32]>,
+     eps: f32,
+     center: bool,
++    cpu: Option<&CpuContext>,
+ ) -> Result<Tensor> {
+     x.validate()?;
+     let width = *x
+@@ -407,7 +408,7 @@ fn norm(
+         return Err(OcrError::Numerical("normalization".into()));
+     }
+     let mut data = vec![0.; x.data.len()];
+-    for (input, output) in x.data.chunks_exact(width).zip(data.chunks_exact_mut(width)) {
++    let normalize = |(input, output): (&[f32], &mut [f32])| {
+         if center {
+             // Wide, nearly constant rows lose their mean under sequential FP32
+             // summation. Retain precision through centering and variance.
+@@ -422,7 +423,7 @@ fn norm(
+                 output[i] = ((input[i] as f64 - mean) * scale * weight[i] as f64
+                     + bias.map_or(0., |b| b[i]) as f64) as f32;
+             }
+-            continue;
++            return;
+         }
+         let mean = 0.;
+         let variance = input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / width as f32;
+@@ -430,15 +431,42 @@ fn norm(
+         for i in 0..width {
+             output[i] = (input[i] - mean) * scale * weight[i] + bias.map_or(0., |b| b[i]);
+         }
++    };
++    if let Some(cpu) = cpu
++        .filter(|cpu| cpu.backend != Backend::Scalar && cpu.threads() > 1 && x.data.len() >= 16384)
++    {
++        let rows_per_task = (x.data.len() / width).div_ceil(cpu.threads());
++        cpu.pool.install(|| {
++            x.data
++                .par_chunks_exact(width)
++                .zip(data.par_chunks_exact_mut(width))
++                .with_min_len(rows_per_task)
++                .for_each(normalize)
++        });
++    } else {
++        x.data
++            .chunks_exact(width)
++            .zip(data.chunks_exact_mut(width))
++            .for_each(normalize);
+     }
+     Tensor::new(x.shape.clone(), data)
+ }
+ 
+ pub fn layer_norm(x: &Tensor, w: &[f32], b: Option<&[f32]>, eps: f32) -> Result<Tensor> {
+-    norm(x, w, b, eps, true)
++    norm(x, w, b, eps, true, None)
++}
++/// Distribute independent rows without changing each row's reduction order.
++pub fn layer_norm_parallel(
++    x: &Tensor,
++    w: &[f32],
++    b: Option<&[f32]>,
++    eps: f32,
++    cpu: &CpuContext,
++) -> Result<Tensor> {
++    norm(x, w, b, eps, true, Some(cpu))
+ }
+ pub fn rms_norm(x: &Tensor, w: &[f32], eps: f32) -> Result<Tensor> {
+-    norm(x, w, None, eps, false)
++    norm(x, w, None, eps, false, None)
+ }
+ 
+ pub fn rope(values: &mut [f32], head_dim: usize, position: usize, theta: f32) -> Result<()> {
+diff --git a/src/vision/clip.rs b/src/vision/clip.rs
+index 0df7eda..4622917 100644
+--- a/src/vision/clip.rs
++++ b/src/vision/clip.rs
+@@ -31,10 +31,11 @@ impl Vision {
+             &Tensor::new(vec![1, tokens, width], data)?,
+             "model.vision_model.pre_layrnorm",
+             1e-5,
++            cpu,
+         )?;
+         for layer in 0..24 {
+             let prefix = format!("model.vision_model.transformer.layers.{layer}");
+-            let norm = self.norm(&x, &format!("{prefix}.layer_norm1"), 1e-5)?;
++            let norm = self.norm(&x, &format!("{prefix}.layer_norm1"), 1e-5, cpu)?;
+             let qkv = self.linear(&norm, &format!("{prefix}.self_attn.qkv_proj"), cpu)?;
+             let mut q = vec![0.; tokens * width];
+             let mut k = q.clone();
+@@ -72,7 +73,7 @@ impl Vision {
+                 cpu,
+             )?;
+             x = residual(x, attention)?;
+-            let norm = self.norm(&x, &format!("{prefix}.layer_norm2"), 1e-5)?;
++            let norm = self.norm(&x, &format!("{prefix}.layer_norm2"), 1e-5, cpu)?;
+             let mut up = self.linear(&norm, &format!("{prefix}.mlp.fc1"), cpu)?;
+             ops::quick_gelu_parallel(&mut up.data, cpu);
+             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.fc2"), cpu)?)?;
+diff --git a/src/vision/mod.rs b/src/vision/mod.rs
+index b7c779b..4bba42b 100644
+--- a/src/vision/mod.rs
++++ b/src/vision/mod.rs
+@@ -41,12 +41,13 @@ impl Vision {
+             .map(|x| x.data.as_slice());
+         ops::linear(x, self.w(&format!("{name}.weight"))?, bias, cpu)
+     }
+-    fn norm(&self, x: &Tensor, name: &str, eps: f32) -> Result<Tensor> {
+-        ops::layer_norm(
++    fn norm(&self, x: &Tensor, name: &str, eps: f32, cpu: &CpuContext) -> Result<Tensor> {
++        ops::layer_norm_parallel(
+             x,
+             &self.w(&format!("{name}.weight"))?.data,
+             Some(&self.w(&format!("{name}.bias"))?.data),
+             eps,
++            cpu,
+         )
+     }
+     fn conv(
+diff --git a/src/vision/sam.rs b/src/vision/sam.rs
+index ee6521a..5e5342f 100644
+--- a/src/vision/sam.rs
++++ b/src/vision/sam.rs
+@@ -66,7 +66,7 @@ impl Vision {
+         x = residual(x, position)?;
+         for layer in 0..12 {
+             let prefix = format!("model.sam_model.blocks.{layer}");
+-            let norm = self.norm(&x, &format!("{prefix}.norm1"), 1e-6)?;
++            let norm = self.norm(&x, &format!("{prefix}.norm1"), 1e-6, cpu)?;
+             let windowed = ![2, 5, 8, 11].contains(&layer);
+             let normalized = if windowed {
+                 window_partition(&norm, 14)?
+@@ -80,15 +80,15 @@ impl Vision {
+                 attended
+             };
+             x = residual(x, attended)?;
+-            let norm = self.norm(&x, &format!("{prefix}.norm2"), 1e-6)?;
++            let norm = self.norm(&x, &format!("{prefix}.norm2"), 1e-6, cpu)?;
+             let mut up = self.linear(&norm, &format!("{prefix}.mlp.lin1"), cpu)?;
+             ops::gelu_parallel(&mut up.data, cpu);
+             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.lin2"), cpu)?)?;
+         }
+         x = self.conv(&x, "model.sam_model.neck.0", 1, 0, cpu)?;
+-        x = self.norm(&x, "model.sam_model.neck.1", 1e-6)?;
++        x = self.norm(&x, "model.sam_model.neck.1", 1e-6, cpu)?;
+         x = self.conv(&x, "model.sam_model.neck.2", 1, 1, cpu)?;
+-        x = self.norm(&x, "model.sam_model.neck.3", 1e-6)?;
++        x = self.norm(&x, "model.sam_model.neck.3", 1e-6, cpu)?;
+         x = self.conv(&x, "model.sam_model.net_2", 2, 1, cpu)?;
+         self.conv(&x, "model.sam_model.net_3", 2, 1, cpu)
+     }

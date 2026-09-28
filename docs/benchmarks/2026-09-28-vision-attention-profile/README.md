@@ -1,5 +1,14 @@
 # Vision profiling protocol
 
+`capture-sam1024` profiles the subsequently accepted SAM-tile executable using
+its exact 12-case quality proof (`profile.py --quality PATH`). The profiler and
+inference process exited 0, and both outputs matched the baseline exactly.
+All 3581 main thread samples are under vision. The collapsed leaf table contains
+428 normalization, 1109 GELU, 809 softmax and 720 vector-exp samples, alongside
+BLAS and waits. Normalization still loops rows serially in this executable,
+motivating the separate parallel-row experiment. Aggregate thread counts are
+not wall-time shares. Both captures retain their own executable identities.
+
 `capture-1` completed after the powered 96-request audit. The profiler and
 inference process both exited 0, and both OCR outputs exactly matched baseline
 text/token IDs and reached EOS. The accepted binary is unchanged.

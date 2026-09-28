@@ -1,0 +1,6 @@
+{
+  "cli_sha256": "7baaad44d8ae6f56fd6f470d29271a0b0529be83a8eacd53b69d60c9140c08ba",
+  "preserved_binary": "artifacts/kernel-baselines/uocr-7baaad44d8ae6f56fd6f470d29271a0b0529be83a8eacd53b69d60c9140c08ba",
+  "ocr_exact_cases": 12,
+  "vision_latency_reduction_percent": 5.520484222846256
+}

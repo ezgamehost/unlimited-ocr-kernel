@@ -31,10 +31,11 @@ impl Vision {
             &Tensor::new(vec![1, tokens, width], data)?,
             "model.vision_model.pre_layrnorm",
             1e-5,
+            cpu,
         )?;
         for layer in 0..24 {
             let prefix = format!("model.vision_model.transformer.layers.{layer}");
-            let norm = self.norm(&x, &format!("{prefix}.layer_norm1"), 1e-5)?;
+            let norm = self.norm(&x, &format!("{prefix}.layer_norm1"), 1e-5, cpu)?;
             let qkv = self.linear(&norm, &format!("{prefix}.self_attn.qkv_proj"), cpu)?;
             let mut q = vec![0.; tokens * width];
             let mut k = q.clone();
@@ -72,7 +73,7 @@ impl Vision {
                 cpu,
             )?;
             x = residual(x, attention)?;
-            let norm = self.norm(&x, &format!("{prefix}.layer_norm2"), 1e-5)?;
+            let norm = self.norm(&x, &format!("{prefix}.layer_norm2"), 1e-5, cpu)?;
             let mut up = self.linear(&norm, &format!("{prefix}.mlp.fc1"), cpu)?;
             ops::quick_gelu_parallel(&mut up.data, cpu);
             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.fc2"), cpu)?)?;

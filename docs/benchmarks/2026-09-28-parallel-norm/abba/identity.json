@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "baseline": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/sam1024-unbiased128",
+      "binary_sha256": "4de760be3374256dd35b2796e579d30dbe4c4c108155401f269f309aa8d31059",
+      "ops_sha256": "2eb721c250e44015913228ea6b8472e181d7ee18d3eadbdb1c0e5126b822ace1"
+    },
+    "parallel": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-norm/parallel",
+      "binary_sha256": "3618136ae27876bc9ed646adf92345d2916b85111ee0aa5f7d90ec920f72a275",
+      "source_sha256": {
+        "src/cpu/ops.rs": "d25ef614537be107593cfae5adae9c886225e4b09e0794a4795692c1ca571e9e",
+        "src/vision/mod.rs": "c2cd432de95e303912616ba11a2b384d0bc4508d5221e8a45c4d562a71e2dec9",
+        "src/vision/sam.rs": "60ab343f395e201d2da6ab97e9cb4821fd50f9893d7a05e3e3ee8513f73d9ec3",
+        "src/vision/clip.rs": "7b81b8dc1ca50513b27e22846d41ac1ffea8ece89d194b131fe4e56df7d242b6",
+        "examples/bench_vision_tiles.rs": "9cdb8d682db742395b6cf54c4c29015d645acd9316632b04b62952ed2b168f4e"
+      }
+    }
+  },
+  "model_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+  "source_commit": "becdf27d39c00c2f958aa7dc9aed84ab4591e987"
+}

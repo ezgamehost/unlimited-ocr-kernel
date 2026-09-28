@@ -164,6 +164,40 @@ fn layernorm_centers_nearly_constant_wide_rows() {
 }
 
 #[test]
+fn parallel_layernorm_preserves_scalar_bits_across_rows_and_worker_settings() {
+    for (rows, width) in [(1, 3), (129, 3), (257, 768), (33, 1024)] {
+        let data = (0..rows * width)
+            .map(|i| {
+                if i / width % 2 == 0 {
+                    1. + (i % 3) as f32 * 0.0001
+                } else {
+                    (i as f32 * 0.137).sin() * 3.
+                }
+            })
+            .collect();
+        let x = Tensor::new(vec![rows, width], data).unwrap();
+        let weights: Vec<f32> = (0..width).map(|i| 0.3 + i as f32 / width as f32).collect();
+        let bias: Vec<f32> = (0..width).map(|i| i as f32 * 0.001 - 0.4).collect();
+        for bias in [None, Some(bias.as_slice())] {
+            let expected = ops::layer_norm(&x, &weights, bias, 1e-6).unwrap();
+            for (backend, threads) in [(Backend::Scalar, 4), (Backend::Auto, 1), (Backend::Auto, 4)]
+            {
+                let cpu = CpuContext::new(backend, threads, 1 << 24).unwrap();
+                let actual = ops::layer_norm_parallel(&x, &weights, bias, 1e-6, &cpu).unwrap();
+                assert_eq!(actual.shape, expected.shape);
+                assert!(
+                    actual
+                        .data
+                        .iter()
+                        .zip(&expected.data)
+                        .all(|(a, b)| a.to_bits() == b.to_bits())
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn causal_attention_masks_across_query_block_boundaries() {
     let (heads, tokens, dim) = (2, 129, 3);
     let q = Tensor::new(vec![heads, tokens, dim], vec![0.; heads * tokens * dim]).unwrap();

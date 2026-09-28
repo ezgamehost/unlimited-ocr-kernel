@@ -1,0 +1,9 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `layer_norm_parallel` in module `ops`
+   --> tests/ops.rs:185:35
+    |
+185 |                 let actual = ops::layer_norm_parallel(&x, &weights, bias, 1e-6, &cpu).unwrap();
+    |                                   ^^^^^^^^^^^^^^^^^^^ not found in `ops`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (test "ops") due to 1 previous error

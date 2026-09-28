@@ -41,12 +41,13 @@ impl Vision {
             .map(|x| x.data.as_slice());
         ops::linear(x, self.w(&format!("{name}.weight"))?, bias, cpu)
     }
-    fn norm(&self, x: &Tensor, name: &str, eps: f32) -> Result<Tensor> {
-        ops::layer_norm(
+    fn norm(&self, x: &Tensor, name: &str, eps: f32, cpu: &CpuContext) -> Result<Tensor> {
+        ops::layer_norm_parallel(
             x,
             &self.w(&format!("{name}.weight"))?.data,
             Some(&self.w(&format!("{name}.bias"))?.data),
             eps,
+            cpu,
         )
     }
     fn conv(
