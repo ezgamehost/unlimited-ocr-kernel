@@ -37,3 +37,15 @@ PYTHONPATH=. .venv/bin/python docs/benchmarks/2026-09-28-packed-int4/audit.py
 `--int4` and `--simulate-int4` are mutually exclusive. Normal Q8 export retains
 its existing format and metadata. The current model overlay loader still
 rejects the packed version until its planned integration is implemented.
+
+Portable matrix implementation is now available in `src/cpu/int4.rs`:
+validated nibble storage, weight-only linear, prefill dequantization and W4A8
+single-token arithmetic. Tests cover literal signed bytes, invalid codes and
+padding, malformed/overflowing dimensions, scales, row tails and scratch limits.
+Across twelve widths (1 through 1280), packed dequantization and dynamic output
+match the I8 simulation bit-for-bit on Scalar and Auto. Weight-only outputs
+match within floating-point tolerance. A signed-zero regression exposed the
+existing scalar/SDOT accumulation identity difference; the packed path preserves
+the selected backend's identity. Full suite: 53 passed, 8 ignored; clippy clean.
+See `portable-tests.log` and `portable-clippy.log`. SIMD and model loader
+integration remain pending; no packed full-model performance result yet.

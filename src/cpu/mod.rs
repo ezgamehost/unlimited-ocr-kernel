@@ -3,6 +3,7 @@ use std::sync::Arc;
 mod accelerate;
 #[cfg(target_os = "macos")]
 mod blas_threads;
+pub mod int4;
 mod neon;
 pub mod ops;
 pub mod quantized;

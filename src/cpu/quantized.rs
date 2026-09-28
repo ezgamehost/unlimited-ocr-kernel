@@ -15,6 +15,9 @@ pub struct Int8Matrix {
     scales: Vec<f32>,
 }
 impl Int8Matrix {
+    pub(super) fn parts(&self) -> (&[i8], &[f32]) {
+        (&self.weights, &self.scales)
+    }
     pub fn from_parts(
         rows: usize,
         cols: usize,
