@@ -46,3 +46,12 @@ from the verified Q8 artifact. Independently byte-check every tensor against its
 intended source. Run eight original-prompt pages and four matched-prompt pages.
 Only after this gate, design packed hybrid storage/runtime support and benchmark
 it. Physical I8 simulation is solely a quality experiment; no packing speed claim.
+
+## Hybrid passes parity; resume repeated comparison
+
+The packed hybrid format is now implemented and verified in
+`../2026-09-28-hybrid-int4/`. All twelve complete outputs match its simulation
+exactly, and all sixteen fixed-work logit hashes agree. `run_repeated.py` checks
+those gates, verifies executable/model/projector/overlay identities, then runs
+native-hybrid, llama-Q8, llama-Q8, native-hybrid. The original ABBA sampling and
+matching rules above remain unchanged. All-Q4 failed pilot evidence stays intact.

@@ -1,0 +1,16 @@
+.............{"event": "ready", "engine": "native", "startup_seconds": 0.33430562500143424}
+{"image_id": "sample", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 0.00017275000573135912, "cer": 0.0}
+{"image_id": "sample", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 0.00010825000936165452, "cer": 0.0}
+{"event": "ready", "engine": "native", "startup_seconds": 0.33222387501155026}
+{"image_id": "sample", "iteration": -1, "warmup": true, "status": "error", "finish_reason": "eos", "wall_seconds": 0.0002699999895412475, "cer": null}
+.{"event": "ready", "engine": "native", "startup_seconds": 0.22581945799174719}
+{"image_id": "sample", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 0.00021541598835028708, "cer": 0.0}
+{"image_id": "sample", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 0.00017870901501737535, "cer": 0.0}
+..........Writing:   0%|          | 0.00/48.0 [00:00<?, ?byte/s]Writing: 100%|██████████| 48.0/48.0 [00:00<00:00, 128kbyte/s]
+........s/Users/matthewzhao/vibe/unlimited-ocr-kernel/.venv/lib/python3.12/site-packages/torch/jit/_script.py:1480: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+.s
+----------------------------------------------------------------------
+Ran 35 tests in 2.023s
+
+OK (skipped=2)

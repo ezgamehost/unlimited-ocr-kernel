@@ -181,3 +181,113 @@ fn packed_overlay_dispatch_and_authenticated_validation() {
         }
     }
 }
+
+#[test]
+fn hybrid_overlay_requires_q8_head_and_q4_body() {
+    use uocr::cpu::quantized::QuantizationMode;
+    let body = "model.layers.0.self_attn.q_proj.weight";
+    for invalid in [
+        "valid",
+        "body_bits",
+        "head_bits",
+        "header_bits",
+        "head_dtype",
+        "body_dtype",
+        "head_range",
+        "body_padding",
+        "head_suffix",
+        "missing_head",
+    ] {
+        let dir = tempfile::tempdir().unwrap();
+        let source_path = dir.path().join("source.safetensors");
+        let mut source_header = serde_json::json!({"lm_head.weight":{"dtype":"F32","shape":[1,2],"data_offsets":[0,8]},body:{"dtype":"F32","shape":[1,2],"data_offsets":[8,16]}});
+        let source_data = [1f32.to_le_bytes(), (-2f32).to_le_bytes()].concat();
+        if invalid == "missing_head" {
+            source_header
+                .as_object_mut()
+                .unwrap()
+                .remove("lm_head.weight");
+            source_header[body]["data_offsets"] = serde_json::json!([0, 8]);
+            write(&source_path, source_header, &source_data);
+        } else {
+            write(
+                &source_path,
+                source_header,
+                &[source_data.clone(), source_data].concat(),
+            );
+        }
+        let source = Checkpoint::open(&source_path).unwrap();
+        let hash = source.sha256().unwrap();
+        let mut header = serde_json::json!({"__metadata__":{"format":"uocr-q4-q8head-block32-v1","block_size":"32","source_sha256":hash,"body_bits":"4","head_bits":"8"},"lm_head.weight":{"dtype":"I8","shape":[1,2],"data_offsets":[0,2]},"lm_head.weight.q8_scales":{"dtype":"F32","shape":[1,1],"data_offsets":[2,6]},body:{"dtype":"U8","shape":[1,1,16],"data_offsets":[6,22]},format!("{body}.q4_scales"):{"dtype":"F32","shape":[1,1],"data_offsets":[22,26]}});
+        let mut data = vec![1, 254];
+        data.extend(1f32.to_le_bytes());
+        data.extend([1, 14]);
+        data.extend([0; 14]);
+        data.extend(1f32.to_le_bytes());
+        match invalid {
+            "header_bits" => header["__metadata__"]["head_bits"] = "4".into(),
+            "head_dtype" => header["lm_head.weight"]["dtype"] = "U8".into(),
+            "body_dtype" => header[body]["dtype"] = "I8".into(),
+            "head_range" => data[0] = 128,
+            "body_padding" => data[6] = 17,
+            "head_suffix" => {
+                let value = header
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("lm_head.weight.q8_scales")
+                    .unwrap();
+                header["lm_head.weight.q4_scales"] = value;
+            }
+            "missing_head" => {
+                header.as_object_mut().unwrap().remove("lm_head.weight");
+                header
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("lm_head.weight.q8_scales");
+                header[body]["data_offsets"] = serde_json::json!([0, 16]);
+                header[format!("{body}.q4_scales")]["data_offsets"] = serde_json::json!([16, 20]);
+                data = data[6..].to_vec();
+            }
+            _ => {}
+        }
+        let path = dir.path().join("hybrid.safetensors");
+        write(&path, header, &data);
+        let bytes = fs::read(&path).unwrap();
+        let mut manifest = serde_json::json!({"schema_version":1,"format":"uocr-q4-q8head-block32-v1","block_size":32,"source_sha256":hash,"output_sha256":format!("{:x}",Sha256::digest(&bytes)),"matrix_count":if invalid=="missing_head" {1} else {2},"bytes":bytes.len(),"body_bits":4,"head_bits":8});
+        if invalid == "body_bits" || invalid == "head_bits" {
+            manifest.as_object_mut().unwrap().remove(invalid);
+        }
+        fs::write(
+            path.with_extension("json"),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        let result = QuantizedWeights::load(&path, &source);
+        if invalid == "valid" {
+            let weights = result.unwrap();
+            assert_eq!(
+                weights.precision(QuantizationMode::DynamicActivations),
+                "int4_body_int8_head_dynamic_int8_activations"
+            );
+            assert_eq!(
+                weights.precision(QuantizationMode::WeightsOnly),
+                "int4_body_int8_head_fp32"
+            );
+            let mut cpu = CpuContext::new(Backend::Auto, 1, 1024).unwrap();
+            let x = Tensor::new(vec![1, 2], vec![3., 4.]).unwrap();
+            for name in ["lm_head.weight", body] {
+                assert_eq!(
+                    weights
+                        .get(name)
+                        .unwrap()
+                        .linear(&x, &mut cpu)
+                        .unwrap()
+                        .data,
+                    [-5.]
+                );
+            }
+        } else {
+            assert!(result.is_err(), "accepted {invalid}");
+        }
+    }
+}

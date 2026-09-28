@@ -91,20 +91,24 @@ and [page results](docs/benchmarks/2026-09-28-parallel-activations/README.md).
 
 ## Experimental packed INT4 decoder
 
+Keep the output head at Q8 to avoid the observed all-Q4 table regression:
+
 ```sh
-.venv/bin/python -m tools.quantize --int4 --output artifacts/unlimited-ocr-q4-block32.safetensors
+.venv/bin/python -m tools.quantize --int4-q8-head --output artifacts/unlimited-ocr-q4-q8head-block32.safetensors
 target/release/uocr --image benchmarks/corpus/english.png --threads 8 --json \
-  --quantized-weights artifacts/unlimited-ocr-q4-block32.safetensors --int8-activations
+  --quantized-weights artifacts/unlimited-ocr-q4-q8head-block32.safetensors --int8-activations
 ```
 
-The signed block32 format keeps FP32 scales and uses ARM SDOT with runtime
-feature detection, plus a portable fallback. The original checkpoint is still
-required for unquantized tensors. All eight synthetic selection pages match the
-unpacked INT4 simulation's text and tokens exactly with the original prompt.
-The matched-newline comparison prompt exposes an empty-table regression in
-all-Q4; a Q8 output-head remedy is under evaluation. Broader quality validation
-and repeated full-page performance acceptance remain pending; see the
-[packed INT4 evidence](docs/benchmarks/2026-09-28-packed-int4/README.md).
+The decoder body uses signed packed block32 weights with FP32 scales and ARM
+SDOT under runtime feature detection, plus a portable fallback. The original
+checkpoint is still required for unquantized tensors. This hybrid matches its
+simulation exactly on twelve prompt/page cases, all at zero character error.
+Broader quality validation and repeated full-page performance acceptance remain
+pending; see the [hybrid evidence](docs/benchmarks/2026-09-28-hybrid-int4/README.md).
+
+All-Q4 export with `--int4` remains available. It passes the eight original-prompt
+pages but returns an empty table with the extra newline used in the llama.cpp
+comparison. See the [precision diagnostic](docs/benchmarks/2026-09-28-packed-int4-resident/README.md).
 
 ## Rust API and checks
 

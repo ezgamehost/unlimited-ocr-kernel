@@ -1,0 +1,12 @@
+{"case": "corpus-english-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 250, "image_tokens_equal": true}
+{"case": "corpus-english-matched", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 250, "image_tokens_equal": true}
+{"case": "corpus-chinese-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 289, "image_tokens_equal": true}
+{"case": "corpus-chinese-matched", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 289, "image_tokens_equal": true}
+{"case": "corpus-table-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 247, "image_tokens_equal": true}
+{"case": "corpus-table-matched", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 247, "image_tokens_equal": true}
+{"case": "corpus-dense-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 1578, "image_tokens_equal": true}
+{"case": "corpus-dense-matched", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 768, "image_tokens_equal": true}
+{"case": "heldout-receipt-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 272, "image_tokens_equal": true}
+{"case": "heldout-wide_report-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 355, "image_tokens_equal": true}
+{"case": "heldout-bilingual_notice-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 384, "image_tokens_equal": true}
+{"case": "heldout-archive_register-original", "exact_text": true, "exact_tokens": true, "eos": true, "tokens": 1790, "image_tokens_equal": true}

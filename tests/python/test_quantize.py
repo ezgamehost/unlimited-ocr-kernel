@@ -5,6 +5,36 @@ from safetensors.numpy import save_file,load_file
 from tools.quantize import quantize_blocks,quantize_file
 
 class QuantizeTests(unittest.TestCase):
+    def test_packed_hybrid_keeps_only_head_at_q8(self):
+        from safetensors import safe_open
+        with tempfile.TemporaryDirectory() as d:
+            source=Path(d)/'source.safetensors';target=Path(d)/'hybrid.safetensors'
+            head=np.zeros((3,35),np.float32);head[:,0]=-127;head[:,16]=127
+            body=np.zeros((3,35),np.float32);body[:,0]=-7;body[:,16]=7;body[:,34]=7
+            name='model.layers.0.self_attn.q_proj.weight'
+            save_file({'lm_head.weight':head,name:body},source)
+            original=source.read_bytes()
+            result=quantize_file(source,target,chunk_rows=2,bits=4,packed=True,q8_head=True)
+            tensors=load_file(target)
+            expected=np.zeros((3,2,16),np.uint8);expected[:,0,0]=0x79;expected[:,1,2]=7
+            np.testing.assert_array_equal(tensors[name],expected)
+            np.testing.assert_array_equal(tensors[name+'.q4_scales'],np.ones((3,2),np.float32))
+            np.testing.assert_array_equal(tensors['lm_head.weight'],head.astype(np.int8))
+            np.testing.assert_array_equal(tensors['lm_head.weight.q8_scales'],[[1.,0.]]*3)
+            self.assertEqual(tensors['lm_head.weight'].dtype,np.int8)
+            self.assertEqual(result['format'],'uocr-q4-q8head-block32-v1')
+            self.assertEqual((result['body_bits'],result['head_bits']),(4,8))
+            self.assertNotIn('storage_bits',result)
+            with safe_open(target,framework='np') as reader:
+                self.assertEqual(reader.metadata()['body_bits'],'4')
+                self.assertEqual(reader.metadata()['head_bits'],'8')
+            self.assertEqual(source.read_bytes(),original)
+            for kwargs in [dict(q8_head=True),dict(q8_head=True,bits=4),dict(q8_head=1,bits=4,packed=True)]:
+                with self.assertRaises(ValueError):quantize_file(source,Path(d)/'invalid.safetensors',**kwargs)
+            save_file({name:body},Path(d)/'nohead.safetensors')
+            with self.assertRaises(ValueError):
+                quantize_file(Path(d)/'nohead.safetensors',Path(d)/'missing.safetensors',bits=4,packed=True,q8_head=True)
+
     def test_packed_int4_half_block_layout_and_partial_tail(self):
         with tempfile.TemporaryDirectory() as d:
             source=Path(d)/'source.safetensors';target=Path(d)/'packed.safetensors'

@@ -241,6 +241,7 @@ impl Int8Matrix {
 
 const FORMAT: &str = "uocr-q8-block32-v1";
 const Q4_FORMAT: &str = "uocr-q4-block32-v1";
+const HYBRID_FORMAT: &str = "uocr-q4-q8head-block32-v1";
 
 #[derive(Clone, Copy, Debug, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -260,6 +261,8 @@ struct Manifest {
     bytes: usize,
     weight_bits: Option<usize>,
     storage_bits: Option<usize>,
+    body_bits: Option<usize>,
+    head_bits: Option<usize>,
 }
 
 /// Validated, immutable owned matrices. Load-time copying also touches pages
@@ -285,6 +288,7 @@ impl QuantizedMatrix {
 pub struct QuantizedWeights {
     matrices: std::collections::BTreeMap<String, QuantizedMatrix>,
     packed_int4: bool,
+    q8_head: bool,
 }
 
 fn eligible(name: &str) -> bool {
@@ -333,7 +337,8 @@ impl QuantizedWeights {
             serde_json::from_slice(&std::fs::read(path.with_extension("json"))?)?;
         let checkpoint = Checkpoint::open(path)?;
         let metadata = checkpoint.metadata();
-        let packed_int4 = manifest.format == Q4_FORMAT;
+        let q8_head = manifest.format == HYBRID_FORMAT;
+        let packed_int4 = manifest.format == Q4_FORMAT || q8_head;
         if manifest.schema_version != 1
             || (!packed_int4 && manifest.format != FORMAT)
             || manifest.block_size != BLOCK
@@ -342,10 +347,16 @@ impl QuantizedWeights {
             || metadata.get("source_sha256") != Some(&manifest.source_sha256)
             || checkpoint.file_bytes() != manifest.bytes
             || (packed_int4
+                && !q8_head
                 && (manifest.weight_bits != Some(4)
                     || manifest.storage_bits != Some(4)
                     || metadata.get("weight_bits").map(String::as_str) != Some("4")
                     || metadata.get("storage_bits").map(String::as_str) != Some("4")))
+            || (q8_head
+                && (manifest.body_bits != Some(4)
+                    || manifest.head_bits != Some(8)
+                    || metadata.get("body_bits").map(String::as_str) != Some("4")
+                    || metadata.get("head_bits").map(String::as_str) != Some("8")))
         {
             return Err(OcrError::Format(
                 "quantized overlay version or metadata mismatch".into(),
@@ -362,6 +373,7 @@ impl QuantizedWeights {
         }
         let expected: Vec<_> = source.names().filter(|name| eligible(name)).collect();
         if expected.is_empty()
+            || (q8_head && !expected.contains(&"lm_head.weight"))
             || expected.len() != manifest.matrix_count
             || checkpoint.names().count() != expected.len() * 2
         {
@@ -371,7 +383,8 @@ impl QuantizedWeights {
         for name in expected {
             let original = source.tensor(name)?;
             let weight = checkpoint.tensor(name)?;
-            let suffix = if packed_int4 {
+            let matrix_packed = packed_int4 && !(q8_head && name == "lm_head.weight");
+            let suffix = if matrix_packed {
                 ".q4_scales"
             } else {
                 ".q8_scales"
@@ -386,7 +399,7 @@ impl QuantizedWeights {
                 return Err(OcrError::Format(format!("invalid quantized matrix {name}")));
             }
             let (rows, cols) = (original.shape[0], original.shape[1]);
-            let matrix = if packed_int4 {
+            let matrix = if matrix_packed {
                 if weight.dtype != DType::U8 || weight.shape != [rows, cols.div_ceil(BLOCK), 16] {
                     return Err(OcrError::Format(format!("invalid INT4 matrix {name}")));
                 }
@@ -415,9 +428,18 @@ impl QuantizedWeights {
         Ok(Self {
             matrices,
             packed_int4,
+            q8_head,
         })
     }
     pub fn precision(&self, mode: QuantizationMode) -> &'static str {
+        if self.q8_head {
+            return match mode {
+                QuantizationMode::WeightsOnly => "int4_body_int8_head_fp32",
+                QuantizationMode::DynamicActivations => {
+                    "int4_body_int8_head_dynamic_int8_activations"
+                }
+            };
+        }
         match (self.packed_int4, mode) {
             (false, QuantizationMode::WeightsOnly) => "int8_weights_fp32",
             (false, QuantizationMode::DynamicActivations) => "int8_weights_dynamic_activations",

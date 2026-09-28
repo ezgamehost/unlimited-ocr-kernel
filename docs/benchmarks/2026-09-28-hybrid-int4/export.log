@@ -1,0 +1,1 @@
+{"schema_version": 1, "format": "uocr-q4-q8head-block32-v1", "block_size": 32, "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6", "output_sha256": "6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae", "matrix_count": 2197, "bytes": 1813492888, "body_bits": 4, "head_bits": 8}
