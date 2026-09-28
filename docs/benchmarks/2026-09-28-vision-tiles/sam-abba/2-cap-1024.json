@@ -1,0 +1,17 @@
+{
+  "phase": 2,
+  "cap": 1024,
+  "utc": "2026-09-28T19:39:06.565074+00:00",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t22%; charging; 3:09 remaining present: true\n",
+  "variant": {
+    "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/sam1024-unbiased128",
+    "binary_sha256": "4de760be3374256dd35b2796e579d30dbe4c4c108155401f269f309aa8d31059",
+    "ops_sha256": "2eb721c250e44015913228ea6b8472e181d7ee18d3eadbdb1c0e5126b822ace1",
+    "cap": 1024,
+    "unbiased_query_cap": 128
+  },
+  "binary_sha256": "4de760be3374256dd35b2796e579d30dbe4c4c108155401f269f309aa8d31059",
+  "model_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+  "exit_code": 0,
+  "process_wall_seconds": 25.27610524999909
+}

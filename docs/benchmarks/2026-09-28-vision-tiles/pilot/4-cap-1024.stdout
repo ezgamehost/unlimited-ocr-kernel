@@ -1,0 +1,4 @@
+{"iteration":0,"seconds":6.303089708,"sha256":"51a95d18a3d1557d48a7cece9dc4a24994fdbfe754a48757e61d7ada803934e9","shape":[1513,1280],"warmup":true}
+{"iteration":1,"seconds":6.254918,"sha256":"51a95d18a3d1557d48a7cece9dc4a24994fdbfe754a48757e61d7ada803934e9","shape":[1513,1280],"warmup":false}
+{"iteration":2,"seconds":6.229110167,"sha256":"51a95d18a3d1557d48a7cece9dc4a24994fdbfe754a48757e61d7ada803934e9","shape":[1513,1280],"warmup":false}
+{"iteration":3,"seconds":6.278119875,"sha256":"51a95d18a3d1557d48a7cece9dc4a24994fdbfe754a48757e61d7ada803934e9","shape":[1513,1280],"warmup":false}

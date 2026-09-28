@@ -1,0 +1,5 @@
+{
+  "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/sam1024-unbiased128",
+  "binary_sha256": "4de760be3374256dd35b2796e579d30dbe4c4c108155401f269f309aa8d31059",
+  "ops_sha256": "2eb721c250e44015913228ea6b8472e181d7ee18d3eadbdb1c0e5126b822ace1"
+}

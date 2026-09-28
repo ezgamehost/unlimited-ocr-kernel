@@ -1,0 +1,4 @@
+{"iteration":0,"seconds":7.238320208,"sha256":"a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213","shape":[1513,1280],"warmup":true}
+{"iteration":1,"seconds":7.177333542,"sha256":"a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213","shape":[1513,1280],"warmup":false}
+{"iteration":2,"seconds":7.175331708,"sha256":"a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213","shape":[1513,1280],"warmup":false}
+{"iteration":3,"seconds":7.197961959,"sha256":"a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213","shape":[1513,1280],"warmup":false}

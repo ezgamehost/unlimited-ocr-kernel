@@ -1,9 +1,17 @@
 # Next performance investigation: vision attention
 
-Do not execute alongside the powered ABBA comparison (exec86420, output
-`2026-09-28-packed-int4-resident/powered-abba-1`). The earlier exec33128 was
-terminated for critical battery and is not live. Preserve the accepted binary
-and complete all four powered phases before compiling, profiling or benchmarking.
+Progress: the powered comparison and vision profile are complete. The tile
+experiment in `docs/benchmarks/2026-09-28-vision-tiles/` selected 1024-query SAM
+tiles while retaining 128-query unbiased attention. Full-vision ABBA improved
+7.1763s→6.1927s with exact embeddings, and all 12 OCR cases retained exact
+text/token IDs. Enlarging unbiased tiles too caused eight one-unit box shifts
+and was not accepted. Head scheduling remains unimplemented; the profile also
+identifies activation and normalization work for subsequent investigation.
+
+The powered ABBA comparison (exec86420) completed and was audited before
+profiling; its binary is preserved. The earlier exec33128 was terminated for
+critical battery. Both handles are terminal. Keep future timed benchmarks
+separate from compilation, profiling, and other inference.
 
 Evidence: `docs/benchmarks/2026-09-28-packed-int4-resident/native-phase0-breakdown.json`.
 In the completed native phase, vision takes about 7.1 s: 67–68% of English,

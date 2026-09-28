@@ -267,7 +267,9 @@ pub fn attention(
     causal: bool,
     cpu: &mut CpuContext,
 ) -> Result<Tensor> {
-    attention_bias(q, k, v, causal, cpu, |_, _, _, _| {})
+    // Keep unbiased CLIP/decoder tiling stable: larger tiles can select a
+    // different BLAS reduction path and perturb generated box coordinates.
+    attention_bias_blocked(q, k, v, causal, cpu, 128, |_, _, _, _| {})
 }
 
 /// Bias callback receives head, first query, query count, and unnormalized scores.
@@ -277,6 +279,23 @@ pub fn attention_bias<F>(
     v: &Tensor,
     causal: bool,
     cpu: &mut CpuContext,
+    bias: F,
+) -> Result<Tensor>
+where
+    F: FnMut(usize, usize, usize, &mut [f32]),
+{
+    // SAM benefits from larger tiles; the shared implementation still shrinks
+    // them to fit the configured scratch limit.
+    attention_bias_blocked(q, k, v, causal, cpu, 1024, bias)
+}
+
+fn attention_bias_blocked<F>(
+    q: &Tensor,
+    k: &Tensor,
+    v: &Tensor,
+    causal: bool,
+    cpu: &mut CpuContext,
+    query_cap: usize,
     mut bias: F,
 ) -> Result<Tensor>
 where
@@ -305,7 +324,7 @@ where
             .checked_add(nk)
             .ok_or_else(|| OcrError::Resource("attention scratch overflow".into()))?,
     )?;
-    let block = nq.min(128).min((cpu.scratch_limit / 4 - fixed) / nk);
+    let block = nq.min(query_cap).min((cpu.scratch_limit / 4 - fixed) / nk);
     let scale = (d as f32).sqrt().recip();
     let mut output = vec![0.; q.data.len()];
     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;

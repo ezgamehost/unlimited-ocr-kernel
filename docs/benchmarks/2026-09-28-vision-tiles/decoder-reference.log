@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 0.05s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 2 tests
+test actual_decoder_layers_match_upstream_prefill_and_decode ... ok
+test actual_expert_scheduling_preserves_results_with_small_scratch ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.01s
+

@@ -1,0 +1,42 @@
+use sha2::{Digest, Sha256};
+use std::{path::Path, time::Instant};
+use uocr::{
+    checkpoint::Checkpoint,
+    cpu::{Backend, CpuContext},
+    preprocess::{ImageMode, prepare},
+    vision::Vision,
+};
+
+fn main() {
+    let weights = Checkpoint::open(Path::new(
+        "artifacts/upstream/model-00001-of-000001.safetensors",
+    ))
+    .unwrap();
+    let model = Vision::new(&weights).unwrap();
+    let input = prepare(
+        Path::new("benchmarks/corpus/english.png"),
+        ImageMode::Gundam,
+    )
+    .unwrap();
+    let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
+    for iteration in 0..4 {
+        let start = Instant::now();
+        let output = model.encode(&input, &mut cpu).unwrap();
+        let seconds = start.elapsed().as_secs_f64();
+        assert!(output.data.iter().all(|x| x.is_finite()));
+        let mut hash = Sha256::new();
+        for value in &output.data {
+            hash.update(value.to_le_bytes());
+        }
+        println!(
+            "{}",
+            serde_json::json!({
+                "iteration": iteration,
+                "warmup": iteration == 0,
+                "seconds": seconds,
+                "shape": output.shape,
+                "sha256": format!("{:x}", hash.finalize()),
+            })
+        );
+    }
+}

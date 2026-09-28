@@ -1,0 +1,98 @@
+[
+  {
+    "case": "corpus-english-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 9,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "corpus-english-matched",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 9,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "corpus-chinese-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 12,
+    "changed_coordinates": 3,
+    "max_absolute_coordinate_change": 1
+  },
+  {
+    "case": "corpus-chinese-matched",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 12,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "corpus-table-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 5,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "corpus-table-matched",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 5,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "corpus-dense-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 56,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "corpus-dense-matched",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 2,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "heldout-receipt-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 8,
+    "changed_coordinates": 2,
+    "max_absolute_coordinate_change": 1
+  },
+  {
+    "case": "heldout-wide_report-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 11,
+    "changed_coordinates": 2,
+    "max_absolute_coordinate_change": 1
+  },
+  {
+    "case": "heldout-bilingual_notice-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 16,
+    "changed_coordinates": 0,
+    "max_absolute_coordinate_change": 0
+  },
+  {
+    "case": "heldout-archive_register-original",
+    "cer": 0.0,
+    "non_box_text_equal": true,
+    "box_count": 54,
+    "changed_coordinates": 1,
+    "max_absolute_coordinate_change": 1
+  }
+]

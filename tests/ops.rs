@@ -202,6 +202,41 @@ fn attention_shrinks_query_blocks_to_fit_scratch_budget() {
 }
 
 #[test]
+fn biased_attention_preserves_absolute_queries_with_large_and_small_scratch() {
+    // An incorrect callback start offset selects the wrong value after a tile
+    // boundary. One-hot bias makes the expected result independent of GEMM.
+    let queries = 1031;
+    let q = Tensor::new(vec![2, queries, 1], vec![0.; 2 * queries]).unwrap();
+    let k = Tensor::new(vec![2, 17, 1], vec![0.; 34]).unwrap();
+    let v = Tensor::new(
+        k.shape.clone(),
+        (0..2)
+            .flat_map(|head| (1..=17).map(move |value| (100 * head + value) as f32))
+            .collect(),
+    )
+    .unwrap();
+    for backend in [Backend::Scalar, Backend::Auto] {
+        for scratch in [8704, 1 << 20] {
+            let mut cpu = CpuContext::new(backend, 4, scratch).unwrap();
+            let actual =
+                ops::attention_bias(&q, &k, &v, false, &mut cpu, |head, start, _, scores| {
+                    for (i, row) in scores.as_chunks_mut::<17>().0.iter_mut().enumerate() {
+                        row.fill(f32::NEG_INFINITY);
+                        row[[2, 7, 11][(start + i + head) % 3]] = 0.;
+                    }
+                })
+                .unwrap();
+            for head in 0..2 {
+                for query in 0..queries {
+                    let expected = 100. * head as f32 + [3., 8., 12.][(query + head) % 3];
+                    assert_eq!(actual.data[head * queries + query], expected);
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn parallel_softmax_rows_preserve_bits_and_causal_offsets() {
     let cpu = CpuContext::new(Backend::Auto, 8, 1 << 24).unwrap();
     for (rows, width) in [(1, 31), (100, 513), (129, 513), (128, 4096)] {

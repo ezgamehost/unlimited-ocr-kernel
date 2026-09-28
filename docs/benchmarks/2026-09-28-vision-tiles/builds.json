@@ -1,0 +1,38 @@
+{
+  "command": [
+    ".tools/cargo/bin/cargo",
+    "build",
+    "--release",
+    "--example",
+    "bench_vision_tiles"
+  ],
+  "source_commit": "c2768bb67177b94b4dcd78522e8c519cb97af8dc",
+  "original_ops_sha256": "ec76aa3c1178c4cb97cfe0e29444a4747372d80aa495f5ca061e42a72e1576a9",
+  "benchmark_sha256": "175a65ad843ec3b6d6b75632756539a49a1bfb35a2603500c8091ca64c9652bc",
+  "variants": [
+    {
+      "cap": 128,
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/cap-128",
+      "binary_sha256": "33ae482e58665bc22d723fdf7a3d4a1e5dddb3ebd4b183ed46c50353758a9679",
+      "ops_sha256": "ec76aa3c1178c4cb97cfe0e29444a4747372d80aa495f5ca061e42a72e1576a9"
+    },
+    {
+      "cap": 256,
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/cap-256",
+      "binary_sha256": "c806af021b64f0ae66641d26334fc847996b94b7d1d86c6d141b808a7b00eca8",
+      "ops_sha256": "6f94fbde11276671a080c46bf11a933e91d72bad9a1eae68c18d5e7e898e3d95"
+    },
+    {
+      "cap": 512,
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/cap-512",
+      "binary_sha256": "aee195a8cd6f593762dccb7e6a80b37df2e9add914170718246da575d7fd0dbc",
+      "ops_sha256": "b2430bc9a69b3fbbcff263ebd4525e258fbe069b70543d96bd51f550256287bd"
+    },
+    {
+      "cap": 1024,
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-tiles/cap-1024",
+      "binary_sha256": "f627715552909e62f94800b2d857e0a1bf5c8e59868133f7d9326305b91697a6",
+      "ops_sha256": "c0a0677fb94faba23995ac42ba38929b2afd793ab377540343439dec86d3f21a"
+    }
+  ]
+}

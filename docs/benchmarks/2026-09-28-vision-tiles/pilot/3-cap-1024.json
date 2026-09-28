@@ -1,0 +1,10 @@
+{
+  "phase": 3,
+  "cap": 1024,
+  "utc": "2026-09-28T19:28:45.791881+00:00",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t16%; charging; 3:03 remaining present: true\n",
+  "binary_sha256": "f627715552909e62f94800b2d857e0a1bf5c8e59868133f7d9326305b91697a6",
+  "model_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+  "exit_code": 0,
+  "process_wall_seconds": 25.629753291985253
+}
