@@ -1,0 +1,114 @@
+Sort by top of stack, same collapsed (when >= 5):
+        __psynch_cvwait  (in libsystem_kernel.dylib)        4857
+        __workq_kernreturn  (in libsystem_kernel.dylib)        4343
+        _RNCNvMs_NtNtCsiDNU5144K5k_4uocr3cpu9quantizedNtB6_10Int8Matrix19linear_dynamic_int8s2_0Ba_  (in uocr)        4069
+        swtch_pri  (in libsystem_kernel.dylib)        2368
+        __psynch_mutexwait  (in libsystem_kernel.dylib)        538
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db26c  [0x1816f926c]        228
+        __psynch_cvsignal  (in libsystem_kernel.dylib)        222
+        _RNvMs8_NtCs9E1KPU9LuJA_15crossbeam_deque5dequeINtB5_7StealerNtNtCs5fJiRc5JJ2V_10rayon_core3job6JobRefE5stealB10_  (in uocr)        122
+        _RNvMs8_NtCs5fJiRc5JJ2V_10rayon_core8registryNtB5_12WorkerThread9find_work  (in uocr)        120
+        _RNvMNtNtCsiDNU5144K5k_4uocr3cpu9quantizedNtB2_10Int8Matrix8quantize  (in uocr)        102
+        __psynch_mutexdrop  (in libsystem_kernel.dylib)        102
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2d4  [0x1816f92d4]        87
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2f8  [0x1816f92f8]        82
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2b0  [0x1816f92b0]        77
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc300  [0x1816ea300]        64
+        _RINvNtCsbKUPuMBiEmA_15crossbeam_epoch7default11with_handleNCNvB2_3pin0NtNtB4_5guard5GuardECs5fJiRc5JJ2V_10rayon_core  (in uocr)        63
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2c4  [0x1816f92c4]        52
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2bc  [0x1816f92bc]        51
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2e8  [0x1816f92e8]        50
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2e0  [0x1816f92e0]        49
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db298  [0x1816f9298]        42
+        _tlv_get_addr  (in libdyld.dylib)        42
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2a0  [0x1816f92a0]        40
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2e4  [0x1816f92e4]        36
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc148  [0x1816ea148]        35
+        VVEXPF  (in libvMisc.dylib)        35
+        _RNCNvNtNtCsiDNU5144K5k_4uocr3cpu3ops16attention_decodes_0B7_  (in uocr)        35
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db28c  [0x1816f928c]        33
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2c0  [0x1816f92c0]        33
+        _RINvMNtCs5fJiRc5JJ2V_10rayon_core5sleepNtB3_5Sleep5sleepNCNvMs8_NtB5_8registryNtB10_12WorkerThread15wait_until_cold0EB5_  (in uocr)        31
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops15softmax_backend  (in uocr)        31
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc104  [0x1816ea104]        30
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc060  [0x1816ea060]        29
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0bc  [0x1816ea0bc]        29
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2fc  [0x1816f92fc]        28
+        _RNvMs8_NtCs5fJiRc5JJ2V_10rayon_core8registryNtB5_12WorkerThread15wait_until_cold  (in uocr)        27
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0a4  [0x1816ea0a4]        26
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db290  [0x1816f9290]        26
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc11c  [0x1816ea11c]        25
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0d4  [0x1816ea0d4]        24
+        expf  (in libsystem_m.dylib)        24
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db29c  [0x1816f929c]        23
+        _platform_memmove  (in libsystem_platform.dylib)        23
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc09c  [0x1816ea09c]        22
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0cc  [0x1816ea0cc]        21
+        _RNvMs5_NtCsbKUPuMBiEmA_15crossbeam_epoch8internalNtB5_6Global11try_advance  (in uocr)        21
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0e4  [0x1816ea0e4]        20
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0b4  [0x1816ea0b4]        19
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0dc  [0x1816ea0dc]        19
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc084  [0x1816ea084]        18
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0fc  [0x1816ea0fc]        18
+        _RNCNvNtNtCsiDNU5144K5k_4uocr3cpu3ops13linear_weights0_0B7_  (in uocr)        18
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0ac  [0x1816ea0ac]        17
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc130  [0x1816ea130]        17
+        _platform_memcmp  (in libsystem_platform.dylib)        17
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc114  [0x1816ea114]        16
+        _RNvNtCsiDNU5144K5k_4uocr10generation12select_token  (in uocr)        16
+        _platform_memset  (in libsystem_platform.dylib)        16
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2ac  [0x1816f92ac]        15
+        powf  (in libsystem_m.dylib)        15
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0ec  [0x1816ea0ec]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc124  [0x1816ea124]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2dc  [0x1816ea2dc]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2f8  [0x1816ea2f8]        14
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc08c  [0x1816ea08c]        13
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc094  [0x1816ea094]        13
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0f4  [0x1816ea0f4]        13
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc10c  [0x1816ea10c]        12
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2f4  [0x1816ea2f4]        12
+        mach_absolute_time  (in libsystem_kernel.dylib)        12
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc12c  [0x1816ea12c]        11
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2ac  [0x1816ea2ac]        11
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2b4  [0x1816ea2b4]        11
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2bc  [0x1816ea2bc]        11
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2cc  [0x1816ea2cc]        11
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2d4  [0x1816ea2d4]        11
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2f0  [0x1816ea2f0]        11
+        DYLD-STUB$$expf  (in uocr)        11
+        _RNvMs_NtCsiDNU5144K5k_4uocr7decoderNtB4_7Decoder10projection  (in uocr)        11
+        pthread_mutex_lock  (in libsystem_pthread.dylib)        11
+        _RINvNvNtNtCsbSmsbwAs35_5rayon4iter8plumbing24bridge_producer_consumer6helperINtNtB6_9enumerate17EnumerateProducerINtNtB6_3len14MinLenProducerINtNtNtB8_5slice6chunks17ChunksMutProducerfEEEINtNtB6_8for_each15ForEachConsumerNCNvMs_NtNtCsiDNU5144K5k_4uocr3cpu9quantizedNtB3E_10Int8Matrix19linear_dynamic_int8s2_0EEB3I_  (in uocr)        10
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops4norm  (in uocr)        10
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc048  [0x1816ea048]        9
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0c4  [0x1816ea0c4]        9
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc298  [0x1816ea298]        9
+        _RNvMs8_NtCs5fJiRc5JJ2V_10rayon_core8registryNtB5_12WorkerThread14take_local_job  (in uocr)        9
+        __sincosf_stret  (in libsystem_m.dylib)        9
+        _xzm_free  (in libsystem_malloc.dylib)        9
+        _xzm_xzone_malloc  (in libsystem_malloc.dylib)        9
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc294  [0x1816ea294]        8
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2e4  [0x1816ea2e4]        8
+        _xzm_xzone_malloc_tiny  (in libsystem_malloc.dylib)        8
+        DYLD-STUB$$swtch_pri  (in libsystem_pthread.dylib)        7
+        madvise  (in libsystem_kernel.dylib)        7
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5c9b88  [0x1816e7b88]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cb474  [0x1816e9474]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0c8  [0x1816ea0c8]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc290  [0x1816ea290]        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2a4  [0x1816ea2a4]        6
+        _RNvMNtCs5fJiRc5JJ2V_10rayon_core5sleepNtB2_5Sleep16wake_any_threads  (in uocr)        6
+        _RNvMNtCs5fJiRc5JJ2V_10rayon_core5sleepNtB2_5Sleep20wake_specific_thread  (in uocr)        6
+        _RNvMNtNtCsiDNU5144K5k_4uocr3cpu9quantizedNtB2_10Int8Matrix10from_parts  (in uocr)        6
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ca7d4  [0x1816e87d4]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc0b8  [0x1816ea0b8]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc260  [0x1816ea260]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc284  [0x1816ea284]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2a0  [0x1816ea2a0]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5cc2c4  [0x1816ea2c4]        5
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5db2a4  [0x1816f92a4]        5
+        _RNvMs_NtCsiDNU5144K5k_4uocr7decoderNtB4_7Decoder12feed_forward  (in uocr)        5
+        _RNvMs_NtCsiDNU5144K5k_4uocr7decoderNtB4_7Decoder7experts  (in uocr)        5
+        cthread_yield  (in libsystem_pthread.dylib)        5
+

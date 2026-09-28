@@ -1,0 +1,18 @@
+{
+  "command": [
+    "target/release/uocr",
+    "--jsonl",
+    "--threads",
+    "8",
+    "--int8-weights",
+    "artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations"
+  ],
+  "binary_sha256": "4451dc2620e28a3df912b8a2bf5dc158b03249a48b11e796dd7165ec1c71324c",
+  "sampling_delay_seconds": 9.91314,
+  "sampling_duration_seconds": 3,
+  "sample_exit_code": 0,
+  "process_exit_code": 0,
+  "profiled_wall_seconds": 15.68782145800651,
+  "note": "Profiler overhead included; not a latency benchmark. Sampling starts using preceding request TTFT estimate; inspect stacks for stage attribution."
+}
