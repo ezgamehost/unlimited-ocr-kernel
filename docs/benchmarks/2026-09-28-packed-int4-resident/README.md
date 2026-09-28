@@ -83,24 +83,32 @@ See `host-memory-deltas.json`, `host-power-thermal.json`, `power-interruption.js
 and the per-phase raw output. No full-series speed ratio is claimed.
 
 The final audit helper requires all four completed phases and therefore is not
-run against this incomplete series. Heavy profiling, builds and inference are
-deferred until AC power is available. A future powered series needs a distinct
-output namespace; do not overwrite these files or silently stitch samples
+run against this incomplete series. Work resumed after AC became available,
+and the separate `powered-abba-1` series completed as linked above. Each later
+series needs a distinct output namespace; do not overwrite these files or stitch samples
 across the power interruption into a completed ABBA run.
 
 The retry runner now requires AC power before large-file hashing and before each
 phase. It also requires a new `--output-root` directory and records initial and
 per-phase power status. The actual 1%-battery preflight was checked: it refused
 before creating the output directory; an existing output directory was also
-rejected. No model was loaded by either check. A powered retry can use:
+rejected. No model was loaded by either check. For a newer executable, pass its
+completed `--quality-proof`: all12 canonical cases must retain exact text,
+tokens, EOS and image-token counts; the proof must have a normal process exit
+and match the executable hash and overlay manifest. Proof hashes are recorded
+with the benchmark identity. This replaces the old stale fixed-work-file
+presence check; it does not claim a fresh decoder-logit audit.
+
+A run of the accepted parallel-normalization executable can use a fresh directory:
 
 ```sh
 PYTHONPATH=. .venv/bin/python docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py \
-  --output-root docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-1
+  --quality-proof docs/benchmarks/2026-09-28-parallel-norm/quality \
+  --output-root docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-next
 PYTHONPATH=. .venv/bin/python docs/benchmarks/2026-09-28-packed-int4-resident/summarize_repeated.py \
-  --input-root docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-1
+  --input-root docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-next
 ```
 
-That retry has not been launched. The guard checks phase boundaries; it does not
+Choose another unused name if that output directory exists. The guard checks phase boundaries; it does not
 claim continuous power monitoring within a request. The audit still requires a
 complete four-phase series and does not treat interrupted data as complete.

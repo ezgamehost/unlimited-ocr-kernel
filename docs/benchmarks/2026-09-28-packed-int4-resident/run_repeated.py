@@ -1,4 +1,4 @@
-"""ABBA full-page resident comparison, gated on hybrid quality and logit parity."""
+"""ABBA full-page comparison, gated on exact OCR quality and artifact identities."""
 import argparse
 import datetime
 import json
@@ -21,21 +21,30 @@ def require_ac_power():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-root', type=Path, required=True, help='New directory for this complete ABBA series')
+    parser.add_argument('--quality-proof', type=Path,
+                        default=ROOT.parent / '2026-09-28-hybrid-int4/packed-equivalence',
+                        help='Completed exact 12-case OCR proof for the native executable')
     options = parser.parse_args()
     output_root = options.output_root.resolve()
     if output_root.exists():
         parser.error('output directory already exists; preserve prior results and choose a new directory')
     initial_power = require_ac_power()
     gate = ROOT.parent / '2026-09-28-hybrid-int4'
-    quality = json.loads((gate / 'packed-equivalence/comparison.json').read_text())
+    quality_root = options.quality_proof.resolve()
+    quality = json.loads((quality_root / 'comparison.json').read_text())
     assert len(quality) == 12 and all(all(row[key] for key in ['exact_text', 'exact_tokens', 'eos', 'image_tokens_equal']) for row in quality)
-    assert json.loads((gate / 'fixed-work/summary.json').read_text())['logits_sha256']
+    original_quality = json.loads((gate / 'packed-equivalence/comparison.json').read_text())
+    assert {row['case'] for row in quality} == {row['case'] for row in original_quality}
+    assert len({row['case'] for row in quality}) == 12
+    quality_process = json.loads((quality_root / 'process.json').read_text())
+    assert quality_process['resources']['exit_code'] == 0 and not quality_process['resources']['forced_kill']
     native = Path('target/release/uocr')
     llama = Path('/tmp/unlimited-ocr-baseline/bin/llama-b11223/llama-server')
     model = Path('/tmp/unlimited-ocr-baseline/models/model.gguf')
     projector = Path('artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf')
     overlay = Path('artifacts/unlimited-ocr-q4-q8head-block32.safetensors')
     overlay_manifest = json.loads(overlay.with_suffix('.json').read_text())
+    assert overlay_manifest == quality_process['overlay_manifest']
     expected = {llama: '6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6',
                 model: '149574e63ec2681bbfb3d0f83ca1064e041fd6f3a97a62382d3168ad64289848',
                 projector: '75dcbeafd883b3f27bee1a3d95c3ef57a6305c16758912af7cf62e6cf4c009a6',
@@ -43,8 +52,10 @@ def main():
     hashes = {str(path.resolve()): sha256(path) for path in [native, *expected]}
     for path, digest in expected.items():
         assert hashes[str(path.resolve())] == digest, path
-    assert hashes[str(native.resolve())] == json.loads((gate / 'packed-equivalence/process.json').read_text())['binary_sha256']
+    assert hashes[str(native.resolve())] == quality_process['binary_sha256']
     identity = dict(hashes=hashes, overlay_manifest=overlay_manifest, initial_power=initial_power,
+                    quality_proof=dict(path=str(quality_root), comparison_sha256=sha256(quality_root / 'comparison.json'),
+                                       process_sha256=sha256(quality_root / 'process.json')),
                     source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                     note='Identity verification precedes all inference timing; resident independent requests, no cold-cache claim.')
     output_root.mkdir(parents=True, exist_ok=False)

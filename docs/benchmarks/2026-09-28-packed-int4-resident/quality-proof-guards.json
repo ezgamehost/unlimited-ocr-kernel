@@ -1,0 +1,20 @@
+[
+  {
+    "case": "missing_case",
+    "exit_code": 1,
+    "output_created": false,
+    "inference_launched": false
+  },
+  {
+    "case": "duplicate_case",
+    "exit_code": 1,
+    "output_created": false,
+    "inference_launched": false
+  },
+  {
+    "case": "failed_eos",
+    "exit_code": 1,
+    "output_created": false,
+    "inference_launched": false
+  }
+]
