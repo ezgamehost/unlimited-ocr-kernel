@@ -1,0 +1,22 @@
+{
+  "manifest": {
+    "schema_version": 1,
+    "format": "uocr-q4-block32-v1",
+    "block_size": 32,
+    "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+    "output_sha256": "c98c6134d7b3925b4b7a10bca543afded92cf6b335143d1d17c8acd31e3dfd74",
+    "matrix_count": 2197,
+    "bytes": 1730753240,
+    "weight_bits": 4,
+    "storage_bits": 4
+  },
+  "oracle_sha256": "693e0503d1faa1ec5e1b4fa2ff6d97c583cce9dd4682a3342cca9d75e8cc4071",
+  "verified_matrices": 2197,
+  "verified_weight_codes": 2768322560,
+  "codes_exact": true,
+  "scales_bitwise_equal": true,
+  "simulation_bytes": 3114914040,
+  "packed_bytes": 1730753240,
+  "file_reduction_fraction": 0.44436564933265377,
+  "note": "File representation parity only; packed runtime and performance are not yet verified."
+}

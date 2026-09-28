@@ -24,6 +24,30 @@ fn reads_bf16_and_f32_without_expanding_checkpoint() {
 }
 
 #[test]
+fn reads_unsigned_packed_bytes_without_treating_them_as_linear_weights() {
+    use uocr::{
+        cpu::{Backend, CpuContext, ops},
+        tensor::Tensor,
+    };
+    let file = fixture(
+        r#"{"x":{"dtype":"U8","shape":[1,2],"data_offsets":[0,2]}}"#,
+        &[0x79, 0xe3],
+    );
+    let model = Checkpoint::open(file.path()).unwrap();
+    let view = model.tensor("x").unwrap();
+    assert_eq!(view.bytes, &[0x79, 0xe3]);
+    assert_eq!(view.to_f32(), vec![121., 227.]);
+    let input = Tensor::new(vec![1, 2], vec![1., 1.]).unwrap();
+    let mut cpu = CpuContext::new(Backend::Scalar, 1, 1024).unwrap();
+    assert!(ops::linear_weight(&input, view, None, &mut cpu).is_err());
+    let truncated = fixture(
+        r#"{"x":{"dtype":"U8","shape":[1,3],"data_offsets":[0,3]}}"#,
+        &[0x79, 0xe3],
+    );
+    assert!(Checkpoint::open(truncated.path()).is_err());
+}
+
+#[test]
 fn rejects_truncation_overlap_and_overflow() {
     for header in [
         r#"{"x":{"dtype":"BF16","shape":[3],"data_offsets":[0,6]}}"#,

@@ -18,6 +18,7 @@ pub enum DType {
     F32,
     I64,
     I8,
+    U8,
 }
 
 impl DType {
@@ -26,7 +27,7 @@ impl DType {
             Self::BF16 | Self::F16 => 2,
             Self::F32 => 4,
             Self::I64 => 8,
-            Self::I8 => 1,
+            Self::I8 | Self::U8 => 1,
         }
     }
 }
@@ -75,6 +76,7 @@ impl WeightView<'_> {
 
     pub fn to_f32(&self) -> Vec<f32> {
         match self.dtype {
+            DType::U8 => self.bytes.iter().map(|&v| v as f32).collect(),
             DType::I8 => self.bytes.iter().map(|&v| (v as i8) as f32).collect(),
             DType::BF16 => self
                 .bytes

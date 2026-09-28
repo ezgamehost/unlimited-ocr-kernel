@@ -5,6 +5,28 @@ from safetensors.numpy import save_file,load_file
 from tools.quantize import quantize_blocks,quantize_file
 
 class QuantizeTests(unittest.TestCase):
+    def test_packed_int4_half_block_layout_and_partial_tail(self):
+        with tempfile.TemporaryDirectory() as d:
+            source=Path(d)/'source.safetensors';target=Path(d)/'packed.safetensors'
+            x=np.zeros((3,35),dtype=np.float32)
+            x[:,0]=-7;x[:,1]=3;x[:,16]=7;x[:,17]=-2
+            x[:,32:]=[-7,0,7]
+            save_file({'lm_head.weight':x},source)
+            original=source.read_bytes()
+            result=quantize_file(source,target,chunk_rows=2,bits=4,packed=True)
+            tensors=load_file(target)
+            expected=np.zeros((3,2,16),dtype=np.uint8)
+            expected[:,0,0]=0x79;expected[:,0,1]=0xE3
+            expected[:,1,:3]=[0x09,0x00,0x07]
+            np.testing.assert_array_equal(tensors['lm_head.weight'],expected)
+            np.testing.assert_array_equal(tensors['lm_head.weight.q4_scales'],np.ones((3,2),np.float32))
+            self.assertEqual(source.read_bytes(),original)
+            self.assertEqual(result['format'],'uocr-q4-block32-v1')
+            self.assertEqual(result['storage_bits'],4)
+            self.assertNotIn('simulated_weight_bits',result)
+            with self.assertRaises(ValueError):
+                quantize_file(source,Path(d)/'invalid.safetensors',packed=True)
+
     def test_int4_simulation_uses_four_bit_levels_but_declares_int8_storage(self):
         with tempfile.TemporaryDirectory() as d:
             source=Path(d)/'source.safetensors';target=Path(d)/'simulation.safetensors'
