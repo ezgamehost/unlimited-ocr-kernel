@@ -1,0 +1,34 @@
+{
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr",
+    "--model",
+    "artifacts/upstream",
+    "--image",
+    "docs/benchmarks/2026-09-28-max32/portrait32.png",
+    "--threads",
+    "8",
+    "--max-tokens",
+    "8192",
+    "--json"
+  ],
+  "binary_sha256": "c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
+  "input_sha256": "4fe946abc026998f6e1a06f878fd7a309aae1d8785fea5d51cc6a25d4a63d01e",
+  "prompt": "native default: <image>document parsing.",
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 7121747968,
+    "user_cpu_seconds": 95.619415,
+    "system_cpu_seconds": 15.262495,
+    "major_faults": 339792,
+    "minor_faults": 272972
+  },
+  "wall_seconds": 38.97692445802386,
+  "finish_reason": "eos",
+  "emitted_tokens": 930,
+  "cer": 0.06911684037301152
+}

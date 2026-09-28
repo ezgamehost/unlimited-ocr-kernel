@@ -1,0 +1,37 @@
+{
+  "variant": "head-major",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/kv-layout/uocr-c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
+    "--model",
+    "artifacts/upstream",
+    "--image",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-max32/portrait32.png",
+    "--prompt",
+    "<image>document parsing.",
+    "--threads",
+    "8",
+    "--max-tokens",
+    "8192",
+    "--quantized-weights",
+    "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+    "--int8-activations",
+    "--json"
+  ],
+  "binary_sha256": "c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 5740609536,
+    "user_cpu_seconds": 162.879337,
+    "system_cpu_seconds": 38.435034,
+    "major_faults": 64,
+    "minor_faults": 776654
+  },
+  "power": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=6226019)\t62%; discharging; 4:05 remaining present: true\n",
+  "wall_seconds": 49.68615083300392,
+  "input_sha256": "4fe946abc026998f6e1a06f878fd7a309aae1d8785fea5d51cc6a25d4a63d01e",
+  "note": "Single fresh-process correctness/resource observation; not a performance comparison.",
+  "finish_reason": "eos",
+  "tokens": 3349,
+  "cer": 1.3664289632473945
+}

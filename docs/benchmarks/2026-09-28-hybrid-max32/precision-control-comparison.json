@@ -1,0 +1,16 @@
+{
+  "native-original-bf16": {
+    "text": true,
+    "token_ids": true,
+    "finish_reason": true,
+    "image_tokens": true,
+    "normalized_text_equal": true
+  },
+  "native-original-dynamic-int8": {
+    "text": true,
+    "token_ids": true,
+    "finish_reason": true,
+    "image_tokens": true,
+    "normalized_text_equal": true
+  }
+}

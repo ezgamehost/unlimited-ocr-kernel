@@ -13,6 +13,9 @@ On the four primary synthetic pages, the latest repeated resident comparison
 measures a **1.26–1.44× median full-page speedup over llama.cpp** with the hybrid
 Q4/Q8-head decoder. Standalone token decoding remains slower. See the
 [full-page results and limits](docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-2/README.md).
+The hybrid has a confirmed accuracy regression on the
+[32-crop stress input](docs/benchmarks/2026-09-28-hybrid-max32/README.md); the
+four-page speedup does not establish general quantization accuracy.
 
 ## Build and run
 
@@ -114,6 +117,14 @@ error. Peak process RSS is 5.05–5.06GB versus 9.29–9.80GB. These systems use
 different precision and policies; broader quality and fresh-process validation
 remain pending. See [full-page evidence](docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-2/README.md)
 and [hybrid format evidence](docs/benchmarks/2026-09-28-hybrid-int4/README.md).
+
+On the synthetic 32-crop input, hybrid Q4/Q8 with dynamic INT8 activations
+produces unrelated repeated text: character error rate 1.3664, versus 0.0691
+for current BF16 and dynamic Q8. Both cache layouts reproduce the hybrid
+failure exactly. BF16 and Q8 retain their earlier outputs, so this observed
+regression is specific to the hybrid precision path. The default runtime
+continues to use original BF16 weights. See the
+[precision controls and raw outputs](docs/benchmarks/2026-09-28-hybrid-max32/README.md).
 
 For the measured eight-worker setup, set `VECLIB_MAXIMUM_THREADS=8` and
 `OMP_NUM_THREADS=8` in the environment before starting the process, alongside
