@@ -1,10 +1,10 @@
-# Pending allocation-lifetime experiment
+# Allocation-lifetime experiment plan and outcome
 
 Baseline source: `a36fc58`. Candidate changes only `Model::infer`: release prepared
 pixels after vision encoding, projected features after copying them into prompt
 embeddings, and prompt embeddings after decoder prefill. None is used again.
-All releases remain inside their corresponding stage timer. This is currently an
-unverified candidate, not an accepted performance improvement.
+All releases remain inside their corresponding stage timer. This section records the proposed experiment; the completed outcome below
+rejects the candidate as a default performance improvement.
 
 For the four-image corpus, prepared pixels occupy 71,565,312 bytes (68.25 MiB),
 projected features 7,746,560 bytes, and matched prompt embeddings 7,772,160 bytes.
@@ -42,3 +42,13 @@ driver response for a 273-token single view and reject mismatches; do not merely
 remove the current checks. Do not change the runner while the active BF16
 process is using its recorded hash. This is a pending prerequisite, not a finding
 that invalidates the current fixed-shape measurements.
+
+## Outcome
+
+Completed and reverted. Full tests, original references, all 32 corpus outputs
+and all four 8,192-token extreme-input outputs passed their checks. Earlier
+release reduced maximum-crop peak RSS in both orderings, but increased observed
+four-page process peak RSS and did not establish a consistent latency benefit.
+See [the retained experiment](../benchmarks/2026-09-28-allocation-lifetime/README.md).
+The source is restored; allocation reuse and broader resource work remain in
+scope. This experiment does not resolve the known 32-crop OCR failure.

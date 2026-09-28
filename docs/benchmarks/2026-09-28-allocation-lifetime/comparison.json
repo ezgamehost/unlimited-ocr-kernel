@@ -1,0 +1,200 @@
+{
+  "processes": {
+    "base-a": {
+      "resources": {
+        "exit_code": 0,
+        "forced_kill": false,
+        "peak_rss_bytes": 5798936576,
+        "user_cpu_seconds": 252.647959,
+        "system_cpu_seconds": 63.318925,
+        "major_faults": 560,
+        "minor_faults": 992214
+      },
+      "startup_seconds": 6.16834658299922,
+      "images": {
+        "english": {
+          "wall_seconds": 10.61725145901437,
+          "cer": 0.0,
+          "emitted_tokens": 250
+        },
+        "chinese": {
+          "wall_seconds": 11.022440834000008,
+          "cer": 0.0,
+          "emitted_tokens": 289
+        },
+        "table": {
+          "wall_seconds": 10.648537375003798,
+          "cer": 0.00398406374501992,
+          "emitted_tokens": 248
+        },
+        "dense": {
+          "wall_seconds": 14.561196333001135,
+          "cer": 0.0,
+          "emitted_tokens": 768
+        }
+      }
+    },
+    "candidate-a": {
+      "resources": {
+        "exit_code": 0,
+        "forced_kill": false,
+        "peak_rss_bytes": 6298533888,
+        "user_cpu_seconds": 251.464483,
+        "system_cpu_seconds": 61.432506,
+        "major_faults": 131,
+        "minor_faults": 954516
+      },
+      "startup_seconds": 6.184962375002215,
+      "images": {
+        "english": {
+          "wall_seconds": 10.58318091701949,
+          "cer": 0.0,
+          "emitted_tokens": 250
+        },
+        "chinese": {
+          "wall_seconds": 10.852078791998792,
+          "cer": 0.0,
+          "emitted_tokens": 289
+        },
+        "table": {
+          "wall_seconds": 10.50214316599886,
+          "cer": 0.00398406374501992,
+          "emitted_tokens": 248
+        },
+        "dense": {
+          "wall_seconds": 14.408786042011343,
+          "cer": 0.0,
+          "emitted_tokens": 768
+        }
+      }
+    },
+    "candidate-b": {
+      "resources": {
+        "exit_code": 0,
+        "forced_kill": false,
+        "peak_rss_bytes": 6349553664,
+        "user_cpu_seconds": 251.113258,
+        "system_cpu_seconds": 61.200356,
+        "major_faults": 36,
+        "minor_faults": 957798
+      },
+      "startup_seconds": 5.940748166991398,
+      "images": {
+        "english": {
+          "wall_seconds": 10.567134415992768,
+          "cer": 0.0,
+          "emitted_tokens": 250
+        },
+        "chinese": {
+          "wall_seconds": 10.851967583002988,
+          "cer": 0.0,
+          "emitted_tokens": 289
+        },
+        "table": {
+          "wall_seconds": 10.508263833005913,
+          "cer": 0.00398406374501992,
+          "emitted_tokens": 248
+        },
+        "dense": {
+          "wall_seconds": 14.434125917003257,
+          "cer": 0.0,
+          "emitted_tokens": 768
+        }
+      }
+    },
+    "base-b": {
+      "resources": {
+        "exit_code": 0,
+        "forced_kill": false,
+        "peak_rss_bytes": 6248415232,
+        "user_cpu_seconds": 251.303054,
+        "system_cpu_seconds": 60.526015,
+        "major_faults": 102,
+        "minor_faults": 937351
+      },
+      "startup_seconds": 5.950464082998224,
+      "images": {
+        "english": {
+          "wall_seconds": 10.623418792005396,
+          "cer": 0.0,
+          "emitted_tokens": 250
+        },
+        "chinese": {
+          "wall_seconds": 10.864786709018517,
+          "cer": 0.0,
+          "emitted_tokens": 289
+        },
+        "table": {
+          "wall_seconds": 10.566108583007008,
+          "cer": 0.00398406374501992,
+          "emitted_tokens": 248
+        },
+        "dense": {
+          "wall_seconds": 14.436307167023188,
+          "cer": 0.0,
+          "emitted_tokens": 768
+        }
+      }
+    }
+  },
+  "comparison": {
+    "english": {
+      "baseline_seconds": [
+        10.61725145901437,
+        10.623418792005396
+      ],
+      "candidate_seconds": [
+        10.58318091701949,
+        10.567134415992768
+      ],
+      "baseline_median": 10.620335125509882,
+      "candidate_median": 10.57515766650613,
+      "exact_outputs_match": true
+    },
+    "chinese": {
+      "baseline_seconds": [
+        11.022440834000008,
+        10.864786709018517
+      ],
+      "candidate_seconds": [
+        10.852078791998792,
+        10.851967583002988
+      ],
+      "baseline_median": 10.943613771509263,
+      "candidate_median": 10.85202318750089,
+      "exact_outputs_match": true
+    },
+    "table": {
+      "baseline_seconds": [
+        10.648537375003798,
+        10.566108583007008
+      ],
+      "candidate_seconds": [
+        10.50214316599886,
+        10.508263833005913
+      ],
+      "baseline_median": 10.607322979005403,
+      "candidate_median": 10.505203499502386,
+      "exact_outputs_match": true
+    },
+    "dense": {
+      "baseline_seconds": [
+        14.561196333001135,
+        14.436307167023188
+      ],
+      "candidate_seconds": [
+        14.408786042011343,
+        14.434125917003257
+      ],
+      "baseline_median": 14.498751750012161,
+      "candidate_median": 14.4214559795073,
+      "exact_outputs_match": true
+    }
+  },
+  "notes": [
+    "Exploratory ABBA; two measured requests per image per variant, not final ten-repeat acceptance.",
+    "All 32 outputs, including warmups, match exactly by image.",
+    "Peak RSS is process-wide, including load and all eight requests.",
+    "Shared host; retain both order brackets and all timing variation."
+  ]
+}

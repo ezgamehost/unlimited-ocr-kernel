@@ -1,0 +1,24 @@
+diff --git a/src/model/mod.rs b/src/model/mod.rs
+index 4b697e8..0b269f1 100644
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -129,6 +129,9 @@ impl Model {
+         let preprocess_seconds = start.elapsed().as_secs_f64();
+         let stamp = Instant::now();
+         let features = self.vision.encode(&image, cpu)?;
++        // Pixel tensors are no longer needed after vision encoding. In Gundam
++        // mode these include every crop; release them before decoder allocation.
++        drop(image);
+         let vision_seconds = stamp.elapsed().as_secs_f64();
+         let stamp = Instant::now();
+         let mut decoder = Decoder::new(&self.checkpoint, self.config.clone())?;
+@@ -141,7 +144,9 @@ impl Model {
+             embeddings.data[position * width..(position + 1) * width]
+                 .copy_from_slice(&features.data[row * width..(row + 1) * width]);
+         }
++        drop(features);
+         let (mut state, mut logits) = decoder.prefill(&embeddings, cpu)?;
++        drop(embeddings);
+         let prefill_seconds = stamp.elapsed().as_secs_f64();
+         let mut history = input.ids;
+         let mut output = Vec::new();

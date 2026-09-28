@@ -1,0 +1,38 @@
+{
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/uocr-lifetime-base",
+    "--model",
+    "artifacts/upstream",
+    "--image",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-max32/portrait32.png",
+    "--prompt",
+    "<image>\ndocument parsing.",
+    "--threads",
+    "8",
+    "--max-tokens",
+    "8192",
+    "--int8-weights",
+    "artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations",
+    "--json"
+  ],
+  "binary_sha256": "4ead24a9d6c2901a470d51fd2316b9e11b3c70b934f5e8463bfdf13dd78d7e85",
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 7093272576,
+    "user_cpu_seconds": 424.885061,
+    "system_cpu_seconds": 93.324701,
+    "major_faults": 253,
+    "minor_faults": 990630
+  },
+  "wall_seconds": 104.03350133402273,
+  "input_sha256": "4fe946abc026998f6e1a06f878fd7a309aae1d8785fea5d51cc6a25d4a63d01e",
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "finish_reason": "token_limit",
+  "emitted_tokens": 8192,
+  "cer": 7.184860120680198
+}

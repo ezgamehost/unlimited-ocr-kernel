@@ -141,3 +141,15 @@ and passing logs are retained in [vision-descriptors](vision-descriptors/).
 This closes the listed descriptor/config/image/window preflight fixes. The
 aggregate allocation-lifetime work and final independent review remain open;
 the broader benchmark and model-quality acceptance work is also incomplete.
+
+## Allocation-lifetime experiment follow-up
+
+The early-release candidate was measured on the complete four-page corpus in
+ABBA order and on the maximum 32-crop input in both orders. It preserved all
+outputs and passed full/reference tests. It reduced the extreme input's observed
+peak RSS by 81–126 MiB within the pairs, but the corpus process peaks were higher
+and latency did not show a consistent benefit. The candidate was reverted;
+[raw measurements and the decision](../benchmarks/2026-09-28-allocation-lifetime/README.md)
+are retained. This completes this specific lifetime experiment, not global
+allocation reuse, a process-memory ceiling, or final independent review.
+The extreme-input OCR failure is still unresolved.

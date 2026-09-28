@@ -1,0 +1,10 @@
+{
+  "baseline_source": "c30bca5",
+  "candidate_source": "c30bca5 plus candidate.patch; later commits only benchmark documents",
+  "candidate_patch_sha256": "0c20ed2a59745bc69eab61c25b5d63b7efd554b798ceac5985a3e3e0942ea51c",
+  "binaries": {
+    "base": "4ead24a9d6c2901a470d51fd2316b9e11b3c70b934f5e8463bfdf13dd78d7e85",
+    "candidate": "11598fb724879a83c5fe2753f2fddd7ef88434afb67a1e350a4662fe725c2058"
+  },
+  "protocol": "ABBA; each process runs one warmup and one measured request per corpus image; exploratory memory/lifetime experiment, not the final ten-repetition acceptance benchmark."
+}
