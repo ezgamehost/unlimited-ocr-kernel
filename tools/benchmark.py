@@ -57,7 +57,7 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
     output = output_prefix.with_suffix(".stdout.txt").read_text(errors="replace").strip()
     steps = re.search(r"\beval time\s*=\s*([\d.]+) ms /\s*(\d+) runs", log)
     rss = re.search(r"(\d+)\s+maximum resident set size", log)
-    vision = re.search(r"mtmd batch encoding done in (\d+) ms", log)
+    vision = re.findall(r"mtmd batch encoding done in (\d+) ms", log)
     count = int(steps[2]) if steps else None
     # CLI decodes each emitted token; a successful run below its cap stopped at EOG.
     finish = "error" if code != 0 else (
@@ -67,7 +67,7 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
         "timed_out": timed_out, "finish_reason": finish,
         "wall_seconds": elapsed, "decode_steps": count,
         "decode_seconds": float(steps[1]) / 1000 if steps else None,
-        "vision_seconds": int(vision[1]) / 1000 if vision else None,
+        "vision_seconds": sum(map(int, vision)) / 1000 if vision else None,
         "peak_rss_bytes": int(rss[1]) if rss else None,
         "output": output, "command": command,
     }

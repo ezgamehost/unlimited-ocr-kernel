@@ -1,0 +1,42 @@
+[
+  {
+    "record": "docs/benchmarks/2026-09-28-llama-tiles32/table-000.json",
+    "previous_vision_seconds": 7.465,
+    "corrected_vision_seconds": 11.868,
+    "vision_batches_ms": [
+      7465,
+      2148,
+      2255
+    ]
+  },
+  {
+    "record": "docs/benchmarks/2026-09-28-llama-tiles32/english-000.json",
+    "previous_vision_seconds": 7.103,
+    "corrected_vision_seconds": 11.336,
+    "vision_batches_ms": [
+      7103,
+      2059,
+      2174
+    ]
+  },
+  {
+    "record": "docs/benchmarks/2026-09-28-llama-tiles32/dense-000.json",
+    "previous_vision_seconds": 7.231,
+    "corrected_vision_seconds": 11.706,
+    "vision_batches_ms": [
+      7231,
+      2168,
+      2307
+    ]
+  },
+  {
+    "record": "docs/benchmarks/2026-09-28-llama-tiles32/chinese-000.json",
+    "previous_vision_seconds": 7.421,
+    "corrected_vision_seconds": 12.23,
+    "vision_batches_ms": [
+      7421,
+      2380,
+      2429
+    ]
+  }
+]

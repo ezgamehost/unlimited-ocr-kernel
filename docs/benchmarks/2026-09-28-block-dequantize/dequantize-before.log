@@ -1,0 +1,15 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 11.72s
+     Running `target/release/examples/bench_dequantize`
+rows=896 cols=1280 repeat=0 seconds=0.070644
+rows=896 cols=1280 repeat=1 seconds=0.063524
+rows=896 cols=1280 repeat=2 seconds=0.063600
+rows=896 cols=1280 repeat=3 seconds=0.062534
+rows=1280 cols=896 repeat=0 seconds=0.063220
+rows=1280 cols=896 repeat=1 seconds=0.062428
+rows=1280 cols=896 repeat=2 seconds=0.062742
+rows=1280 cols=896 repeat=3 seconds=0.063697
+rows=257 cols=513 repeat=0 seconds=0.007283
+rows=257 cols=513 repeat=1 seconds=0.007245
+rows=257 cols=513 repeat=2 seconds=0.007253
+rows=257 cols=513 repeat=3 seconds=0.007286

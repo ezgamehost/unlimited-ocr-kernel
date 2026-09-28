@@ -11,6 +11,14 @@ python -m tools.benchmark --manifest benchmarks/corpus/manifest.json --llama /tm
 
 This is a single-run exploratory pilot, not the final 2-warmup/10-repetition benchmark. CPU only, eight threads, fresh processes; model and executable provenance remain those in the original baseline report. CLI details and raw stdout/stderr are retained beside each record.
 
+Vision-phase timing correction: the original parser counted only the first
+`mtmd batch encoding done` line. Summing all three batches gives English
+11.336 s, Chinese 12.230 s, table 11.868 s and dense 11.706 s. The per-page JSON
+records are corrected; `vision-timing-correction.json` retains previous values
+and batch durations. Raw logs, process wall time, decode time, outputs and CER
+are unchanged. Earlier conversational comparisons using the first-batch vision
+time should not be used as full vision comparisons.
+
 | Page | Process wall (s) | Decode (s) | CER | Finish |
 |---|---:|---:|---:|---|
 | english | 18.738 | 1.230 | 0.000000 | eos |

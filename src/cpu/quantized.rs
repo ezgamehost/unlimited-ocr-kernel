@@ -74,12 +74,23 @@ impl Int8Matrix {
     }
     pub fn dequantize(&self) -> Result<Tensor> {
         let blocks = self.cols.div_ceil(BLOCK);
-        let data = self
+        let mut data = vec![0.; self.weights.len()];
+        for ((weights, scales), output) in self
             .weights
-            .iter()
-            .enumerate()
-            .map(|(i, &w)| w as f32 * self.scales[i / self.cols * blocks + (i % self.cols) / BLOCK])
-            .collect();
+            .chunks_exact(self.cols)
+            .zip(self.scales.chunks_exact(blocks))
+            .zip(data.chunks_exact_mut(self.cols))
+        {
+            for ((weights, &scale), output) in weights
+                .chunks(BLOCK)
+                .zip(scales)
+                .zip(output.chunks_mut(BLOCK))
+            {
+                for (dest, &weight) in output.iter_mut().zip(weights) {
+                    *dest = weight as f32 * scale;
+                }
+            }
+        }
         Tensor::new(vec![self.rows, self.cols], data)
     }
     pub fn storage_bytes(&self) -> usize {

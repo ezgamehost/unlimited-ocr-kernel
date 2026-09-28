@@ -1,13 +1,29 @@
 """Catch biased aggregation, corrupt fixture acceptance and inaccurate scoring."""
 import tempfile
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 from pathlib import Path
 
-from tools.benchmark import aggregate, validate_image
+from tools.benchmark import aggregate, validate_image, run_llama
 from tools.score import character_error_rate, normalize_ocr
 
 
 class BenchmarkTests(unittest.TestCase):
+    def test_all_vision_batches_are_counted(self):
+        def process(command, stdout, stderr, timeout):
+            stderr.write(b"mtmd batch encoding done in 7103 ms\n"
+                         b"mtmd batch encoding done in 2059 ms\n"
+                         b"mtmd batch encoding done in 2174 ms\n"
+                         b"eval time = 1230.21 ms / 250 runs\n")
+            return SimpleNamespace(returncode=0)
+
+        with tempfile.TemporaryDirectory() as directory, patch("tools.benchmark.subprocess.run", side_effect=process):
+            result = run_llama(["fake"], Path(directory) / "page", 2048, 30)
+        self.assertEqual(result["vision_seconds"], 11.336)
+        self.assertEqual(result["decode_seconds"], 1.23021)
+        self.assertEqual(result["finish_reason"], "eos")
+
     def test_failure_and_truncation_cannot_improve_latency(self):
         records = [
             dict(status="ok", finish_reason="eos", wall_seconds=4.0),

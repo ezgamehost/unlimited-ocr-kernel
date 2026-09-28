@@ -2,6 +2,32 @@ use uocr::{
     cpu::{Backend, CpuContext, quantized::Int8Matrix},
     tensor::Tensor,
 };
+
+#[test]
+fn dequantization_matches_correctly_rounded_products_across_row_tails() {
+    for cols in [1usize, 31, 32, 33, 513, 1280] {
+        let rows = 5;
+        let weights: Vec<i8> = (0..rows * cols)
+            .map(|i| ((i % 255) as i16 - 127) as i8)
+            .collect();
+        let scales: Vec<f32> = (0..rows * cols.div_ceil(32))
+            .map(|i| [0., -0., 0.1234567, 1e-20, 1e20][i % 5])
+            .collect();
+        let matrix = Int8Matrix::from_parts(rows, cols, weights.clone(), scales.clone()).unwrap();
+        let restored = matrix.dequantize().unwrap();
+        for row in 0..rows {
+            for col in 0..cols {
+                let expected = (weights[row * cols + col] as f64
+                    * scales[row * cols.div_ceil(32) + col / 32] as f64)
+                    as f32;
+                assert_eq!(
+                    restored.data[row * cols + col].to_bits(),
+                    expected.to_bits()
+                );
+            }
+        }
+    }
+}
 #[test]
 fn int8_blocks_roundtrip_zero_rows_tails_and_linear() {
     for cols in [1, 31, 32, 33, 131, 513] {
