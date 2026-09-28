@@ -1,0 +1,164 @@
+diff --git a/src/vision/mod.rs b/src/vision/mod.rs
+index 9469b3a..e3a8528 100644
+--- a/src/vision/mod.rs
++++ b/src/vision/mod.rs
+@@ -112,6 +112,35 @@ impl Vision {
+         Ok(self.encode_debug(image, cpu)?.2)
+     }
+ 
++    /// Encode local 640px crops in bounded SAM batches, preserving input order.
++    pub fn encode_crops(&self, crops: &[Tensor], cpu: &mut CpuContext) -> Result<Vec<Tensor>> {
++        for crop in crops {
++            crop.validate()?;
++            if crop.shape != [1, 640, 640, 3] {
++                return Err(OcrError::Shape("local crop must be 640x640 RGB".into()));
++            }
++        }
++        let mut output = Vec::with_capacity(crops.len());
++        for batch in crops.chunks(3) {
++            let count = batch.len() * 640 * 640 * 3;
++            cpu.check_elements(count)?;
++            let mut data = Vec::with_capacity(count);
++            for crop in batch {
++                data.extend_from_slice(&crop.data);
++            }
++            let sam = self.sam(&Tensor::new(vec![batch.len(), 640, 640, 3], data)?, cpu)?;
++            if sam.shape != [batch.len(), 10, 10, 1024] {
++                return Err(OcrError::Shape("batched SAM output".into()));
++            }
++            for features in sam.data.chunks_exact(100 * 1024) {
++                let crop = Tensor::new(vec![1, 10, 10, 1024], features.to_vec())?;
++                let clip = self.clip(&crop, cpu)?;
++                output.push(self.project(&crop, &clip, cpu)?);
++            }
++        }
++        Ok(output)
++    }
++
+     /// Intermediate outputs for a single global view or local crop.
+     pub fn encode_view_debug(
+         &self,
+@@ -138,8 +167,7 @@ impl Vision {
+                 return Err(OcrError::Shape("crop grid mismatch".into()));
+             }
+             let mut grid = vec![0.; gy * 10 * gx * 10 * 1280];
+-            for (index, crop) in image.crops.iter().enumerate() {
+-                let (_, _, local) = self.encode_view_debug(crop, cpu)?;
++            for (index, local) in self.encode_crops(&image.crops, cpu)?.iter().enumerate() {
+                 if local.shape != [100, 1280] {
+                     return Err(OcrError::Shape("crop embedding shape".into()));
+                 }
+diff --git a/src/vision/sam.rs b/src/vision/sam.rs
+index 622ace0..a03f186 100644
+--- a/src/vision/sam.rs
++++ b/src/vision/sam.rs
+@@ -10,8 +10,9 @@ use crate::{
+ 
+ impl Vision {
+     pub(super) fn sam(&self, image: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
++        image.validate()?;
+         if image.shape.len() != 4
+-            || image.shape[0] != 1
++            || image.shape[0] == 0
+             || image.shape[1] != image.shape[2]
+             || ![640, 1024].contains(&image.shape[1])
+             || image.shape[3] != 3
+@@ -23,7 +24,14 @@ impl Vision {
+         let mut x = self.conv(image, "model.sam_model.patch_embed.proj", 16, 0, cpu)?;
+         let position =
+             interpolate_grid(self.w("model.sam_model.pos_embed")?, x.shape[1], x.shape[2])?;
+-        x = residual(x, position)?;
++        if position.shape[1..] != x.shape[1..] {
++            return Err(OcrError::Shape("SAM positional grid shape".into()));
++        }
++        for batch in x.data.chunks_exact_mut(position.data.len()) {
++            for (value, pos) in batch.iter_mut().zip(&position.data) {
++                *value += pos;
++            }
++        }
+         for layer in 0..12 {
+             let prefix = format!("model.sam_model.blocks.{layer}");
+             let norm = self.norm(&x, &format!("{prefix}.norm1"), 1e-6)?;
+diff --git a/tests/vision.rs b/tests/vision.rs
+index 6b0cff9..6e8165c 100644
+--- a/tests/vision.rs
++++ b/tests/vision.rs
+@@ -193,3 +193,37 @@ fn original_english_global_stages_match_rust() {
+         &reference.tensor("global.projected").unwrap().to_f32(),
+     );
+ }
++
++#[test]
++#[ignore = "requires original model and English crop reference"]
++fn crop_batches_preserve_order_and_handle_partial_last_batch() {
++    let image = uocr::preprocess::prepare(
++        Path::new("benchmarks/corpus/english.png"),
++        uocr::preprocess::ImageMode::Gundam,
++    )
++    .unwrap();
++    let weights = Checkpoint::open(Path::new(
++        "artifacts/upstream/model-00001-of-000001.safetensors",
++    ))
++    .unwrap();
++    let model = Vision::new(&weights).unwrap();
++    let reference = Checkpoint::open(Path::new(
++        "artifacts/reference-english-gundam-f32/vision.safetensors",
++    ))
++    .unwrap();
++    let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
++    let actual = model.encode_crops(&image.crops[..4], &mut cpu).unwrap();
++    assert_eq!(actual.len(), 4);
++    for (i, value) in actual.iter().enumerate() {
++        compare(
++            &format!("batch crop {i}"),
++            &value.data,
++            &reference
++                .tensor(&format!("crop.{i}.projected"))
++                .unwrap()
++                .to_f32(),
++        );
++    }
++    assert!(model.encode_crops(&[], &mut cpu).unwrap().is_empty());
++    assert!(model.encode_crops(&[image.global], &mut cpu).is_err());
++}
+diff --git a/examples/bench_crops.rs b/examples/bench_crops.rs
+new file mode 100644
+index 0000000..38371a3
+--- /dev/null
++++ b/examples/bench_crops.rs
+@@ -0,0 +1,35 @@
++use std::{hint::black_box, path::Path, time::Instant};
++use uocr::{
++    checkpoint::Checkpoint,
++    cpu::{Backend, CpuContext},
++    preprocess::{ImageMode, prepare},
++    vision::Vision,
++};
++fn main() {
++    let weights = Checkpoint::open(Path::new(
++        "artifacts/upstream/model-00001-of-000001.safetensors",
++    ))
++    .unwrap();
++    let model = Vision::new(&weights).unwrap();
++    let input = prepare(
++        Path::new("benchmarks/corpus/english.png"),
++        ImageMode::Gundam,
++    )
++    .unwrap();
++    let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
++    for batch in [false, true, true, false] {
++        let start = Instant::now();
++        if batch {
++            black_box(model.encode_crops(&input.crops, &mut cpu).unwrap());
++        } else {
++            for crop in &input.crops {
++                black_box(model.encode_view_debug(crop, &mut cpu).unwrap());
++            }
++        }
++        println!(
++            "batch={batch} crops={} seconds={:.6}",
++            input.crops.len(),
++            start.elapsed().as_secs_f64()
++        );
++    }
++}

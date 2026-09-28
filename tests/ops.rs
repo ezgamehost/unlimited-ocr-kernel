@@ -162,3 +162,41 @@ fn layernorm_centers_nearly_constant_wide_rows() {
         );
     }
 }
+
+#[test]
+fn causal_attention_masks_across_query_block_boundaries() {
+    let (heads, tokens, dim) = (2, 129, 3);
+    let q = Tensor::new(vec![heads, tokens, dim], vec![0.; heads * tokens * dim]).unwrap();
+    let v = Tensor::new(
+        q.shape.clone(),
+        (0..heads * tokens * dim)
+            .map(|i| {
+                let head = i / (tokens * dim);
+                let token = (i / dim) % tokens;
+                let channel = i % dim;
+                (head * 100 + token + channel) as f32
+            })
+            .collect(),
+    )
+    .unwrap();
+    let mut cpu = CpuContext::new(Backend::Auto, 2, 1 << 20).unwrap();
+    let out = ops::attention(&q, &q, &v, true, &mut cpu).unwrap();
+    for head in 0..heads {
+        for token in 0..tokens {
+            for channel in 0..dim {
+                let expected = (head * 100 + channel) as f32 + token as f32 / 2.;
+                assert!(
+                    (out.data[(head * tokens + token) * dim + channel] - expected).abs() < 2e-4
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn attention_shrinks_query_blocks_to_fit_scratch_budget() {
+    let q = Tensor::new(vec![1, 129, 3], vec![0.; 129 * 3]).unwrap();
+    let mut cpu = CpuContext::new(Backend::Auto, 1, 8192).unwrap();
+    let result = ops::attention(&q, &q, &q, true, &mut cpu).unwrap();
+    assert_eq!(result.data, q.data);
+}

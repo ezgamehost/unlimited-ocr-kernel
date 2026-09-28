@@ -1,0 +1,4 @@
+batch=false crops=12 seconds=9.225803
+batch=true crops=12 seconds=9.255912
+batch=true crops=12 seconds=9.238703
+batch=false crops=12 seconds=9.198028

@@ -242,12 +242,15 @@ where
         return Err(OcrError::Shape("invalid attention layout".into()));
     }
     let (heads, nq, nk, d) = (q.shape[0], q.shape[1], k.shape[1], q.shape[2]);
-    let block = nq.min(32);
-    let scratch = element_count(&[block, nk])?
-        .checked_add(element_count(&[d, nk])?)
-        .and_then(|n| n.checked_add(q.data.len()))
+    let fixed = element_count(&[d, nk])?
+        .checked_add(q.data.len())
         .ok_or_else(|| OcrError::Resource("attention size overflow".into()))?;
-    cpu.check_elements(scratch)?;
+    cpu.check_elements(
+        fixed
+            .checked_add(nk)
+            .ok_or_else(|| OcrError::Resource("attention scratch overflow".into()))?,
+    )?;
+    let block = nq.min(128).min((cpu.scratch_limit / 4 - fixed) / nk);
     let scale = (d as f32).sqrt().recip();
     let mut output = vec![0.; q.data.len()];
     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
