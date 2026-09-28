@@ -1,4 +1,5 @@
 """Audit all four completed ABBA phases and summarize quality alongside latency."""
+import argparse
 import hashlib
 import json
 import math
@@ -22,13 +23,16 @@ def distribution(values):
 
 
 def main():
-    identity = read(ROOT / 'repeated-identity.json')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--input-root', type=Path, default=ROOT)
+    root = parser.parse_args().input_root
+    identity = read(root / 'repeated-identity.json')
     phases = []
     all_rows = {'native': [], 'llama': []}
     decoded = {'native': {}, 'llama': {}}
     reference = None
     for phase, engine in enumerate(['native', 'llama', 'llama', 'native']):
-        directory = ROOT / f'repeated-{phase}-{engine}'
+        directory = root / f'repeated-{phase}-{engine}'
         process, summary = read(directory / 'process.json'), read(directory / 'summary.json')
         assert summary['complete'] and summary['protocol_complete']
         assert summary['expected_requests'] == summary['collected_requests'] == 24
@@ -120,7 +124,7 @@ def main():
                'TTFT/decode clock boundaries differ by engine; raw timings retained.',
                'Startup and exact-child lifetime RSS are per-process observations, not per-page measurements.',
                'Shared M4 Pro; no universal speed or host-isolation claim.'])
-    (ROOT / 'repeated-comparison.json').write_text(json.dumps(result, indent=2) + '\n')
+    (root / 'repeated-comparison.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(comparison, indent=2))
 
 

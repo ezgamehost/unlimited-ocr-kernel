@@ -1,5 +1,6 @@
 """ABBA full-page resident comparison, gated on hybrid quality and logit parity."""
 import argparse
+import datetime
 import json
 import subprocess
 from pathlib import Path
@@ -10,7 +11,21 @@ from tools.fetch_model import sha256
 ROOT = Path(__file__).resolve().parent
 
 
+def require_ac_power():
+    status = subprocess.check_output(['pmset', '-g', 'batt'], text=True)
+    if "Now drawing from 'AC Power'" not in status:
+        raise RuntimeError('AC power is required before benchmark hashing or inference; ' + status.splitlines()[0])
+    return dict(utc=datetime.datetime.now(datetime.timezone.utc).isoformat(), status=status)
+
+
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-root', type=Path, required=True, help='New directory for this complete ABBA series')
+    options = parser.parse_args()
+    output_root = options.output_root.resolve()
+    if output_root.exists():
+        parser.error('output directory already exists; preserve prior results and choose a new directory')
+    initial_power = require_ac_power()
     gate = ROOT.parent / '2026-09-28-hybrid-int4'
     quality = json.loads((gate / 'packed-equivalence/comparison.json').read_text())
     assert len(quality) == 12 and all(all(row[key] for key in ['exact_text', 'exact_tokens', 'eos', 'image_tokens_equal']) for row in quality)
@@ -29,12 +44,15 @@ def main():
     for path, digest in expected.items():
         assert hashes[str(path.resolve())] == digest, path
     assert hashes[str(native.resolve())] == json.loads((gate / 'packed-equivalence/process.json').read_text())['binary_sha256']
-    identity = dict(hashes=hashes, overlay_manifest=overlay_manifest,
+    identity = dict(hashes=hashes, overlay_manifest=overlay_manifest, initial_power=initial_power,
                     source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                     note='Identity verification precedes all inference timing; resident independent requests, no cold-cache claim.')
-    (ROOT / 'repeated-identity.json').write_text(json.dumps(identity, indent=2) + '\n')
+    output_root.mkdir(parents=True, exist_ok=False)
+    (output_root / 'repeated-identity.json').write_text(json.dumps(identity, indent=2) + '\n')
     for index, engine in enumerate(['native', 'llama', 'llama', 'native']):
-        output = ROOT / f'repeated-{index}-{engine}'
+        power = require_ac_power()
+        (output_root / f'power-before-phase-{index}.json').write_text(json.dumps(power, indent=2) + '\n')
+        output = output_root / f'repeated-{index}-{engine}'
         args = argparse.Namespace(engine=engine, binary=native if engine == 'native' else llama,
             model=Path('artifacts/upstream') if engine == 'native' else model,
             mmproj=None if engine == 'native' else projector,

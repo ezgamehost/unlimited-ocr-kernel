@@ -82,3 +82,20 @@ run against this incomplete series. Heavy profiling, builds and inference are
 deferred until AC power is available. A future powered series needs a distinct
 output namespace; do not overwrite these files or silently stitch samples
 across the power interruption into a completed ABBA run.
+
+The retry runner now requires AC power before large-file hashing and before each
+phase. It also requires a new `--output-root` directory and records initial and
+per-phase power status. The actual 1%-battery preflight was checked: it refused
+before creating the output directory; an existing output directory was also
+rejected. No model was loaded by either check. A powered retry can use:
+
+```sh
+PYTHONPATH=. .venv/bin/python docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py \
+  --output-root docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-1
+PYTHONPATH=. .venv/bin/python docs/benchmarks/2026-09-28-packed-int4-resident/summarize_repeated.py \
+  --input-root docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-1
+```
+
+That retry has not been launched. The guard checks phase boundaries; it does not
+claim continuous power monitoring within a request. The audit still requires a
+complete four-phase series and does not treat interrupted data as complete.
