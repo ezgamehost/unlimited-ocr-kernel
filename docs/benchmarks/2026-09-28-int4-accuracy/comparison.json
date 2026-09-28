@@ -1,0 +1,77 @@
+{
+  "cases": {
+    "corpus-english": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 250,
+      "q4_tokens": 250,
+      "exact_raw_output_match": false
+    },
+    "corpus-chinese": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 289,
+      "q4_tokens": 289,
+      "exact_raw_output_match": false
+    },
+    "corpus-table": {
+      "q8_cer": 0.00398406374501992,
+      "q4_cer": 0.0,
+      "cer_delta": -0.00398406374501992,
+      "both_eos": true,
+      "q8_tokens": 248,
+      "q4_tokens": 247,
+      "exact_raw_output_match": false
+    },
+    "corpus-dense": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 1649,
+      "q4_tokens": 768,
+      "exact_raw_output_match": false
+    },
+    "heldout-receipt": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 272,
+      "q4_tokens": 272,
+      "exact_raw_output_match": false
+    },
+    "heldout-wide_report": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 355,
+      "q4_tokens": 355,
+      "exact_raw_output_match": false
+    },
+    "heldout-bilingual_notice": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 384,
+      "q4_tokens": 384,
+      "exact_raw_output_match": false
+    },
+    "heldout-archive_register": {
+      "q8_cer": 0.0,
+      "q4_cer": 0.0,
+      "cer_delta": 0.0,
+      "both_eos": true,
+      "q8_tokens": 1790,
+      "q4_tokens": 1790,
+      "exact_raw_output_match": false
+    }
+  },
+  "note": "All weights remain I8 storage; this report establishes neither packed-kernel speed nor memory savings."
+}
