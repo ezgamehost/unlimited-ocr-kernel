@@ -198,17 +198,36 @@ impl Int8Matrix {
                 .sum()
         };
         let mut data = vec![0.; self.rows];
+        let compute_group = |(group, output): (usize, &mut [f32])| {
+            let first = group * 4;
+            #[cfg(target_arch = "aarch64")]
+            if dotprod && self.cols.is_multiple_of(BLOCK) && output.len() == 4 {
+                // SAFETY: feature detection above; four complete validated rows
+                // with columns divisible by the kernel's 32-element block.
+                let result = unsafe {
+                    super::neon::dot_int8_four_rows(
+                        &self.weights[first * self.cols..(first + 4) * self.cols],
+                        &activation.weights,
+                        &self.scales[first * blocks..(first + 4) * blocks],
+                        &activation.scales,
+                    )
+                };
+                output.copy_from_slice(&result);
+                return;
+            }
+            for (offset, value) in output.iter_mut().enumerate() {
+                *value = dot(first + offset);
+            }
+        };
         if cpu.backend == Backend::Scalar || cpu.threads() == 1 || self.weights.len() <= 128 * 1024
         {
-            for (row, y) in data.iter_mut().enumerate() {
-                *y = dot(row);
-            }
+            data.chunks_mut(4).enumerate().for_each(compute_group);
         } else {
             cpu.pool.install(|| {
-                data.par_iter_mut()
-                    .with_min_len(self.rows.div_ceil(cpu.threads()))
+                data.par_chunks_mut(4)
+                    .with_min_len(self.rows.div_ceil(4).div_ceil(cpu.threads()))
                     .enumerate()
-                    .for_each(|(row, y)| *y = dot(row))
+                    .for_each(compute_group)
             });
         }
         let mut shape = x.shape.clone();

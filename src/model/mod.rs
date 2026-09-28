@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod benchmark;
 pub mod config;
 use crate::{
     checkpoint::Checkpoint,

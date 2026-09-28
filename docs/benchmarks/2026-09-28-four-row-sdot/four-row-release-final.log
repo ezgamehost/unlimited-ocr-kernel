@@ -1,0 +1,22 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 15.46s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 4 tests
+test model::benchmark::fixed_work_decoder_benchmark ... ignored, requires original weights, INT8 overlay, and English vision reference
+test cpu::neon::tests::four_rows_match_single_row_dot_bits ... ok
+test cpu::tests::expert_worker_reuses_pool_but_limits_inner_parallelism_and_memory ... ok
+test vision::sam::tests::relative_bias_rows_preserve_indexed_formula ... ok
+
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/quantized.rs (target/release/deps/quantized-21e3b1163353c50f)
+
+running 4 tests
+test invalid_int8_storage_scales_and_weights_are_rejected ... ok
+test dequantization_matches_correctly_rounded_products_across_row_tails ... ok
+test dynamic_int8_activation_dot_matches_explicit_quantized_reference ... ok
+test int8_blocks_roundtrip_zero_rows_tails_and_linear ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

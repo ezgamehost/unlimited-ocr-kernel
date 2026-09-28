@@ -1,0 +1,21 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+     Running unittests src/lib.rs (target/debug/deps/uocr-f42723686a5ed574)
+
+running 3 tests
+test cpu::neon::tests::four_rows_match_single_row_dot_bits ... ok
+test cpu::tests::expert_worker_reuses_pool_but_limits_inner_parallelism_and_memory ... ok
+test vision::sam::tests::relative_bias_rows_preserve_indexed_formula ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/quantized.rs (target/debug/deps/quantized-1f65773f488e1896)
+
+running 4 tests
+test dequantization_matches_correctly_rounded_products_across_row_tails ... ok
+test invalid_int8_storage_scales_and_weights_are_rejected ... ok
+test dynamic_int8_activation_dot_matches_explicit_quantized_reference ... ok
+test int8_blocks_roundtrip_zero_rows_tails_and_linear ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

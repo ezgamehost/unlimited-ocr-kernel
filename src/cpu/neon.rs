@@ -183,3 +183,95 @@ pub(super) unsafe fn dot_int8_pair(weights: &[i8], x: &[i8], ws: &[f32], xs: &[f
     }
     total
 }
+
+/// Four row-major outputs sharing each activation block. No weight repacking.
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "dotprod")]
+pub(super) unsafe fn dot_int8_four_rows(
+    weights: &[i8],
+    x: &[i8],
+    ws: &[f32],
+    xs: &[f32],
+) -> [f32; 4] {
+    use std::arch::aarch64::*;
+    assert!(x.len().is_multiple_of(32));
+    assert_eq!(weights.len().checked_div(4), Some(x.len()));
+    assert!(weights.len().is_multiple_of(4));
+    let blocks = x.len() / 32;
+    assert_eq!(xs.len(), blocks);
+    assert_eq!(ws.len(), blocks * 4);
+    let mut total = vdupq_n_f32(0.);
+    for b in 0..blocks {
+        // SAFETY: caller proves dotprod availability. Every load reads exactly
+        // half of a complete 32-byte block in one of four validated rows.
+        // Integer block sums fit i32 even for -128 inputs. The scale array and
+        // output array each contain exactly four initialized floats.
+        unsafe {
+            let x0 = vld1q_s8(x.as_ptr().add(b * 32));
+            let x1 = vld1q_s8(x.as_ptr().add(b * 32 + 16));
+            let mut sums = [vdupq_n_s32(0); 4];
+            for (row, sum) in sums.iter_mut().enumerate() {
+                let w = weights.as_ptr().add(row * x.len() + b * 32);
+                *sum = vdotq_s32(vdotq_s32(*sum, vld1q_s8(w), x0), vld1q_s8(w.add(16)), x1);
+            }
+            let sums = vpaddq_s32(vpaddq_s32(sums[0], sums[1]), vpaddq_s32(sums[2], sums[3]));
+            let scales = [
+                ws[b],
+                ws[blocks + b],
+                ws[2 * blocks + b],
+                ws[3 * blocks + b],
+            ];
+            // Deliberately separate multiplies/add: match sum * ws * xs and
+            // the original per-block FP32 accumulation without FMA contraction.
+            let scaled = vmulq_n_f32(
+                vmulq_f32(vcvtq_f32_s32(sums), vld1q_f32(scales.as_ptr())),
+                xs[b],
+            );
+            total = vaddq_f32(total, scaled);
+        }
+    }
+    let mut result = [0.; 4];
+    // SAFETY: result has exactly four writable floats.
+    unsafe {
+        vst1q_f32(result.as_mut_ptr(), total);
+    }
+    result
+}
+
+#[cfg(all(test, target_arch = "aarch64"))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn four_rows_match_single_row_dot_bits() {
+        if !std::arch::is_aarch64_feature_detected!("dotprod") {
+            return;
+        }
+        for cols in [32usize, 64, 896, 1280] {
+            let blocks = cols / 32;
+            let weights: Vec<i8> = (0..cols * 4)
+                .map(|i| ((i * 53 % 256) as i16 - 128) as i8)
+                .collect();
+            let x: Vec<i8> = (0..cols)
+                .map(|i| ((i * 71 % 256) as i16 - 128) as i8)
+                .collect();
+            let scales: Vec<f32> = (0..blocks * 4)
+                .map(|i| [0., 0.00317, 0.7, 1e-10, 17.][i % 5])
+                .collect();
+            let xs: Vec<f32> = (0..blocks).map(|i| (i % 17 + 1) as f32 / 123.).collect();
+            // SAFETY: runtime detection above and exact complete-block storage.
+            let actual = unsafe { dot_int8_four_rows(&weights, &x, &scales, &xs) };
+            for row in 0..4 {
+                let expected = unsafe {
+                    dot_int8_pair(
+                        &weights[row * cols..(row + 1) * cols],
+                        &x,
+                        &scales[row * blocks..(row + 1) * blocks],
+                        &xs,
+                    )
+                };
+                assert_eq!(actual[row].to_bits(), expected.to_bits());
+            }
+        }
+    }
+}
