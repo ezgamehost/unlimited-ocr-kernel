@@ -82,6 +82,14 @@ fresh output directories and verify binary/model hashes. Commands run with
 directories are protected from overwriting.
 
 The accepted production CLI identity and full request/response evidence are in
-`quality-sam1024/process.json`. The previous complete llama comparison remains
+`quality-sam1024/process.json`. A final integration-test build replaced the
+top-level executable with a different cached build. The exact OCR-tested
+binary remained in Cargo's dependency directory and was preserved separately;
+`cargo build --release --bin uocr` restored its exact SHA to the top-level path.
+`cli-build-identity.json` records both identities and the final verification.
+The accepted CLI SHA is
+`44ef43f5a91e065440131c9c666306f63b5fa0dac9c4bec51a3eb08cdb2a64ab`.
+
+The previous complete llama comparison remains
 in `../2026-09-28-packed-int4-resident/powered-abba-1/`; do not apply the vision
 percentage directly to those full-page speed ratios.

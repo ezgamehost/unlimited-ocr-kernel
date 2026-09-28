@@ -1,0 +1,8 @@
+{
+  "quality_binary_sha256": "44ef43f5a91e065440131c9c666306f63b5fa0dac9c4bec51a3eb08cdb2a64ab",
+  "quality_binary_cached_path": "target/release/deps/uocr-ca08cbd4219b5b9e",
+  "preserved_binary": "artifacts/kernel-baselines/uocr-44ef43f5a91e065440131c9c666306f63b5fa0dac9c4bec51a3eb08cdb2a64ab",
+  "integration_test_build_sha256": "4e93802bb45db011b7efb8ad7e5d58d2a7fe11290452f84b5d78fb984bf4dc43",
+  "note": "The final cargo test --test ops changed the top-level CLI to a different cached build. The exact quality-tested release binary remained in deps and was preserved before restoring the release build.",
+  "final_release_binary_sha256": "44ef43f5a91e065440131c9c666306f63b5fa0dac9c4bec51a3eb08cdb2a64ab"
+}
