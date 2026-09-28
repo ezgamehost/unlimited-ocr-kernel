@@ -1,0 +1,134 @@
+[
+  {
+    "case": "english",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/english.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 21.132466541981557,
+    "load_seconds": 6.9062069170000004,
+    "timings": {
+      "preprocess_seconds": 0.131064625,
+      "vision_seconds": 7.804862625,
+      "prefill_seconds": 3.313504667,
+      "decode_seconds": 2.4504059209999993,
+      "first_token_seconds": 11.249511583,
+      "total_seconds": 13.721480541,
+      "decode_steps": 250
+    },
+    "finish": "eos",
+    "tokens": 250,
+    "same_token_ids": true,
+    "cer": 0.0
+  },
+  {
+    "case": "chinese",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/chinese.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 19.888274124998134,
+    "load_seconds": 5.842264625,
+    "timings": {
+      "preprocess_seconds": 0.121655875,
+      "vision_seconds": 7.607531875,
+      "prefill_seconds": 3.440306834,
+      "decode_seconds": 2.734146338000001,
+      "first_token_seconds": 11.16959525,
+      "total_seconds": 13.928653083,
+      "decode_steps": 289
+    },
+    "finish": "eos",
+    "tokens": 289,
+    "same_token_ids": true,
+    "cer": 0.0
+  },
+  {
+    "case": "table",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/table.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 19.809612709010253,
+    "load_seconds": 5.827558166,
+    "timings": {
+      "preprocess_seconds": 0.151870083,
+      "vision_seconds": 7.927899416,
+      "prefill_seconds": 3.349326709,
+      "decode_seconds": 2.4170671790000005,
+      "first_token_seconds": 11.429176041,
+      "total_seconds": 13.867729041,
+      "decode_steps": 248
+    },
+    "finish": "eos",
+    "tokens": 248,
+    "same_token_ids": true,
+    "cer": 0.00398406374501992
+  },
+  {
+    "case": "dense",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/dense.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 33.617851083981805,
+    "load_seconds": 5.845618667,
+    "timings": {
+      "preprocess_seconds": 0.123316208,
+      "vision_seconds": 7.620259917,
+      "prefill_seconds": 3.457998041,
+      "decode_seconds": 16.300122574999993,
+      "first_token_seconds": 11.201659333,
+      "total_seconds": 27.641975583,
+      "decode_steps": 1649
+    },
+    "finish": "eos",
+    "tokens": 1649,
+    "same_token_ids": true,
+    "cer": 0.0
+  }
+]

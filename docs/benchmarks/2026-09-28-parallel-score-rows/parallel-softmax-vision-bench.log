@@ -1,0 +1,6 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 10.31s
+     Running `target/release/examples/bench_vision --gundam`
+image_tokens=1513 seconds=8.009633
+image_tokens=1513 seconds=8.237656
+image_tokens=1513 seconds=7.866418

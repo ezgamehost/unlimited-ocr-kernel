@@ -1,0 +1,19 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 15.83s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 2 tests
+test actual_decoder_layers_match_upstream_prefill_and_decode ... ok
+test actual_expert_scheduling_preserves_results_with_small_scratch ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+
+     Running tests/vision.rs (target/release/deps/vision-efc745dfe720a983)
+
+running 3 tests
+test original_english_global_stages_match_rust ... ok
+test original_gundam_pixels_and_embeddings_match_rust ... ok
+test original_vision_features_match_rust ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 12.41s
+

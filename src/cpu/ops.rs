@@ -186,6 +186,42 @@ pub fn softmax_backend(values: &mut [f32], backend: Backend) -> Result<()> {
     Ok(())
 }
 
+/// Normalize independent score rows, optionally masking beyond each absolute
+/// causal query position. Parallelism never changes a row's reduction order.
+pub fn softmax_rows(
+    values: &mut [f32],
+    width: usize,
+    causal_start: Option<usize>,
+    cpu: &CpuContext,
+) -> Result<()> {
+    if width == 0 || !values.len().is_multiple_of(width) {
+        return Err(OcrError::Shape("invalid softmax row layout".into()));
+    }
+    let rows = values.len() / width;
+    if causal_start.is_some_and(|start| start.checked_add(rows).is_none_or(|end| end > width)) {
+        return Err(OcrError::Shape(
+            "causal softmax position exceeds row width".into(),
+        ));
+    }
+    let normalize = |(i, row): (usize, &mut [f32])| {
+        if let Some(start) = causal_start {
+            row[start + i + 1..].fill(f32::NEG_INFINITY);
+        }
+        softmax_backend(row, cpu.backend)
+    };
+    if cpu.backend != Backend::Scalar && cpu.threads() > 1 && values.len() >= 65536 {
+        cpu.pool.install(|| {
+            values
+                .par_chunks_mut(width)
+                .with_min_len(rows.div_ceil(cpu.threads()))
+                .enumerate()
+                .try_for_each(normalize)
+        })
+    } else {
+        values.chunks_mut(width).enumerate().try_for_each(normalize)
+    }
+}
+
 pub fn silu(values: &mut [f32]) {
     for value in values {
         *value /= 1. + (-*value).exp();
@@ -303,12 +339,7 @@ where
                 *value *= scale;
             }
             bias(head, start, count, &mut scores);
-            for i in 0..count {
-                if causal {
-                    scores[i * nk + start + i + 1..(i + 1) * nk].fill(f32::NEG_INFINITY);
-                }
-                softmax_backend(&mut scores[i * nk..(i + 1) * nk], cpu.backend)?;
-            }
+            softmax_rows(&mut scores, nk, causal.then_some(start), cpu)?;
             let dest = &mut output[(head * nq + start) * d..(head * nq + start + count) * d];
             if fast {
                 accelerate::linear(&scores, &vt, dest, count, d, nk)?;

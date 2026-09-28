@@ -200,3 +200,35 @@ fn attention_shrinks_query_blocks_to_fit_scratch_budget() {
     let result = ops::attention(&q, &q, &q, true, &mut cpu).unwrap();
     assert_eq!(result.data, q.data);
 }
+
+#[test]
+fn parallel_softmax_rows_preserve_bits_and_causal_offsets() {
+    let cpu = CpuContext::new(Backend::Auto, 8, 1 << 24).unwrap();
+    for (rows, width) in [(1, 31), (100, 513), (129, 513), (128, 4096)] {
+        for start in [None, Some(7)] {
+            let mut expected: Vec<f32> = (0..rows * width)
+                .map(|i| (i as f32 * 0.13).sin() * 8.)
+                .collect();
+            let mut actual = expected.clone();
+            for (i, row) in expected.chunks_mut(width).enumerate() {
+                if let Some(start) = start {
+                    row[start + i + 1..].fill(f32::NEG_INFINITY);
+                }
+                ops::softmax_backend(row, Backend::Auto).unwrap();
+            }
+            ops::softmax_rows(&mut actual, width, start, &cpu).unwrap();
+            assert!(
+                actual
+                    .iter()
+                    .zip(&expected)
+                    .all(|(a, b)| a.to_bits() == b.to_bits())
+            );
+        }
+    }
+    assert!(ops::softmax_rows(&mut [0.; 3], 2, None, &cpu).is_err());
+    assert!(ops::softmax_rows(&mut [], 0, None, &cpu).is_err());
+    assert!(ops::softmax_rows(&mut [0.; 8], 4, Some(3), &cpu).is_err());
+    let mut invalid = vec![0.; 128 * 1024];
+    *invalid.last_mut().unwrap() = f32::NAN;
+    assert!(ops::softmax_rows(&mut invalid, 1024, None, &cpu).is_err());
+}

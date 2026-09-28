@@ -7,6 +7,46 @@ use crate::{
     error::{OcrError, Result},
     tensor::Tensor,
 };
+use rayon::prelude::*;
+
+fn add_relative_bias(
+    scores: &mut [f32],
+    head: usize,
+    start: usize,
+    (h, w): (usize, usize),
+    (bh, bw): (&[f32], &[f32]),
+    pool: &rayon::ThreadPool,
+    threads: usize,
+) {
+    let tokens = h * w;
+    let add_row = |(i, row): (usize, &mut [f32])| {
+        let query = start + i;
+        let (qy, qx) = (query / w, query % w);
+        let hbase = (head * tokens + query) * (2 * h - 1) + qy;
+        let wbase = (head * tokens + query) * (2 * w - 1) + qx;
+        let horizontal = &bw[wbase..wbase + w];
+        for (key_row, &vertical) in row
+            .chunks_exact_mut(w)
+            .zip(bh[hbase..hbase + h].iter().rev())
+        {
+            for (value, &horizontal) in key_row.iter_mut().zip(horizontal.iter().rev()) {
+                *value += vertical + horizontal;
+            }
+        }
+    };
+    if threads > 1 && scores.len() >= 65536 {
+        let rows_per_task = (scores.len() / tokens).div_ceil(threads);
+        pool.install(|| {
+            scores
+                .par_chunks_mut(tokens)
+                .with_min_len(rows_per_task)
+                .enumerate()
+                .for_each(add_row)
+        });
+    } else {
+        scores.chunks_mut(tokens).enumerate().for_each(add_row);
+    }
+}
 
 impl Vision {
     pub(super) fn sam(&self, image: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
@@ -80,22 +120,23 @@ impl Vision {
         let rw = interpolate_relative(self.w(&format!("{prefix}.rel_pos_w"))?, 2 * w - 1)?;
         let bh = ops::linear(&q, &rh, None, cpu)?;
         let bw = ops::linear(&q, &rw, None, cpu)?;
-        let attended =
-            ops::attention_bias(&q, &k, &v, false, cpu, |head, start, count, scores| {
-                for i in 0..count {
-                    let query = start + i;
-                    let (qy, qx) = (query / w, query % w);
-                    let hbase = (head * tokens + query) * (2 * h - 1);
-                    let wbase = (head * tokens + query) * (2 * w - 1);
-                    for ky in 0..h {
-                        let vertical = bh.data[hbase + qy + h - 1 - ky];
-                        for kx in 0..w {
-                            scores[i * tokens + ky * w + kx] +=
-                                vertical + bw.data[wbase + qx + w - 1 - kx];
-                        }
-                    }
-                }
-            })?;
+        let bias_pool = std::sync::Arc::clone(&cpu.pool);
+        let workers = if cpu.backend == crate::cpu::Backend::Scalar {
+            1
+        } else {
+            cpu.threads()
+        };
+        let attended = ops::attention_bias(&q, &k, &v, false, cpu, |head, start, _, scores| {
+            add_relative_bias(
+                scores,
+                head,
+                start,
+                (h, w),
+                (&bh.data, &bw.data),
+                &bias_pool,
+                workers,
+            );
+        })?;
         let mut joined = vec![0.; batch * tokens * c];
         for b in 0..batch {
             for head in 0..heads {
@@ -111,5 +152,56 @@ impl Vision {
             &format!("{prefix}.proj"),
             cpu,
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn relative_bias_rows_preserve_indexed_formula() {
+        for (h, w, start, count) in [(3, 5, 2, 9), (40, 40, 37, 127), (64, 64, 55, 128)] {
+            let tokens = h * w;
+            let bh: Vec<f32> = (0..2 * tokens * (2 * h - 1))
+                .map(|i| (i as f32 * 0.03).sin())
+                .collect();
+            let bw: Vec<f32> = (0..2 * tokens * (2 * w - 1))
+                .map(|i| (i as f32 * 0.13).cos())
+                .collect();
+            let mut expected: Vec<f32> = (0..count * tokens)
+                .map(|i| (i as f32 * 0.23).sin())
+                .collect();
+            let original = expected.clone();
+            for i in 0..count {
+                let query = start + i;
+                for ky in 0..h {
+                    for kx in 0..w {
+                        expected[i * tokens + ky * w + kx] += bh
+                            [(tokens + query) * (2 * h - 1) + query / w + h - 1 - ky]
+                            + bw[(tokens + query) * (2 * w - 1) + query % w + w - 1 - kx];
+                    }
+                }
+            }
+            for threads in [1, 8] {
+                let cpu = CpuContext::new(crate::cpu::Backend::Auto, threads, 1 << 24).unwrap();
+                let mut actual = original.clone();
+                add_relative_bias(
+                    &mut actual,
+                    1,
+                    start,
+                    (h, w),
+                    (&bh, &bw),
+                    &cpu.pool,
+                    threads,
+                );
+                assert!(
+                    actual
+                        .iter()
+                        .zip(&expected)
+                        .all(|(a, b)| a.to_bits() == b.to_bits())
+                );
+            }
+        }
     }
 }
