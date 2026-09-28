@@ -10,19 +10,19 @@ competitor, not a runtime dependency.
 This is an active performance project. Portable scalar fallbacks exist, but
 other CPU platforms have not received equivalent optimization or benchmarking.
 On the four primary synthetic pages, the latest repeated resident comparison
-measures a **1.30–1.54× median full-page speedup over llama.cpp Q8** with the
+measures a **1.39–1.59× median full-page speedup over llama.cpp Q8** with the
 native dynamic-activation Q8 decoder. Standalone token decoding remains slower.
-See the [Q8 full-page results and limits](docs/benchmarks/2026-09-28-current-q8/README.md).
+See the [Q8 full-page results and limits](docs/benchmarks/2026-09-28-q8-scheduling-fullpage/README.md).
 The hybrid has a confirmed accuracy regression on the
 [32-crop stress input](docs/benchmarks/2026-09-28-hybrid-max32/README.md); the
 four-page speedup does not establish general quantization accuracy.
 
-Subsequent scheduling changes reduce native fixed-work Q8 decode time:
+Controlled native measurements show scheduling improvements in Q8 decode time:
 [shared-expert worker allocation](docs/benchmarks/2026-09-28-shared-expert-workers/README.md)
 by **2.22%**, then [concurrent Q/K/V projections](docs/benchmarks/2026-09-28-concurrent-qkv/README.md)
 by a further **8.28%** against that accepted runtime. Each AC comparison preserves
-every checked logit and all 24 Q8/hybrid OCR outputs. These separate decoder
-results are not included in the full-page numbers above.
+every checked logit and all 24 Q8/hybrid OCR outputs. The latest full-page comparison
+above includes both changes; their individual decoder gains were measured separately.
 
 ## Build and run
 

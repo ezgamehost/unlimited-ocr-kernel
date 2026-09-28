@@ -1,0 +1,30 @@
+{
+  "utc": "2026-09-28T23:43:44.251167+00:00",
+  "commands": {
+    "pmset -g batt": {
+      "returncode": 0,
+      "stdout": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t71%; charging; 2:37 remaining present: true\n",
+      "stderr": ""
+    },
+    "pmset -g custom": {
+      "returncode": 0,
+      "stdout": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n",
+      "stderr": ""
+    },
+    "pmset -g therm": {
+      "returncode": 0,
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "stderr": ""
+    },
+    "sysctl vm.swapusage": {
+      "returncode": 0,
+      "stdout": "vm.swapusage: total = 10240.00M  used = 9600.88M  free = 639.12M  (encrypted)\n",
+      "stderr": ""
+    },
+    "vm_stat": {
+      "returncode": 0,
+      "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   340874.\nPages active:                                 262509.\nPages inactive:                               369196.\nPages speculative:                              1451.\nPages throttled:                                   0.\nPages wired down:                             173743.\nPages purgeable:                                 674.\n\"Translation faults\":                     1753400398.\nPages copy-on-write:                        37565273.\nPages zero filled:                         922069107.\nPages reactivated:                         281591703.\nPages purged:                               15441908.\nFile-backed pages:                            178306.\nAnonymous pages:                              454850.\nPages stored in compressor:                  1865876.\nPages occupied by compressor:                 380577.\nDecompressions:                            267016162.\nCompressions:                              345193424.\nPageins:                                   176188428.\nPageouts:                                    3255765.\nSwapins:                                     2455480.\nSwapouts:                                    3673149.\n",
+      "stderr": ""
+    }
+  }
+}

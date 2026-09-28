@@ -1,0 +1,12 @@
+{
+  "before_utc": "2026-09-28T23:23:01.094509+00:00",
+  "after_utc": "2026-09-28T23:43:44.251167+00:00",
+  "page_size_bytes": 16384,
+  "counter_deltas": {
+    "Pageins": 2388818,
+    "Pageouts": 30686,
+    "Swapins": 16118,
+    "Swapouts": 4180
+  },
+  "note": "Whole-host cumulative counters across hashing, startup and all phases; not attributable exclusively to benchmark children."
+}

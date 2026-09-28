@@ -1,0 +1,20 @@
+{
+  "exact_native_requests": 48,
+  "counts": {
+    "english": 12,
+    "chinese": 12,
+    "table": 12,
+    "dense": 12
+  },
+  "baseline": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-current-q8/powered-abba-1",
+  "current": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-q8-scheduling-fullpage/powered-abba-1",
+  "compared_fields": [
+    "text",
+    "token_ids",
+    "finish_reason",
+    "image_tokens",
+    "precision"
+  ],
+  "baseline_identity_sha256": "e5a78a8d3002254c16686ddfc03e3510c380cc8dd4baa2f499fa138a3d977d96",
+  "current_identity_sha256": "67bd10a6b80ae3ba146d7846c23b419a6872201c4682b115e283df3b163d0140"
+}

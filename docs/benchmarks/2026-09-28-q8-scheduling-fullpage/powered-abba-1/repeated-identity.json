@@ -1,0 +1,30 @@
+{
+  "hashes": {
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr": "1f1902e4db8a0c9ad5ad79242a439c589ba423ab8462cf52754e8af285c1f193",
+    "/private/tmp/unlimited-ocr-baseline/bin/llama-b11223/llama-server": "6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6",
+    "/private/tmp/unlimited-ocr-baseline/models/model.gguf": "149574e63ec2681bbfb3d0f83ca1064e041fd6f3a97a62382d3168ad64289848",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf": "75dcbeafd883b3f27bee1a3d95c3ef57a6305c16758912af7cf62e6cf4c009a6",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/unlimited-ocr-q8-block32.safetensors": "b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441"
+  },
+  "overlay_manifest": {
+    "schema_version": 1,
+    "format": "uocr-q8-block32-v1",
+    "block_size": 32,
+    "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+    "output_sha256": "b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441",
+    "matrix_count": 2197,
+    "bytes": 3114913992
+  },
+  "initial_power": {
+    "utc": "2026-09-28T23:23:01.141202+00:00",
+    "status": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t68%; charging; 1:48 remaining present: true\n"
+  },
+  "native_precision": "int8",
+  "quality_proof": {
+    "path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-concurrent-qkv/quality/q8",
+    "comparison_sha256": "158e4a57ad9a43debc7e84b9d51042f9200e6f56bdd7e042275ac97b3c3abacc",
+    "process_sha256": "a0f2a64ad44ce26fce6687fd2a158c3f3a3bcc7fff4c9e3296b519d2a2699a48"
+  },
+  "source_commit": "a3a53e13cd23456f8fcedd36319a023e867b605a",
+  "note": "Identity verification precedes all inference timing; resident independent requests, no cold-cache claim."
+}

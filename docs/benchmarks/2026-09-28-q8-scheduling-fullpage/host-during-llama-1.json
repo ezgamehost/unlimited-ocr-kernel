@@ -1,0 +1,26 @@
+{
+  "utc": "2026-09-28T23:31:49.632449+00:00",
+  "purpose": "Read-only midpoint snapshot after observed latency variation; not a reason to exclude samples",
+  "commands": {
+    "pmset -g batt": {
+      "returncode": 0,
+      "stdout": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t70%; charging; (no estimate) present: true\n",
+      "stderr": ""
+    },
+    "pmset -g therm": {
+      "returncode": 0,
+      "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+      "stderr": ""
+    },
+    "sysctl vm.swapusage": {
+      "returncode": 0,
+      "stdout": "vm.swapusage: total = 10240.00M  used = 9712.88M  free = 527.12M  (encrypted)\n",
+      "stderr": ""
+    },
+    "vm_stat": {
+      "returncode": 0,
+      "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4021.\nPages active:                                 373443.\nPages inactive:                               370034.\nPages speculative:                              2193.\nPages throttled:                                   0.\nPages wired down:                             177619.\nPages purgeable:                                 606.\n\"Translation faults\":                     1742856997.\nPages copy-on-write:                        37448841.\nPages zero filled:                         919292737.\nPages reactivated:                         275698643.\nPages purged:                               15289457.\nFile-backed pages:                            239793.\nAnonymous pages:                              505877.\nPages stored in compressor:                  2326972.\nPages occupied by compressor:                 600531.\nDecompressions:                            262069068.\nCompressions:                              340272135.\nPageins:                                   175219222.\nPageouts:                                    3239005.\nSwapins:                                     2447906.\nSwapouts:                                    3673149.\n",
+      "stderr": ""
+    }
+  }
+}
