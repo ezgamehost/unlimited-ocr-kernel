@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "format": "uocr-q8-block32-v1",
+  "block_size": 32,
+  "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+  "output_sha256": "b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441",
+  "matrix_count": 2197,
+  "bytes": 3114913992
+}

@@ -92,3 +92,94 @@ pub(super) fn sum(values: &[f32]) -> f32 {
         vaddvq_f32(sum) + tail.iter().sum::<f32>()
     }
 }
+
+/// Weight-only INT8: activations are never quantized.
+#[cfg(target_arch = "aarch64")]
+pub(super) fn dot_int8(weights: &[i8], x: &[f32], scales: &[f32]) -> f32 {
+    use std::arch::aarch64::*;
+    assert_eq!(weights.len(), x.len());
+    assert_eq!(scales.len(), x.len().div_ceil(32));
+    // SAFETY: NEON is mandatory on AArch64. Each 16-byte load is bounded by
+    // its current 32-element block; tails use scalar indexing. Float loads
+    // have the same bounded length, and neither input is mutated.
+    unsafe {
+        let mut total = vdupq_n_f32(0.);
+        let mut tail = 0.;
+        for (block, &scale) in scales.iter().enumerate() {
+            let start = block * 32;
+            let end = (start + 32).min(x.len());
+            let mut a = vdupq_n_f32(0.);
+            let mut b = a;
+            let mut c = a;
+            let mut d = a;
+            let mut i = start;
+            while i + 16 <= end {
+                let packed = vld1q_s8(weights.as_ptr().add(i));
+                let lo = vmovl_s8(vget_low_s8(packed));
+                let hi = vmovl_s8(vget_high_s8(packed));
+                a = vfmaq_f32(
+                    a,
+                    vcvtq_f32_s32(vmovl_s16(vget_low_s16(lo))),
+                    vld1q_f32(x.as_ptr().add(i)),
+                );
+                b = vfmaq_f32(
+                    b,
+                    vcvtq_f32_s32(vmovl_s16(vget_high_s16(lo))),
+                    vld1q_f32(x.as_ptr().add(i + 4)),
+                );
+                c = vfmaq_f32(
+                    c,
+                    vcvtq_f32_s32(vmovl_s16(vget_low_s16(hi))),
+                    vld1q_f32(x.as_ptr().add(i + 8)),
+                );
+                d = vfmaq_f32(
+                    d,
+                    vcvtq_f32_s32(vmovl_s16(vget_high_s16(hi))),
+                    vld1q_f32(x.as_ptr().add(i + 12)),
+                );
+                i += 16;
+            }
+            let sum = vaddq_f32(vaddq_f32(a, b), vaddq_f32(c, d));
+            total = vfmaq_n_f32(total, sum, scale);
+            for j in i..end {
+                tail += weights[j] as f32 * scale * x[j];
+            }
+        }
+        vaddvq_f32(total) + tail
+    }
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "dotprod")]
+pub(super) unsafe fn dot_int8_pair(weights: &[i8], x: &[i8], ws: &[f32], xs: &[f32]) -> f32 {
+    use std::arch::aarch64::*;
+    assert_eq!(weights.len(), x.len());
+    assert_eq!(ws.len(), x.len().div_ceil(32));
+    assert_eq!(ws.len(), xs.len());
+    let mut total = 0.;
+    for b in 0..ws.len() {
+        let start = b * 32;
+        let end = (start + 32).min(x.len());
+        let mut sum = vdupq_n_s32(0);
+        let mut i = start;
+        while i + 16 <= end {
+            // SAFETY: the caller has checked dotprod support. Both loads stay
+            // within their equal-length slices. A block sum is at most
+            // 32*128*128, so signed 32-bit accumulation cannot overflow.
+            unsafe {
+                sum = vdotq_s32(
+                    sum,
+                    vld1q_s8(weights.as_ptr().add(i)),
+                    vld1q_s8(x.as_ptr().add(i)),
+                );
+            }
+            i += 16;
+        }
+        let mut sum = vaddvq_s32(sum);
+        for j in i..end {
+            sum += weights[j] as i32 * x[j] as i32;
+        }
+        total += sum as f32 * ws[b] * xs[b];
+    }
+    total
+}

@@ -1,0 +1,14 @@
+weight=model.layers.1.mlp.experts.0.gate_proj.weight bf16_bytes=2293760 int8_bytes=1290240
+mode=0 us_per_call=23.491
+mode=1 us_per_call=41.572
+mode=2 us_per_call=21.044
+mode=2 us_per_call=19.274
+mode=1 us_per_call=26.694
+mode=0 us_per_call=16.603
+weight=lm_head.weight bf16_bytes=330956800 int8_bytes=186163200
+mode=0 us_per_call=1805.427
+mode=1 us_per_call=1863.629
+mode=2 us_per_call=1275.600
+mode=2 us_per_call=1011.192
+mode=1 us_per_call=1702.683
+mode=0 us_per_call=1690.067

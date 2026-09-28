@@ -3,6 +3,7 @@ use std::sync::Arc;
 mod accelerate;
 mod neon;
 pub mod ops;
+pub mod quantized;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Backend {
