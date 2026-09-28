@@ -1,0 +1,27 @@
+Sort by top of stack, same collapsed (when >= 5):
+        __psynch_cvwait  (in libsystem_kernel.dylib)        35912
+        __workq_kernreturn  (in libsystem_kernel.dylib)        11978
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops4gelu  (in uocr)        952
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a2068  [0x1816c0068]        894
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c5c  [0x1815d2c5c]        757
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c60  [0x1815d2c60]        684
+        _RNCNvMNtNtCsiDNU5144K5k_4uocr6vision3samNtB6_6Vision13sam_attention0B8_  (in uocr)        637
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops15softmax_backend  (in uocr)        445
+        VVEXPF  (in libvMisc.dylib)        417
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops4norm  (in uocr)        349
+        _RNvNtNtCsgXDUyvWqpNB_4libm4math4erff5erfc2  (in uocr)        341
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a207c  [0x1816c007c]        305
+        swtch_pri  (in libsystem_kernel.dylib)        150
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5a1de8  [0x1816bfde8]        148
+        _RNvNtNtCsgXDUyvWqpNB_4libm4math4expf4expf  (in uocr)        147
+        __ulock_wait  (in libsystem_kernel.dylib)        135
+        _RINvNtNtCsiDNU5144K5k_4uocr3cpu3ops14attention_biasNCNvMNtNtB6_6vision3samNtBU_6Vision13sam_attention0EB6_  (in uocr)        126
+        _platform_memmove  (in libsystem_platform.dylib)        108
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4ca8  [0x1815d2ca8]        101
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c64  [0x1815d2c64]        91
+        madvise  (in libsystem_kernel.dylib)        89
+        _RNvNtNtCsiDNU5144K5k_4uocr3cpu3ops6linear  (in uocr)        79
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4d5c  [0x1815d2d5c]        78
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x4b4c3c  [0x1815d2c3c]        77
+        ???  (in libBLAS.dylib)  load address 0x18111e000 + 0x5ab318  [0x1816c9318]        66
+        expf  (in libsystem_m.dylib)        61

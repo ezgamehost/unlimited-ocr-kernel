@@ -1,0 +1,10 @@
+{
+  "mapped": {
+    "path": "artifacts/uocr-before-expert-parallel",
+    "sha256": "aa9639558d26af317a5a1611eebeecd3da4a383c93c5d0d6cdb48ec955207e3f"
+  },
+  "streamed": {
+    "path": "target/release/uocr",
+    "sha256": "c345cd8f2b0c88dca74e2ac77a918cb20ba300ea47d5642a0d9f376f10bc81c1"
+  }
+}

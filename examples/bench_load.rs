@@ -35,7 +35,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     ))?;
     eprintln!("source_open_seconds={:.6}", start.elapsed().as_secs_f64());
     let start = Instant::now();
-    let hash = source.sha256();
+    let hash = source.sha256()?;
     eprintln!(
         "source_hash_seconds={:.6} sha256={hash}",
         start.elapsed().as_secs_f64()

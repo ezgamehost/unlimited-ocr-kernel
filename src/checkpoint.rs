@@ -3,7 +3,13 @@ use crate::error::{OcrError, Result};
 use memmap2::{Mmap, MmapOptions};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
-use std::{collections::BTreeMap, fs::File, path::Path};
+use std::{
+    collections::BTreeMap,
+    fs::File,
+    io::{Read, Seek, SeekFrom},
+    path::Path,
+    sync::Mutex,
+};
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 pub enum DType {
@@ -34,6 +40,7 @@ struct Descriptor {
 
 pub struct Checkpoint {
     mapping: Mmap,
+    file: Mutex<File>,
     data_start: usize,
     tensors: BTreeMap<String, Descriptor>,
     metadata: BTreeMap<String, String>,
@@ -161,6 +168,7 @@ impl Checkpoint {
         }
         Ok(Self {
             mapping,
+            file: Mutex::new(file),
             data_start,
             tensors,
             metadata,
@@ -170,8 +178,28 @@ impl Checkpoint {
     pub fn metadata(&self) -> &BTreeMap<String, String> {
         &self.metadata
     }
-    pub fn sha256(&self) -> String {
-        format!("{:x}", Sha256::digest(&self.mapping[..]))
+    pub fn sha256(&self) -> Result<String> {
+        // Read the same inode used by the mapping, without faulting every tensor
+        // page into the process's mapped working set. Serialize file-offset use
+        // so repeated/concurrent checks start at zero and hash the entire file.
+        let mut file = self
+            .file
+            .lock()
+            .map_err(|_| OcrError::Format("checkpoint file lock poisoned".into()))?;
+        file.seek(SeekFrom::Start(0))?;
+        let mut buffer = vec![0u8; 1 << 20];
+        let mut remaining = self.mapping.len();
+        let mut hash = Sha256::new();
+        while remaining > 0 {
+            let count = remaining.min(buffer.len());
+            file.read_exact(&mut buffer[..count])?;
+            hash.update(&buffer[..count]);
+            remaining -= count;
+        }
+        if file.read(&mut buffer[..1])? != 0 {
+            return Err(OcrError::Format("checkpoint file size changed".into()));
+        }
+        Ok(format!("{:x}", hash.finalize()))
     }
     pub fn file_bytes(&self) -> usize {
         self.mapping.len()

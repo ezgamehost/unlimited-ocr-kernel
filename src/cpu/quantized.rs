@@ -291,8 +291,10 @@ impl QuantizedWeights {
                 "INT8 overlay version or metadata mismatch".into(),
             ));
         }
-        if checkpoint.sha256() != manifest.output_sha256
-            || source.sha256() != manifest.source_sha256
+        // Validate the large source first so the overlay is the most recently
+        // read file when its matrices are copied below.
+        if source.sha256()? != manifest.source_sha256
+            || checkpoint.sha256()? != manifest.output_sha256
         {
             return Err(OcrError::Format(
                 "INT8 checksum or source model mismatch".into(),

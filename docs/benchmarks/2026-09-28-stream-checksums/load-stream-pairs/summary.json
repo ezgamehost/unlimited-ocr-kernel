@@ -1,0 +1,104 @@
+[
+  {
+    "mode": "mapped",
+    "repetition": 0,
+    "wall_seconds": 20.016135917016072,
+    "load_seconds": 19.818915708,
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "artifacts/uocr-before-expert-parallel",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ]
+  },
+  {
+    "mode": "streamed",
+    "repetition": 0,
+    "wall_seconds": 5.418973916006507,
+    "load_seconds": 5.232847041,
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ]
+  },
+  {
+    "mode": "streamed",
+    "repetition": 1,
+    "wall_seconds": 5.8406301669892855,
+    "load_seconds": 5.615428958,
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ]
+  },
+  {
+    "mode": "mapped",
+    "repetition": 1,
+    "wall_seconds": 17.318207625008654,
+    "load_seconds": 17.09815875,
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "artifacts/uocr-before-expert-parallel",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ]
+  },
+  {
+    "mode": "mapped",
+    "repetition": 2,
+    "wall_seconds": 17.18221599998651,
+    "load_seconds": 16.959661791,
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "artifacts/uocr-before-expert-parallel",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ]
+  },
+  {
+    "mode": "streamed",
+    "repetition": 2,
+    "wall_seconds": 5.951647916022921,
+    "load_seconds": 5.757171208,
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ]
+  }
+]

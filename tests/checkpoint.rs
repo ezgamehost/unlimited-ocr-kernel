@@ -50,3 +50,31 @@ fn rejects_shape_byte_count_mismatch_and_trailing_payload() {
         assert!(Checkpoint::open(file.path()).is_err());
     }
 }
+
+#[test]
+fn checksum_streams_multiple_chunks_repeats_and_uses_original_file() {
+    use sha2::{Digest, Sha256};
+    let data: Vec<u8> = (0..3 * 1024 * 1024 + 19).map(|i| (i * 113) as u8).collect();
+    let header = format!(
+        r#"{{"x":{{"dtype":"I8","shape":[{}],"data_offsets":[0,{}]}}}}"#,
+        data.len(),
+        data.len()
+    );
+    let fixture = fixture(&header, &data);
+    let bytes = std::fs::read(fixture.path()).unwrap();
+    let expected = format!("{:x}", Sha256::digest(&bytes));
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("model.safetensors");
+    std::fs::write(&path, bytes).unwrap();
+    let checkpoint = Checkpoint::open(&path).unwrap();
+    // Atomic pathname replacement leaves the mapped inode and retained file intact.
+    std::fs::rename(&path, dir.path().join("original.safetensors")).unwrap();
+    std::fs::write(&path, b"a different file").unwrap();
+    assert_eq!(checkpoint.sha256().unwrap(), expected);
+    std::thread::scope(|scope| {
+        let first = scope.spawn(|| checkpoint.sha256().unwrap());
+        let second = scope.spawn(|| checkpoint.sha256().unwrap());
+        assert_eq!(first.join().unwrap(), expected);
+        assert_eq!(second.join().unwrap(), expected);
+    });
+}
