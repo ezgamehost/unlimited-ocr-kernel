@@ -1,0 +1,24 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `dot_int8_four_rows_paired` in this scope
+   --> src/cpu/neon.rs:317:35
+    |
+190 | / pub(super) unsafe fn dot_int8_four_rows(
+191 | |     weights: &[i8],
+192 | |     x: &[i8],
+193 | |     ws: &[f32],
+...   |
+238 | |     result
+239 | | }
+    | |_- similarly named function `dot_int8_four_rows` defined here
+...
+317 |               let actual = unsafe { dot_int8_four_rows_paired(&weights[1..], &x[1..], &ws[1..], &xs[1..]) };
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: a function with a similar name exists
+    |
+317 -             let actual = unsafe { dot_int8_four_rows_paired(&weights[1..], &x[1..], &ws[1..], &xs[1..]) };
+317 +             let actual = unsafe { dot_int8_four_rows(&weights[1..], &x[1..], &ws[1..], &xs[1..]) };
+    |
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 1 previous error
