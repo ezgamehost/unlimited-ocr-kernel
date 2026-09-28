@@ -1,0 +1,23 @@
+[
+  {
+    "rows": 896,
+    "cols": 1280,
+    "four_row_seconds": 0.017054542,
+    "eight_row_seconds": 0.017029083,
+    "ratio": 1.001495030589727
+  },
+  {
+    "rows": 1280,
+    "cols": 896,
+    "four_row_seconds": 0.016766125,
+    "eight_row_seconds": 0.016796625,
+    "ratio": 0.9981841590200413
+  },
+  {
+    "rows": 129280,
+    "cols": 1280,
+    "four_row_seconds": 0.041136666,
+    "eight_row_seconds": 0.044073083,
+    "ratio": 0.9333739144139294
+  }
+]

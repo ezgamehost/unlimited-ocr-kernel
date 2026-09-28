@@ -1,0 +1,9 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 11.73s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 1 test
+test cpu::neon::tests::eight_rows_preserve_block_order_and_unaligned_integer_extremes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+

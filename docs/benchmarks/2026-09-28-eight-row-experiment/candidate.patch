@@ -1,0 +1,162 @@
+diff --git a/src/cpu/neon.rs b/src/cpu/neon.rs
+index e35d265..723baeb 100644
+--- a/src/cpu/neon.rs
++++ b/src/cpu/neon.rs
+@@ -242,6 +242,157 @@ pub(super) unsafe fn dot_int8_four_rows(
+ mod tests {
+     use super::*;
+ 
++    #[target_feature(enable = "dotprod")]
++    unsafe fn dot_int8_eight_rows(weights: &[i8], x: &[i8], ws: &[f32], xs: &[f32]) -> [f32; 8] {
++        use std::arch::aarch64::*;
++        assert!(x.len().is_multiple_of(32));
++        assert_eq!(weights.len().checked_div(8), Some(x.len()));
++        assert!(weights.len().is_multiple_of(8));
++        let blocks = x.len() / 32;
++        assert_eq!(xs.len(), blocks);
++        assert_eq!(ws.len(), blocks * 8);
++        let mut low = vdupq_n_f32(0.);
++        let mut high = low;
++        for b in 0..blocks {
++            // SAFETY: caller checks dotprod. All eight row loads stay within
++            // complete 32-byte blocks; block sums fit signed i32.
++            unsafe {
++                let x0 = vld1q_s8(x.as_ptr().add(b * 32));
++                let x1 = vld1q_s8(x.as_ptr().add(b * 32 + 16));
++                let mut sums = [vdupq_n_s32(0); 8];
++                for (row, sum) in sums.iter_mut().enumerate() {
++                    let w = weights.as_ptr().add(row * x.len() + b * 32);
++                    *sum = vdotq_s32(vdotq_s32(*sum, vld1q_s8(w), x0), vld1q_s8(w.add(16)), x1);
++                }
++                let a = vpaddq_s32(vpaddq_s32(sums[0], sums[1]), vpaddq_s32(sums[2], sums[3]));
++                let c = vpaddq_s32(vpaddq_s32(sums[4], sums[5]), vpaddq_s32(sums[6], sums[7]));
++                let scales0 = [
++                    ws[b],
++                    ws[blocks + b],
++                    ws[2 * blocks + b],
++                    ws[3 * blocks + b],
++                ];
++                let scales1 = [
++                    ws[4 * blocks + b],
++                    ws[5 * blocks + b],
++                    ws[6 * blocks + b],
++                    ws[7 * blocks + b],
++                ];
++                low = vaddq_f32(
++                    low,
++                    vmulq_n_f32(
++                        vmulq_f32(vcvtq_f32_s32(a), vld1q_f32(scales0.as_ptr())),
++                        xs[b],
++                    ),
++                );
++                high = vaddq_f32(
++                    high,
++                    vmulq_n_f32(
++                        vmulq_f32(vcvtq_f32_s32(c), vld1q_f32(scales1.as_ptr())),
++                        xs[b],
++                    ),
++                );
++            }
++        }
++        let mut output = [0.; 8];
++        // SAFETY: output has eight writable floats, split into two four-lane stores.
++        unsafe {
++            vst1q_f32(output.as_mut_ptr(), low);
++            vst1q_f32(output.as_mut_ptr().add(4), high);
++        }
++        output
++    }
++
++    #[test]
++    fn eight_rows_preserve_block_order_and_unaligned_integer_extremes() {
++        if !std::arch::is_aarch64_feature_detected!("dotprod") {
++            return;
++        }
++        // Catch row/scale strides, missing second groups, rounding-order changes,
++        // and alignment assumptions with an independent scalar block oracle.
++        for cols in [32usize, 64, 896, 1280, 1792, 6848] {
++            let blocks = cols / 32;
++            let weights: Vec<i8> = (0..cols * 8 + 1)
++                .map(|i| ((i * 53 % 256) as i16 - 128) as i8)
++                .collect();
++            let input: Vec<i8> = (0..cols + 1)
++                .map(|i| ((i * 71 % 256) as i16 - 128) as i8)
++                .collect();
++            let scales: Vec<f32> = (0..blocks * 8 + 1)
++                .map(|i| [0., 0.00317, 0.7, 1e-10, 17.][i % 5])
++                .collect();
++            let xs: Vec<f32> = (0..blocks).map(|i| (i % 17 + 1) as f32 / 123.).collect();
++            let (weights, input, scales) = (&weights[1..], &input[1..], &scales[1..]);
++            // SAFETY: runtime ISA check and complete exact-size row storage.
++            let actual = unsafe { dot_int8_eight_rows(weights, input, scales, &xs) };
++            for row in 0..8 {
++                let mut expected = 0f32;
++                for b in 0..blocks {
++                    let sum: i32 = (0..32)
++                        .map(|j| weights[row * cols + b * 32 + j] as i32 * input[b * 32 + j] as i32)
++                        .sum();
++                    expected += sum as f32 * scales[row * blocks + b] * xs[b];
++                }
++                assert_eq!(
++                    actual[row].to_bits(),
++                    expected.to_bits(),
++                    "cols={cols} row={row}"
++                );
++            }
++        }
++    }
++
++    #[test]
++    #[ignore = "timed single-thread kernel experiment; run without concurrent work"]
++    fn compare_four_and_eight_row_kernels() {
++        if !std::arch::is_aarch64_feature_detected!("dotprod") {
++            return;
++        }
++        for (rows, cols, repetitions) in [
++            (896usize, 1280usize, 1024),
++            (1280, 896, 1024),
++            (129280, 1280, 16),
++        ] {
++            let blocks = cols / 32;
++            let weights: Vec<i8> = (0..rows * cols)
++                .map(|i| ((i * 53 % 255) as i16 - 127) as i8)
++                .collect();
++            let x: Vec<i8> = (0..cols)
++                .map(|i| ((i * 71 % 255) as i16 - 127) as i8)
++                .collect();
++            let ws: Vec<f32> = (0..rows * blocks)
++                .map(|i| (i % 17 + 1) as f32 / 123.)
++                .collect();
++            let xs = vec![0.013; blocks];
++            for (round, group) in [4usize, 8, 8, 4, 4, 8].into_iter().enumerate() {
++                let start = std::time::Instant::now();
++                let mut checksum = 0u64;
++                for _ in 0..repetitions {
++                    for row in (0..rows).step_by(group) {
++                        let w = std::hint::black_box(&weights[row * cols..(row + group) * cols]);
++                        let s = &ws[row * blocks..(row + group) * blocks];
++                        // SAFETY: runtime ISA detection and exact complete row groups.
++                        unsafe {
++                            if group == 4 {
++                                for v in dot_int8_four_rows(w, &x, s, &xs) {
++                                    checksum = checksum.wrapping_add(v.to_bits() as u64);
++                                }
++                            } else {
++                                for v in dot_int8_eight_rows(w, &x, s, &xs) {
++                                    checksum = checksum.wrapping_add(v.to_bits() as u64);
++                                }
++                            }
++                        }
++                    }
++                }
++                println!(
++                    "{}",
++                    serde_json::json!({"rows":rows,"cols":cols,"repetitions":repetitions,"round":round,"group":group,"seconds":start.elapsed().as_secs_f64(),"checksum":std::hint::black_box(checksum)})
++                );
++            }
++        }
++    }
++
+     #[test]
+     fn four_rows_match_single_row_dot_bits() {
+         if !std::arch::is_aarch64_feature_detected!("dotprod") {

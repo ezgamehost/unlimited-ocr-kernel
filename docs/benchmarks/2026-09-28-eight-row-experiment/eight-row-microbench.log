@@ -1,0 +1,24 @@
+
+running 1 test
+test cpu::neon::tests::compare_four_and_eight_row_kernels ... {"checksum":1912987380359168,"cols":1280,"group":4,"repetitions":1024,"round":0,"rows":896,"seconds":0.01740775}
+{"checksum":1912987380359168,"cols":1280,"group":8,"repetitions":1024,"round":1,"rows":896,"seconds":0.016667791}
+{"checksum":1912987380359168,"cols":1280,"group":8,"repetitions":1024,"round":2,"rows":896,"seconds":0.017029083}
+{"checksum":1912987380359168,"cols":1280,"group":4,"repetitions":1024,"round":3,"rows":896,"seconds":0.016938125}
+{"checksum":1912987380359168,"cols":1280,"group":4,"repetitions":1024,"round":4,"rows":896,"seconds":0.017054542}
+{"checksum":1912987380359168,"cols":1280,"group":8,"repetitions":1024,"round":5,"rows":896,"seconds":0.017032167}
+{"checksum":2927568494056448,"cols":896,"group":4,"repetitions":1024,"round":0,"rows":1280,"seconds":0.016777833}
+{"checksum":2927568494056448,"cols":896,"group":8,"repetitions":1024,"round":1,"rows":1280,"seconds":0.01683725}
+{"checksum":2927568494056448,"cols":896,"group":8,"repetitions":1024,"round":2,"rows":1280,"seconds":0.016237709}
+{"checksum":2927568494056448,"cols":896,"group":4,"repetitions":1024,"round":3,"rows":1280,"seconds":0.016702417}
+{"checksum":2927568494056448,"cols":896,"group":4,"repetitions":1024,"round":4,"rows":1280,"seconds":0.016766125}
+{"checksum":2927568494056448,"cols":896,"group":8,"repetitions":1024,"round":5,"rows":1280,"seconds":0.016796625}
+{"checksum":4313078408105184,"cols":1280,"group":4,"repetitions":16,"round":0,"rows":129280,"seconds":0.041428542}
+{"checksum":4313078408105184,"cols":1280,"group":8,"repetitions":16,"round":1,"rows":129280,"seconds":0.044073083}
+{"checksum":4313078408105184,"cols":1280,"group":8,"repetitions":16,"round":2,"rows":129280,"seconds":0.04394175}
+{"checksum":4313078408105184,"cols":1280,"group":4,"repetitions":16,"round":3,"rows":129280,"seconds":0.040656208}
+{"checksum":4313078408105184,"cols":1280,"group":4,"repetitions":16,"round":4,"rows":129280,"seconds":0.041136666}
+{"checksum":4313078408105184,"cols":1280,"group":8,"repetitions":16,"round":5,"rows":129280,"seconds":0.045299791}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.50s
+
