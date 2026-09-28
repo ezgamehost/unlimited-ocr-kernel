@@ -1,0 +1,34 @@
+
+running 1 test
+test cpu::cache_probe::compare_kv_strides ... {"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"parity_differences":0}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":0,"repetition":0,"seconds":0.213568084,"steps":128,"threads":8,"tokens":1641,"warmup":true}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":0,"repetition":1,"seconds":0.223242458,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":0,"repetition":2,"seconds":0.216364625,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":0,"repetition":3,"seconds":0.214052083,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":1,"repetition":0,"seconds":0.172375292,"steps":128,"threads":8,"tokens":1641,"warmup":true}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":1,"repetition":1,"seconds":0.167935333,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":1,"repetition":2,"seconds":0.166368625,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":1,"repetition":3,"seconds":0.167699083,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":2,"repetition":0,"seconds":0.168974792,"steps":128,"threads":8,"tokens":1641,"warmup":true}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":2,"repetition":1,"seconds":0.169303042,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":2,"repetition":2,"seconds":0.180470542,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":true,"phase":2,"repetition":3,"seconds":0.172006458,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":3,"repetition":0,"seconds":0.215564708,"steps":128,"threads":8,"tokens":1641,"warmup":true}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":3,"repetition":1,"seconds":0.213175958,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":3,"repetition":2,"seconds":0.215347583,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+{"checksum":2592629010816,"dim":128,"heads":10,"layers":12,"packed":false,"phase":3,"repetition":3,"seconds":0.212610583,"steps":128,"threads":8,"tokens":1641,"warmup":false}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 3.21s
+

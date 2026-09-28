@@ -311,7 +311,19 @@ impl<'a> Decoder<'a> {
             cache.push(&k.data, &v.data)?;
         }
         let joined = if position > 0 {
-            ops::attention_decode(&q, cache.keys(), cache.values(), heads, cpu)?.data
+            if cache.is_head_major() {
+                ops::attention_decode_head_major(
+                    &q,
+                    cache.keys(),
+                    cache.values(),
+                    heads,
+                    cache.tokens(),
+                    cpu,
+                )?
+                .data
+            } else {
+                ops::attention_decode(&q, cache.keys(), cache.values(), heads, cpu)?.data
+            }
         } else {
             let split = |data: &[f32], tokens: usize| -> Result<Tensor> {
                 let mut out = vec![0.; data.len()];
@@ -397,6 +409,7 @@ impl<'a> Decoder<'a> {
                 self.config.sliding_window,
             )?;
             hidden = self.layer(index, &hidden, &mut cache, cpu)?;
+            cache.pack_heads()?;
             layers.push(cache);
         }
         Ok((DecodeState { layers }, self.logits(&hidden, cpu)?))

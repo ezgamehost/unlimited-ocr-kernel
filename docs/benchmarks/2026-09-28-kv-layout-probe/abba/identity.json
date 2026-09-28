@@ -1,0 +1,21 @@
+{
+  "binaries": {
+    "baseline": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/q8-scheduling/baseline",
+      "sha256": "3f1f59322ba6f224ad2b8190aa1a10593b0ca4ac3917db9757fd010c9a86ea08",
+      "source_sha256": "c4e297680cffc01d62ba5c5650ca323fab77b6a157d913648527e94c774c3bb1"
+    },
+    "packed": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/kv-layout/candidate",
+      "sha256": "e8789d21ac78b5db575ab7055b710f39959cd1452ba01ddf8ccc676b7eeb9426",
+      "source_sha256": {
+        "src/cpu/ops.rs": "ba406c7fe21c96b213a2b6bb0978cc4c5a9292a55c0f8ea3cd441fb77d090313",
+        "src/decoder/mod.rs": "46224bf874a2bf57f205e795667af3d9facb6bd0432fa7d5adc90c481098d727",
+        "src/decoder/cache.rs": "3fa2fbd6c0f9914b34e04e642fff769c7be973b7b2674eba1cf382e3bf2c301b"
+      }
+    }
+  },
+  "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+  "overlay_sha256": "6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae",
+  "source_commit": "7ab1ef45392c6673ca338e6193a1768aa239061f"
+}

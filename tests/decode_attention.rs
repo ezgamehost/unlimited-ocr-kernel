@@ -4,6 +4,61 @@ use uocr::{
 };
 
 #[test]
+fn head_major_decode_preserves_bits_and_ignores_unused_capacity() {
+    let (heads, dim) = (10, 128);
+    let width = heads * dim;
+    for (tokens, capacity) in [(1, 129), (129, 257), (1518, 1646), (1646, 1646)] {
+        let q = Tensor::new(
+            vec![1, width],
+            (0..width).map(|i| (i as f32 * 0.17).sin()).collect(),
+        )
+        .unwrap();
+        let keys: Vec<_> = (0..tokens * width)
+            .map(|i| (i as f32 * 0.013).cos())
+            .collect();
+        let values: Vec<_> = (0..tokens * width)
+            .map(|i| (i as f32 * 0.031).sin())
+            .collect();
+        let pack = |input: &[f32]| {
+            let mut output = vec![f32::NAN; capacity * width];
+            for head in 0..heads {
+                for token in 0..tokens {
+                    output[(head * capacity + token) * dim..(head * capacity + token + 1) * dim]
+                        .copy_from_slice(
+                            &input[token * width + head * dim..token * width + (head + 1) * dim],
+                        );
+                }
+            }
+            output
+        };
+        let (pk, pv) = (pack(&keys), pack(&values));
+        for backend in [Backend::Scalar, Backend::Auto] {
+            for (threads, scratch) in [
+                (1, (tokens + width) * 4),
+                (8, (tokens * heads + width) * 4),
+                (8, (tokens + width) * 4),
+            ] {
+                let mut cpu = CpuContext::new(backend, threads, scratch).unwrap();
+                let a = ops::attention_decode(&q, &keys, &values, heads, &mut cpu).unwrap();
+                let b = ops::attention_decode_head_major(&q, &pk, &pv, heads, tokens, &mut cpu)
+                    .unwrap();
+                assert_eq!(
+                    a.data.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
+                    b.data.iter().map(|x| x.to_bits()).collect::<Vec<_>>()
+                );
+                assert!(
+                    ops::attention_decode_head_major(&q, &pk, &pv, heads, 0, &mut cpu).is_err()
+                );
+                assert!(
+                    ops::attention_decode_head_major(&q, &pk, &pv, heads, capacity + 1, &mut cpu)
+                        .is_err()
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn strided_decode_attention_matches_f64_oracle() {
     for tokens in [1, 7, 139, 1641] {
         let (heads, dim) = (3, 5);

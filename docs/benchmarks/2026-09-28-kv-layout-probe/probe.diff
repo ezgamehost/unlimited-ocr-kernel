@@ -1,0 +1,13 @@
+diff --git a/src/cpu/mod.rs b/src/cpu/mod.rs
+index 55b8612..495b11d 100644
+--- a/src/cpu/mod.rs
++++ b/src/cpu/mod.rs
+@@ -3,6 +3,8 @@ use std::sync::Arc;
+ mod accelerate;
+ #[cfg(target_os = "macos")]
+ mod blas_threads;
++#[cfg(test)]
++mod cache_probe;
+ pub mod int4;
+ mod neon;
+ #[cfg(target_arch = "aarch64")]

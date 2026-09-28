@@ -46,7 +46,10 @@ fn actual_decoder_layers_match_upstream_prefill_and_decode() {
     let decoder = Decoder::new(&weights, config.clone()).unwrap();
     let mut cpu = CpuContext::new(Backend::Auto, 10, 1 << 30).unwrap();
     let prefix = 277;
-    for layer in [0, 1, 11] {
+    for (layer, packed) in [0, 1, 11]
+        .into_iter()
+        .flat_map(|layer| [(layer, false), (layer, true)])
+    {
         let input = fixture
             .tensor(if layer == 0 {
                 "input_embeddings"
@@ -65,6 +68,10 @@ fn actual_decoder_layers_match_upstream_prefill_and_decode() {
         let x = Tensor::new(vec![prefix, 1280], input[..prefix * 1280].to_vec()).unwrap();
         let y = decoder.layer(layer, &x, &mut cache, &mut cpu).unwrap();
         check(&y.data, &expected[..prefix * 1280], layer, 0);
+        if packed {
+            cache.pack_heads().unwrap();
+        }
+        eprintln!("reference layer={layer} head_major={packed}");
         for pos in prefix..prefix + 300 {
             let x =
                 Tensor::new(vec![1, 1280], input[pos * 1280..(pos + 1) * 1280].to_vec()).unwrap();

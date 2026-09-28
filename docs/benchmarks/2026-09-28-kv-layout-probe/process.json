@@ -1,0 +1,22 @@
+{
+  "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/deps/uocr-17f9463a030211d5",
+  "sha256": "402d4ac976e47d92f3926eda0b42f396cc595449626c6d44abba8ca02e640a42",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t62%; charging; 1:57 remaining present: true\n",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/deps/uocr-17f9463a030211d5",
+    "cpu::cache_probe::compare_kv_strides",
+    "--ignored",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 412532736,
+    "user_cpu_seconds": 16.455377,
+    "system_cpu_seconds": 4.21744,
+    "major_faults": 2,
+    "minor_faults": 25469
+  }
+}

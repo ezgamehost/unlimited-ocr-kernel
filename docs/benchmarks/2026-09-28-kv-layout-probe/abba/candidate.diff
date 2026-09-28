@@ -1,0 +1,385 @@
+diff --git a/src/cpu/mod.rs b/src/cpu/mod.rs
+index 55b8612..495b11d 100644
+--- a/src/cpu/mod.rs
++++ b/src/cpu/mod.rs
+@@ -3,6 +3,8 @@ use std::sync::Arc;
+ mod accelerate;
+ #[cfg(target_os = "macos")]
+ mod blas_threads;
++#[cfg(test)]
++mod cache_probe;
+ pub mod int4;
+ mod neon;
+ #[cfg(target_arch = "aarch64")]
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index 1650390..8e3111d 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -572,6 +572,29 @@ pub fn attention_decode(
+     values: &[f32],
+     heads: usize,
+     cpu: &mut CpuContext,
++) -> Result<Tensor> {
++    attention_decode_layout(q, keys, values, heads, None, cpu)
++}
++
++/// Head-major storage with fixed capacity per head and an explicit active count.
++pub fn attention_decode_head_major(
++    q: &Tensor,
++    keys: &[f32],
++    values: &[f32],
++    heads: usize,
++    tokens: usize,
++    cpu: &mut CpuContext,
++) -> Result<Tensor> {
++    attention_decode_layout(q, keys, values, heads, Some(tokens), cpu)
++}
++
++fn attention_decode_layout(
++    q: &Tensor,
++    keys: &[f32],
++    values: &[f32],
++    heads: usize,
++    active: Option<usize>,
++    cpu: &mut CpuContext,
+ ) -> Result<Tensor> {
+     q.validate()?;
+     let width = q.data.len();
+@@ -585,8 +608,17 @@ pub fn attention_decode(
+     {
+         return Err(OcrError::Shape("decode attention layout".into()));
+     }
+-    let tokens = keys.len() / width;
++    let capacity = keys.len() / width;
++    let tokens = active.unwrap_or(capacity);
++    if tokens == 0 || tokens > capacity {
++        return Err(OcrError::Shape("decode attention active tokens".into()));
++    }
+     let dim = width / heads;
++    let (head_stride, token_stride) = if active.is_some() {
++        (capacity * dim, dim)
++    } else {
++        (dim, width)
++    };
+     cpu.check_elements(
+         tokens
+             .checked_add(width)
+@@ -596,15 +628,23 @@ pub fn attention_decode(
+     let scale = (dim as f32).sqrt().recip();
+     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
+     let compute_head = |head: usize, scores: &mut [f32], dest: &mut [f32]| -> Result<()> {
+-        let offset = head * dim;
+-        let query = &q.data[offset..offset + dim];
++        let offset = head * head_stride;
++        let query = &q.data[head * dim..(head + 1) * dim];
+         if fast {
+-            accelerate::matvec_strided(&keys[offset..], query, scores, tokens, dim, width, false)?;
++            accelerate::matvec_strided(
++                &keys[offset..],
++                query,
++                scores,
++                tokens,
++                dim,
++                token_stride,
++                false,
++            )?;
+         } else {
+             for (token, score) in scores.iter_mut().enumerate() {
+                 *score = query
+                     .iter()
+-                    .zip(&keys[token * width + offset..token * width + offset + dim])
++                    .zip(&keys[token * token_stride + offset..token * token_stride + offset + dim])
+                     .map(|(q, k)| q * k)
+                     .sum();
+             }
+@@ -614,13 +654,20 @@ pub fn attention_decode(
+         }
+         softmax_backend(scores, cpu.backend)?;
+         if fast {
+-            accelerate::matvec_strided(&values[offset..], scores, dest, tokens, dim, width, true)?;
++            accelerate::matvec_strided(
++                &values[offset..],
++                scores,
++                dest,
++                tokens,
++                dim,
++                token_stride,
++                true,
++            )?;
+         } else {
+             for (token, &score) in scores.iter().enumerate() {
+-                for (out, &value) in dest
+-                    .iter_mut()
+-                    .zip(&values[token * width + offset..token * width + offset + dim])
+-                {
++                for (out, &value) in dest.iter_mut().zip(
++                    &values[token * token_stride + offset..token * token_stride + offset + dim],
++                ) {
+                     *out += score * value;
+                 }
+             }
+@@ -632,7 +679,7 @@ pub fn attention_decode(
+         && heads > 1
+         && (!fast || accelerate::parallel_matvec_supported())
+         && cpu.backend != Backend::Scalar
+-        && keys.len() >= 65536
++        && tokens * width >= 65536
+         && parallel_scores
+             .and_then(|n| n.checked_add(width))
+             .is_some_and(|n| cpu.check_elements(n).is_ok());
+diff --git a/src/decoder/cache.rs b/src/decoder/cache.rs
+index c13cf9d..4e55142 100644
+--- a/src/decoder/cache.rs
++++ b/src/decoder/cache.rs
+@@ -3,6 +3,8 @@ use crate::error::{OcrError, Result};
+ /// Token-major keys and values: immutable prefix followed by a bounded ring.
+ pub struct LayerCache {
+     width: usize,
++    head_dim: usize,
++    head_major: bool,
+     window: usize,
+     prefix: Option<usize>,
+     generated: usize,
+@@ -21,6 +23,8 @@ impl LayerCache {
+         }
+         Ok(Self {
+             width,
++            head_dim,
++            head_major: false,
+             window,
+             prefix: None,
+             generated: 0,
+@@ -60,7 +64,18 @@ impl LayerCache {
+         if key.len() != self.width || value.len() != self.width {
+             return Err(OcrError::Shape("decode cache vector width".into()));
+         }
+-        if self.generated < self.window {
++        if self.head_major {
++            let capacity = prefix + self.window;
++            let slot = prefix + self.generated % self.window;
++            for head in 0..self.width / self.head_dim {
++                let offset = (head * capacity + slot) * self.head_dim;
++                let input = head * self.head_dim;
++                self.keys[offset..offset + self.head_dim]
++                    .copy_from_slice(&key[input..input + self.head_dim]);
++                self.values[offset..offset + self.head_dim]
++                    .copy_from_slice(&value[input..input + self.head_dim]);
++            }
++        } else if self.generated < self.window {
+             self.keys.extend_from_slice(key);
+             self.values.extend_from_slice(value);
+         } else {
+@@ -71,6 +86,48 @@ impl LayerCache {
+         self.generated += 1;
+         Ok(())
+     }
++
++    /// Convert once to [head, prefix+window capacity, head_dim] storage.
++    /// Active tokens retain their original physical order. Allocation failure
++    /// leaves both original buffers intact; no permanent duplicate is retained.
++    pub fn pack_heads(&mut self) -> Result<()> {
++        let prefix = self
++            .prefix
++            .ok_or_else(|| OcrError::Shape("cache must be prefilled".into()))?;
++        if self.head_major {
++            return Ok(());
++        }
++        let capacity = prefix + self.window; // checked by prefill
++        let elements = capacity * self.width;
++        let pack = |input: &[f32]| -> Result<Vec<f32>> {
++            let mut output = Vec::new();
++            output
++                .try_reserve_exact(elements)
++                .map_err(|e| OcrError::Resource(e.to_string()))?;
++            output.resize(elements, 0.);
++            for head in 0..self.width / self.head_dim {
++                for token in 0..self.tokens() {
++                    let dest = (head * capacity + token) * self.head_dim;
++                    let source = token * self.width + head * self.head_dim;
++                    output[dest..dest + self.head_dim]
++                        .copy_from_slice(&input[source..source + self.head_dim]);
++                }
++            }
++            Ok(output)
++        };
++        let keys = pack(&self.keys)?;
++        let values = pack(&self.values)?;
++        self.keys = keys;
++        self.values = values;
++        self.head_major = true;
++        Ok(())
++    }
++
++    pub fn is_head_major(&self) -> bool {
++        self.head_major
++    }
++
++    /// Physical storage; packed caches include unused capacity after each head.
+     pub fn keys(&self) -> &[f32] {
+         &self.keys
+     }
+@@ -78,7 +135,11 @@ impl LayerCache {
+         &self.values
+     }
+     pub fn tokens(&self) -> usize {
+-        self.keys.len() / self.width
++        if self.head_major {
++            self.prefix.unwrap_or(0) + self.generated.min(self.window)
++        } else {
++            self.keys.len() / self.width
++        }
+     }
+     pub fn position(&self) -> usize {
+         self.prefix.unwrap_or(0) + self.generated
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index ee7d7c4..0bb8cea 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -311,7 +311,19 @@ impl<'a> Decoder<'a> {
+             cache.push(&k.data, &v.data)?;
+         }
+         let joined = if position > 0 {
+-            ops::attention_decode(&q, cache.keys(), cache.values(), heads, cpu)?.data
++            if cache.is_head_major() {
++                ops::attention_decode_head_major(
++                    &q,
++                    cache.keys(),
++                    cache.values(),
++                    heads,
++                    cache.tokens(),
++                    cpu,
++                )?
++                .data
++            } else {
++                ops::attention_decode(&q, cache.keys(), cache.values(), heads, cpu)?.data
++            }
+         } else {
+             let split = |data: &[f32], tokens: usize| -> Result<Tensor> {
+                 let mut out = vec![0.; data.len()];
+@@ -397,6 +409,7 @@ impl<'a> Decoder<'a> {
+                 self.config.sliding_window,
+             )?;
+             hidden = self.layer(index, &hidden, &mut cache, cpu)?;
++            cache.pack_heads()?;
+             layers.push(cache);
+         }
+         Ok((DecodeState { layers }, self.logits(&hidden, cpu)?))
+diff --git a/tests/cache.rs b/tests/cache.rs
+index b84bb36..19ea762 100644
+--- a/tests/cache.rs
++++ b/tests/cache.rs
+@@ -1,5 +1,48 @@
+ use uocr::decoder::cache::LayerCache;
+ 
++#[test]
++fn head_major_preserves_prefix_active_count_and_ring_slots() {
++    let (heads, dim, prefix, window) = (3, 2, 5, 3);
++    let width = heads * dim;
++    let mut reference = LayerCache::new(heads, dim, window).unwrap();
++    let mut packed = LayerCache::new(heads, dim, window).unwrap();
++    assert!(packed.pack_heads().is_err());
++    let keys: Vec<_> = (0..prefix * width).map(|i| i as f32).collect();
++    let values: Vec<_> = keys.iter().map(|x| -x).collect();
++    reference.prefill(&keys, &values, prefix).unwrap();
++    packed.prefill(&keys, &values, prefix).unwrap();
++    packed.pack_heads().unwrap();
++    packed.pack_heads().unwrap();
++    assert!(packed.is_head_major());
++    for step in 0..12 {
++        assert_eq!(packed.tokens(), reference.tokens());
++        assert_eq!(packed.position(), reference.position());
++        for (a, b) in [
++            (packed.keys(), reference.keys()),
++            (packed.values(), reference.values()),
++        ] {
++            for head in 0..heads {
++                for token in 0..packed.tokens() {
++                    assert_eq!(
++                        &a[(head * (prefix + window) + token) * dim
++                            ..(head * (prefix + window) + token + 1) * dim],
++                        &b[token * width + head * dim..token * width + (head + 1) * dim]
++                    );
++                }
++            }
++        }
++        let key: Vec<_> = (0..width)
++            .map(|i| (100 + step * width + i) as f32)
++            .collect();
++        let value: Vec<_> = key.iter().map(|x| -x).collect();
++        reference.push(&key, &value).unwrap();
++        packed.push(&key, &value).unwrap();
++    }
++    let position = packed.position();
++    assert!(packed.push(&[0.], &[0.]).is_err());
++    assert_eq!(packed.position(), position);
++}
++
+ #[test]
+ fn prefix_is_preserved_across_multiple_ring_wraps() {
+     let mut cache = LayerCache::new(1, 1, 3).unwrap();
+diff --git a/tests/decode_attention.rs b/tests/decode_attention.rs
+index d83865b..6fea3f0 100644
+--- a/tests/decode_attention.rs
++++ b/tests/decode_attention.rs
+@@ -3,6 +3,61 @@ use uocr::{
+     tensor::Tensor,
+ };
+ 
++#[test]
++fn head_major_decode_preserves_bits_and_ignores_unused_capacity() {
++    let (heads, dim) = (10, 128);
++    let width = heads * dim;
++    for (tokens, capacity) in [(1, 129), (129, 257), (1518, 1646), (1646, 1646)] {
++        let q = Tensor::new(
++            vec![1, width],
++            (0..width).map(|i| (i as f32 * 0.17).sin()).collect(),
++        )
++        .unwrap();
++        let keys: Vec<_> = (0..tokens * width)
++            .map(|i| (i as f32 * 0.013).cos())
++            .collect();
++        let values: Vec<_> = (0..tokens * width)
++            .map(|i| (i as f32 * 0.031).sin())
++            .collect();
++        let pack = |input: &[f32]| {
++            let mut output = vec![f32::NAN; capacity * width];
++            for head in 0..heads {
++                for token in 0..tokens {
++                    output[(head * capacity + token) * dim..(head * capacity + token + 1) * dim]
++                        .copy_from_slice(
++                            &input[token * width + head * dim..token * width + (head + 1) * dim],
++                        );
++                }
++            }
++            output
++        };
++        let (pk, pv) = (pack(&keys), pack(&values));
++        for backend in [Backend::Scalar, Backend::Auto] {
++            for (threads, scratch) in [
++                (1, (tokens + width) * 4),
++                (8, (tokens * heads + width) * 4),
++                (8, (tokens + width) * 4),
++            ] {
++                let mut cpu = CpuContext::new(backend, threads, scratch).unwrap();
++                let a = ops::attention_decode(&q, &keys, &values, heads, &mut cpu).unwrap();
++                let b = ops::attention_decode_head_major(&q, &pk, &pv, heads, tokens, &mut cpu)
++                    .unwrap();
++                assert_eq!(
++                    a.data.iter().map(|x| x.to_bits()).collect::<Vec<_>>(),
++                    b.data.iter().map(|x| x.to_bits()).collect::<Vec<_>>()
++                );
++                assert!(
++                    ops::attention_decode_head_major(&q, &pk, &pv, heads, 0, &mut cpu).is_err()
++                );
++                assert!(
++                    ops::attention_decode_head_major(&q, &pk, &pv, heads, capacity + 1, &mut cpu)
++                        .is_err()
++                );
++            }
++        }
++    }
++}
++
+ #[test]
+ fn strided_decode_attention_matches_f64_oracle() {
+     for tokens in [1, 7, 139, 1641] {

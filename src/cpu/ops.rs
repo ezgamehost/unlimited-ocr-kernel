@@ -573,6 +573,29 @@ pub fn attention_decode(
     heads: usize,
     cpu: &mut CpuContext,
 ) -> Result<Tensor> {
+    attention_decode_layout(q, keys, values, heads, None, cpu)
+}
+
+/// Head-major storage with fixed capacity per head and an explicit active count.
+pub fn attention_decode_head_major(
+    q: &Tensor,
+    keys: &[f32],
+    values: &[f32],
+    heads: usize,
+    tokens: usize,
+    cpu: &mut CpuContext,
+) -> Result<Tensor> {
+    attention_decode_layout(q, keys, values, heads, Some(tokens), cpu)
+}
+
+fn attention_decode_layout(
+    q: &Tensor,
+    keys: &[f32],
+    values: &[f32],
+    heads: usize,
+    active: Option<usize>,
+    cpu: &mut CpuContext,
+) -> Result<Tensor> {
     q.validate()?;
     let width = q.data.len();
     if heads == 0
@@ -585,8 +608,17 @@ pub fn attention_decode(
     {
         return Err(OcrError::Shape("decode attention layout".into()));
     }
-    let tokens = keys.len() / width;
+    let capacity = keys.len() / width;
+    let tokens = active.unwrap_or(capacity);
+    if tokens == 0 || tokens > capacity {
+        return Err(OcrError::Shape("decode attention active tokens".into()));
+    }
     let dim = width / heads;
+    let (head_stride, token_stride) = if active.is_some() {
+        (capacity * dim, dim)
+    } else {
+        (dim, width)
+    };
     cpu.check_elements(
         tokens
             .checked_add(width)
@@ -596,15 +628,23 @@ pub fn attention_decode(
     let scale = (dim as f32).sqrt().recip();
     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
     let compute_head = |head: usize, scores: &mut [f32], dest: &mut [f32]| -> Result<()> {
-        let offset = head * dim;
-        let query = &q.data[offset..offset + dim];
+        let offset = head * head_stride;
+        let query = &q.data[head * dim..(head + 1) * dim];
         if fast {
-            accelerate::matvec_strided(&keys[offset..], query, scores, tokens, dim, width, false)?;
+            accelerate::matvec_strided(
+                &keys[offset..],
+                query,
+                scores,
+                tokens,
+                dim,
+                token_stride,
+                false,
+            )?;
         } else {
             for (token, score) in scores.iter_mut().enumerate() {
                 *score = query
                     .iter()
-                    .zip(&keys[token * width + offset..token * width + offset + dim])
+                    .zip(&keys[token * token_stride + offset..token * token_stride + offset + dim])
                     .map(|(q, k)| q * k)
                     .sum();
             }
@@ -614,13 +654,20 @@ pub fn attention_decode(
         }
         softmax_backend(scores, cpu.backend)?;
         if fast {
-            accelerate::matvec_strided(&values[offset..], scores, dest, tokens, dim, width, true)?;
+            accelerate::matvec_strided(
+                &values[offset..],
+                scores,
+                dest,
+                tokens,
+                dim,
+                token_stride,
+                true,
+            )?;
         } else {
             for (token, &score) in scores.iter().enumerate() {
-                for (out, &value) in dest
-                    .iter_mut()
-                    .zip(&values[token * width + offset..token * width + offset + dim])
-                {
+                for (out, &value) in dest.iter_mut().zip(
+                    &values[token * token_stride + offset..token * token_stride + offset + dim],
+                ) {
                     *out += score * value;
                 }
             }
@@ -632,7 +679,7 @@ pub fn attention_decode(
         && heads > 1
         && (!fast || accelerate::parallel_matvec_supported())
         && cpu.backend != Backend::Scalar
-        && keys.len() >= 65536
+        && tokens * width >= 65536
         && parallel_scores
             .and_then(|n| n.checked_add(width))
             .is_some_and(|n| cpu.check_elements(n).is_ok());

@@ -1,0 +1,83 @@
+{
+  "binary": {
+    "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/kv-layout/candidate",
+    "sha256": "e8789d21ac78b5db575ab7055b710f39959cd1452ba01ddf8ccc676b7eeb9426",
+    "source_sha256": {
+      "src/cpu/ops.rs": "ba406c7fe21c96b213a2b6bb0978cc4c5a9292a55c0f8ea3cd441fb77d090313",
+      "src/decoder/mod.rs": "46224bf874a2bf57f205e795667af3d9facb6bd0432fa7d5adc90c481098d727",
+      "src/decoder/cache.rs": "3fa2fbd6c0f9914b34e04e642fff769c7be973b7b2674eba1cf382e3bf2c301b"
+    }
+  },
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 3241213952,
+    "user_cpu_seconds": 68.615771,
+    "system_cpu_seconds": 21.696004,
+    "major_faults": 745,
+    "minor_faults": 521988
+  },
+  "samples": [
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.265829959,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187982722308573981,
+      "logits_sha256": "c129d845d9d0f6b2b1f7bc1aaa7741d1a9fb95b428a1016f519df94acb862f3a",
+      "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+      "precision": "int4_body_int8_head_dynamic_int8_activations",
+      "prefill_seconds": 1.9921476249999999,
+      "prefix_tokens": 1517,
+      "repetition": 0,
+      "threads": 8,
+      "warmup": true
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.295294042,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187982722308573981,
+      "logits_sha256": "c129d845d9d0f6b2b1f7bc1aaa7741d1a9fb95b428a1016f519df94acb862f3a",
+      "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+      "precision": "int4_body_int8_head_dynamic_int8_activations",
+      "prefill_seconds": 1.597103917,
+      "prefix_tokens": 1517,
+      "repetition": 1,
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.282738209,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187982722308573981,
+      "logits_sha256": "c129d845d9d0f6b2b1f7bc1aaa7741d1a9fb95b428a1016f519df94acb862f3a",
+      "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+      "precision": "int4_body_int8_head_dynamic_int8_activations",
+      "prefill_seconds": 1.605606083,
+      "prefix_tokens": 1517,
+      "repetition": 2,
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.275663625,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187982722308573981,
+      "logits_sha256": "c129d845d9d0f6b2b1f7bc1aaa7741d1a9fb95b428a1016f519df94acb862f3a",
+      "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+      "precision": "int4_body_int8_head_dynamic_int8_activations",
+      "prefill_seconds": 1.62007775,
+      "prefix_tokens": 1517,
+      "repetition": 3,
+      "threads": 8,
+      "warmup": false
+    }
+  ],
+  "note": "Correctness only on battery; timings are not a performance comparison."
+}

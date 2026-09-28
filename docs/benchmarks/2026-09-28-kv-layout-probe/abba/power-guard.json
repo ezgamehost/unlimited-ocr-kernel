@@ -1,0 +1,6 @@
+{
+  "timed_phases": 0,
+  "driver_exit_code": 1,
+  "reason": "AC power guard failed before first phase",
+  "power_observed_after_failure": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=6226019)\t65%; discharging; (no estimate) present: true\n"
+}

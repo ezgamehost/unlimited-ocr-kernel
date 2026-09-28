@@ -1,8 +1,11 @@
 use crate::error::{OcrError, Result};
 
-/// Token-major keys and values: immutable prefix followed by a bounded ring.
+/// Immutable prefix and bounded ring, initially token-major; optionally packed
+/// into contiguous per-head storage after prefill.
 pub struct LayerCache {
     width: usize,
+    head_dim: usize,
+    head_major: bool,
     window: usize,
     prefix: Option<usize>,
     generated: usize,
@@ -21,6 +24,8 @@ impl LayerCache {
         }
         Ok(Self {
             width,
+            head_dim,
+            head_major: false,
             window,
             prefix: None,
             generated: 0,
@@ -60,7 +65,18 @@ impl LayerCache {
         if key.len() != self.width || value.len() != self.width {
             return Err(OcrError::Shape("decode cache vector width".into()));
         }
-        if self.generated < self.window {
+        if self.head_major {
+            let capacity = prefix + self.window;
+            let slot = prefix + self.generated % self.window;
+            for head in 0..self.width / self.head_dim {
+                let offset = (head * capacity + slot) * self.head_dim;
+                let input = head * self.head_dim;
+                self.keys[offset..offset + self.head_dim]
+                    .copy_from_slice(&key[input..input + self.head_dim]);
+                self.values[offset..offset + self.head_dim]
+                    .copy_from_slice(&value[input..input + self.head_dim]);
+            }
+        } else if self.generated < self.window {
             self.keys.extend_from_slice(key);
             self.values.extend_from_slice(value);
         } else {
@@ -71,6 +87,48 @@ impl LayerCache {
         self.generated += 1;
         Ok(())
     }
+
+    /// Convert once to [head, prefix+window capacity, head_dim] storage.
+    /// Active tokens retain their original physical order. Allocation failure
+    /// leaves both original buffers intact; no permanent duplicate is retained.
+    pub fn pack_heads(&mut self) -> Result<()> {
+        let prefix = self
+            .prefix
+            .ok_or_else(|| OcrError::Shape("cache must be prefilled".into()))?;
+        if self.head_major {
+            return Ok(());
+        }
+        let capacity = prefix + self.window; // checked by prefill
+        let elements = capacity * self.width;
+        let pack = |input: &[f32]| -> Result<Vec<f32>> {
+            let mut output = Vec::new();
+            output
+                .try_reserve_exact(elements)
+                .map_err(|e| OcrError::Resource(e.to_string()))?;
+            output.resize(elements, 0.);
+            for head in 0..self.width / self.head_dim {
+                for token in 0..self.tokens() {
+                    let dest = (head * capacity + token) * self.head_dim;
+                    let source = token * self.width + head * self.head_dim;
+                    output[dest..dest + self.head_dim]
+                        .copy_from_slice(&input[source..source + self.head_dim]);
+                }
+            }
+            Ok(output)
+        };
+        let keys = pack(&self.keys)?;
+        let values = pack(&self.values)?;
+        self.keys = keys;
+        self.values = values;
+        self.head_major = true;
+        Ok(())
+    }
+
+    pub fn is_head_major(&self) -> bool {
+        self.head_major
+    }
+
+    /// Physical storage; packed caches include unused capacity after each head.
     pub fn keys(&self) -> &[f32] {
         &self.keys
     }
@@ -78,7 +136,11 @@ impl LayerCache {
         &self.values
     }
     pub fn tokens(&self) -> usize {
-        self.keys.len() / self.width
+        if self.head_major {
+            self.prefix.unwrap_or(0) + self.generated.min(self.window)
+        } else {
+            self.keys.len() / self.width
+        }
     }
     pub fn position(&self) -> usize {
         self.prefix.unwrap_or(0) + self.generated
