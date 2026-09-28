@@ -19,12 +19,42 @@ pub struct PreparedImage {
 }
 
 impl PreparedImage {
-    pub fn image_tokens(&self) -> usize {
-        273 + if self.crops.is_empty() {
-            0
-        } else {
-            (10 * self.grid[0] + 1) * 10 * self.grid[1]
+    pub fn validate(&self) -> Result<()> {
+        let count = self.grid[0]
+            .checked_mul(self.grid[1])
+            .filter(|&n| (1..=32).contains(&n))
+            .ok_or_else(|| OcrError::Shape("crop grid must contain 1 to 32 tiles".into()))?;
+        if (count == 1 && !self.crops.is_empty()) || (count > 1 && self.crops.len() != count) {
+            return Err(OcrError::Shape(
+                "prepared crop count does not match grid".into(),
+            ));
         }
+        self.global.validate()?;
+        if self.global.shape != [1, 1024, 1024, 3] {
+            return Err(OcrError::Shape(
+                "prepared global view must be 1024 RGB".into(),
+            ));
+        }
+        for crop in &self.crops {
+            crop.validate()?;
+            if crop.shape != [1, 640, 640, 3] {
+                return Err(OcrError::Shape("prepared crop must be 640 RGB".into()));
+            }
+        }
+        Ok(())
+    }
+    pub fn image_tokens(&self) -> Result<usize> {
+        self.validate()?;
+        if self.crops.is_empty() {
+            return Ok(273);
+        }
+        self.grid[0]
+            .checked_mul(10)
+            .and_then(|n| n.checked_add(1))
+            .and_then(|n| n.checked_mul(10))
+            .and_then(|n| n.checked_mul(self.grid[1]))
+            .and_then(|n| n.checked_add(273))
+            .ok_or_else(|| OcrError::Resource("image token count overflow".into()))
     }
 }
 

@@ -90,6 +90,10 @@ backend, worker count and scratch budget, then call `Model::infer(&Request,
 it is not a total process-memory limit. Mapped checkpoint contents must remain
 immutable throughout their lifetime.
 
+Manually constructed `PreparedImage` values are validated before vision inference.
+`PreparedImage::image_tokens()` returns `Result<usize>` and rejects inconsistent
+crop grids, unsupported view sizes, and malformed tensor storage.
+
 ```sh
 cargo test
 cargo clippy --all-targets -- -D warnings

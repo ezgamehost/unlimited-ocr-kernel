@@ -23,7 +23,7 @@ fn main() {
         black_box(model.encode(&input, &mut cpu).unwrap());
         println!(
             "image_tokens={} seconds={:.6}",
-            input.image_tokens(),
+            input.image_tokens().unwrap(),
             start.elapsed().as_secs_f64()
         );
     }

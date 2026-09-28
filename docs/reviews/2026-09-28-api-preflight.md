@@ -85,3 +85,21 @@ vision tests pass when the three original artifact-dependent fixtures are includ
 including full multi-crop pixels and image embeddings. Logs are retained in
 [window-bounds](window-bounds/). This is not a global scratch-memory bound and does
 not resolve the remaining prepared-image/config/checkpoint descriptor findings.
+
+
+## Prepared-image follow-up
+
+Item 2 is addressed: public prepared images validate grid multiplication, the
+32-tile limit, crop count, fixed global/local view shapes, and tensor storage.
+Token counting is fallible (`Result<usize>`) and checks layout first. Vision
+encoding obtains that validated count before any global-view work, bounding
+subsequent grid assembly arithmetic. The Rust API documentation and benchmark
+example are updated for the fallible count.
+
+The new layout test fails on the missing validation before implementation,
+then passes with the full Rust suite and clippy. All six release vision checks,
+including original multi-crop pixel/embedding references, pass. An initial full
+build caught an example call site needing the new Result handling; it was fixed
+before the final checks. [Verification logs](prepared-layout/) retain the results.
+Vision descriptor preflight, direct-config validation and aggregate lifetime
+optimization remain open.

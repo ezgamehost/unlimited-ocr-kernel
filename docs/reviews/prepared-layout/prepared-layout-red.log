@@ -1,0 +1,19 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running tests/preprocess.rs (target/debug/deps/preprocess-7a04c3d3947e59df)
+
+running 1 test
+
+thread 'prepared_images_reject_invalid_grids_and_storage' (3935137) panicked at src/preprocess.rs:23:9:
+not yet implemented: validate prepared-image layout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test prepared_images_reject_invalid_grids_and_storage ... FAILED
+
+failures:
+
+failures:
+    prepared_images_reject_invalid_grids_and_storage
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test preprocess`

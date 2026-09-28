@@ -130,6 +130,7 @@ impl Vision {
         image: &PreparedImage,
         cpu: &mut CpuContext,
     ) -> Result<(Tensor, Tensor, Tensor)> {
+        let image_tokens = image.image_tokens()?;
         let (sam, clip, global) = self.encode_view_debug(&image.global, cpu)?;
         let mut sequence = Vec::new();
         let [gx, gy] = image.grid;
@@ -164,7 +165,7 @@ impl Vision {
             return Err(OcrError::Shape("image separator width".into()));
         }
         sequence.extend_from_slice(separator);
-        let result = Tensor::new(vec![image.image_tokens(), 1280], sequence)?;
+        let result = Tensor::new(vec![image_tokens, 1280], sequence)?;
         Ok((sam, clip, result))
     }
 }

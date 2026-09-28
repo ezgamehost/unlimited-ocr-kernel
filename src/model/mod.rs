@@ -114,7 +114,7 @@ impl Model {
         }
         let start = Instant::now();
         let image = preprocess::prepare(&request.image, request.mode)?;
-        let image_tokens = image.image_tokens();
+        let image_tokens = image.image_tokens()?;
         let input = self.tokenizer.encode(&request.prompt, image_tokens)?;
         if input
             .ids

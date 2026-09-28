@@ -1,6 +1,39 @@
 use image::RgbImage;
 use std::path::Path;
-use uocr::preprocess::{ImageMode, prepare, resize_rgb};
+use uocr::preprocess::{ImageMode, PreparedImage, prepare, resize_rgb};
+use uocr::tensor::Tensor;
+
+#[test]
+fn prepared_images_reject_invalid_grids_and_storage() {
+    let mut image = PreparedImage {
+        global: Tensor::new(vec![1, 1024, 1024, 3], vec![0.; 1024 * 1024 * 3]).unwrap(),
+        crops: vec![],
+        grid: [1, 1],
+    };
+    assert!(image.validate().is_ok());
+    assert_eq!(image.image_tokens().unwrap(), 273);
+    for grid in [[0, 1], [1, 0], [usize::MAX, 2], [1, 33], [2, 2]] {
+        image.grid = grid;
+        assert!(image.validate().is_err(), "grid={grid:?}");
+        assert!(image.image_tokens().is_err());
+    }
+    image.grid = [2, 1];
+    image.crops = vec![
+        Tensor {
+            shape: vec![1, 640, 640, 3],
+            data: vec![]
+        };
+        2
+    ];
+    assert!(image.validate().is_err());
+    for crop in &mut image.crops {
+        crop.data = vec![0.; 640 * 640 * 3];
+    }
+    assert!(image.validate().is_ok());
+    assert_eq!(image.image_tokens().unwrap(), 483);
+    image.global.data.pop();
+    assert!(image.validate().is_err());
+}
 
 #[test]
 fn bicubic_matches_pillow_fixed_point_fixture() {

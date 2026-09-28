@@ -136,7 +136,7 @@ fn original_gundam_pixels_and_embeddings_match_rust() {
         ]
     );
     assert_eq!(
-        image.image_tokens(),
+        image.image_tokens().unwrap(),
         metadata["image_tokens"].as_u64().unwrap() as usize
     );
     let inputs = Checkpoint::open(&directory.join("preprocess.safetensors")).unwrap();
