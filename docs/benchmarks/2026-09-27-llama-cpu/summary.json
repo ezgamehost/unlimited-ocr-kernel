@@ -1,0 +1,29 @@
+[
+  {
+    "run": 7,
+    "exit_code": 0,
+    "wall_seconds": 4.469392083,
+    "vision_ms": 1923.0,
+    "decode_tokens_per_second": 251.57,
+    "decode_runs": 19.0,
+    "peak_rss_bytes": 8376074240.0
+  },
+  {
+    "run": 8,
+    "exit_code": 0,
+    "wall_seconds": 4.573821417,
+    "vision_ms": 2001.0,
+    "decode_tokens_per_second": 242.6,
+    "decode_runs": 19.0,
+    "peak_rss_bytes": 8377204736.0
+  },
+  {
+    "run": 9,
+    "exit_code": 0,
+    "wall_seconds": 4.54528575,
+    "vision_ms": 1937.0,
+    "decode_tokens_per_second": 240.17,
+    "decode_runs": 19.0,
+    "peak_rss_bytes": 8377892864.0
+  }
+]

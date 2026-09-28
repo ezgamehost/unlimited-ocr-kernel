@@ -1,0 +1,35 @@
+0.02.926.856 W load: special_eos_id is not in special_eog_ids - the tokenizer config may be incorrect
+0.04.983.863 I cmn          init: llama threadpool init, n_threads = 10
+WARNING: Using native backtrace. Set GGML_BACKTRACE_LLDB for more info.
+WARNING: GGML_BACKTRACE_LLDB may cause native MacOS Terminal.app to crash.
+See: https://github.com/ggml-org/llama.cpp/pull/17869
+0   libggml-base.0.25.3.dylib           0x00000001032013f0 ggml_print_backtrace + 276
+1   libggml-base.0.25.3.dylib           0x00000001032143b0 _ZL23ggml_uncaught_exceptionv + 12
+2   libc++abi.dylib                     0x000000018062f75c _ZSt11__terminatePFvvE + 16
+3   libc++abi.dylib                     0x0000000180631be4 __cxa_get_exception_ptr + 0
+4   libc++abi.dylib                     0x000000018061e09c __cxa_get_globals + 0
+5   libllama-common.0.5.0.dylib         0x00000001038b4fcc _Z27common_chat_templates_applyPK21common_chat_templatesRK28common_chat_templates_inputs + 2204
+6   libllama-common.0.5.0.dylib         0x00000001038b969c _Z26common_chat_format_examplePK21common_chat_templatesbRKNSt3__13mapINS2_12basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEES9_NS2_4lessIS9_EENS7_INS2_4pairIKS9_S9_EEEEEE + 648
+7   llama-mtmd-cli                      0x0000000102d2fa80 _ZN16mtmd_cli_contextC2ER13common_params + 544
+8   llama-mtmd-cli                      0x0000000102d2b8dc main + 204
+9   dyld                                0x00000001802b04e4 start + 6992
+libc++abi: terminating due to uncaught exception of type std::runtime_error: this custom template is not supported, try using --jinja
+time: command terminated abnormally
+        5.56 real         1.89 user         0.76 sys
+          3895508992  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              448151  page reclaims
+                2150  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 173  voluntary context switches
+               11364  involuntary context switches
+         41349852970  instructions retired
+         10855509388  cycles elapsed
+          4114798112  peak memory footprint

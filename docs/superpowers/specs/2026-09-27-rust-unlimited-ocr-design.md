@@ -1,6 +1,7 @@
 # Unlimited-OCR Rust CPU runtime
 
-Status: proposed design for review; implementation and benchmarks have not run.
+Status: design direction approved on 2026-09-27; llama.cpp CPU smoke benchmark
+completed. Rust implementation and representative document benchmarks remain.
 
 ## Intent and scope
 
@@ -12,7 +13,8 @@ Inference itself must not require Python. Success means real image-to-text
 inference, validated against upstream, followed by measured performance work.
 Microbenchmarks alone do not satisfy this objective.
 
-First deliverable: reproducible vLLM baseline tooling and reference fixtures.
+First deliverable: a local llama.cpp CPU baseline and reference fixtures;
+vLLM measurement remains dependent on access to supported hardware.
 Second: correct single-image Rust inference, including base and gundam modes.
 Third: measured CPU optimization. Multi-page support and GPU backends are
 subsequent extensions; interfaces should allow them without implementing them now.
@@ -78,12 +80,26 @@ output limit; emit text and machine-readable timing/error reports.
 
 ## Initial vLLM benchmark
 
-Run this before CPU optimization. The official Unlimited-OCR recipe uses a
+The requested vLLM baseline is hardware-blocked; the user accepted the local
+llama.cpp smoke benchmark and requested aggressive Rust CPU optimization.
+Continue implementation without waiting for vLLM hardware. The official recipe uses a
 dedicated CUDA Docker image and an NVIDIA GPU. The local host is macOS ARM64;
-no GPU host or vLLM endpoint has been provided yet. Ask for an execution target.
+the user confirmed that only the M4 Pro is available.
 Do not claim a run, fabricate timing, or substitute another inference engine.
 If only the Mac is available, record the baseline as blocked and investigate
 model-specific CPU support separately; generic vLLM CPU support is insufficient.
+
+The user subsequently proposed llama.cpp. Use release b11223, commit
+`4da6337767f973e2b4d0797e5b323d77d8565e4a`, for an initial local CPU smoke
+benchmark with GPU layer, operation, KV and projector offloading disabled.
+The current converter documents that its OCR decoder ignores sliding-window
+metadata and uses full attention. This makes it a useful practical CPU baseline,
+but not a reference for the original model's long-generation attention behavior.
+Record precision and sampling differences explicitly. Start with community Q8_0
+language weights and F16 vision weights from
+`vimalnakrani/unlimited-ocr-gguf`, revision
+`45cd66ec6b46a7c4de49f376084ecec2b8d3c59a`.
+The upstream baidu.png is only a logo smoke test, not a document benchmark.
 
 Use the official model recipe, including its n-gram logits processor, literal
 `<image>document parsing.` prompt, special-token retention, and disabled prefix

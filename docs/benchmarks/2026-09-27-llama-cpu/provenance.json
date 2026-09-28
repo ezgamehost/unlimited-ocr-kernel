@@ -1,0 +1,16 @@
+{
+  "llama_release": "b11223",
+  "llama_commit": "4da6337767f973e2b4d0797e5b323d77d8565e4a",
+  "llama_archive_url": "https://github.com/ggml-org/llama.cpp/releases/download/b11223/llama-b11223-bin-macos-arm64.tar.gz",
+  "llama_archive_digest": "sha256:5bacea12237283699a196194b7f62a0e613438bd5feed694359ed6050492bb3e",
+  "model_repo": "vimalnakrani/unlimited-ocr-gguf",
+  "model_revision": "45cd66ec6b46a7c4de49f376084ecec2b8d3c59a",
+  "language_file": "unlimited-ocr-Q8_0.gguf",
+  "vision_file": "mmproj-unlimited-ocr-F16.gguf",
+  "image_source": "https://huggingface.co/baidu/Unlimited-OCR/resolve/07dea832e22aefee32ad281d4b80551282e1c168/assets/baidu.png",
+  "cpu": "Apple M4 Pro",
+  "ram_bytes": 25769803776,
+  "performance_cores": 10,
+  "efficiency_cores": 4,
+  "os": "macOS 26.6.2 (25G83)"
+}

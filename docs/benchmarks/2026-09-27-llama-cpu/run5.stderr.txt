@@ -1,0 +1,27 @@
+0.00.186.909 W load: special_eos_id is not in special_eog_ids - the tokenizer config may be incorrect
+0.02.088.180 I cmn          init: llama threadpool init, n_threads = 10
+0.02.245.555 I mtmd_cli_context: chat template example:
+You are a helpful assistantHelloHi thereHow are you?
+0.02.245.557 I main: loading model: /tmp/unlimited-ocr-baseline/models/model.gguf
+0.02.245.694 W WARN: This is an experimental CLI for testing multimodal capability.
+0.02.245.695 W       For normal use cases, please use the standard llama-cli
+0.02.254.410 I encoding mtmd batch, n_chunks = 1 (done = 1, total = 3)
+0.04.178.222 I mtmd batch encoding done in 1924 ms
+        4.45 real        22.67 user         1.00 sys
+          8377368576  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              562931  page reclaims
+                 184  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                5288  involuntary context switches
+        467197767636  instructions retired
+         91791250272  cycles elapsed
+          5442836984  peak memory footprint
