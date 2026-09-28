@@ -1,0 +1,10 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 16.91s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 2 tests
+test cpu::tests::expert_worker_reuses_pool_but_limits_inner_parallelism_and_memory ... ok
+test cpu::tests::shared_expert_uses_spare_workers_with_same_memory_partition ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+

@@ -1,0 +1,136 @@
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index d91e921..a899773 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -10,6 +10,24 @@ use crate::{
+ use cache::LayerCache;
+ use rayon::prelude::*;
+ 
++// Temporary, test-only stage attribution; never compiled into the CLI.
++#[cfg(test)]
++pub(crate) static STAGE_NS: [std::sync::atomic::AtomicU64; 5] =
++    [const { std::sync::atomic::AtomicU64::new(0) }; 5];
++#[cfg(test)]
++pub(crate) static STAGE_CALLS: [std::sync::atomic::AtomicU64; 5] =
++    [const { std::sync::atomic::AtomicU64::new(0) }; 5];
++#[cfg(test)]
++fn record_stage(stage: usize, started: std::time::Instant) -> std::time::Instant {
++    let now = std::time::Instant::now();
++    STAGE_NS[stage].fetch_add(
++        now.duration_since(started).as_nanos() as u64,
++        std::sync::atomic::Ordering::Relaxed,
++    );
++    STAGE_CALLS[stage].fetch_add(1, std::sync::atomic::Ordering::Relaxed);
++    std::time::Instant::now()
++}
++
+ pub struct Decoder<'a> {
+     weights: &'a Checkpoint,
+     quantized: Option<(
+@@ -254,6 +272,8 @@ impl<'a> Decoder<'a> {
+         cache: &mut LayerCache,
+         cpu: &mut CpuContext,
+     ) -> Result<Tensor> {
++        #[cfg(test)]
++        let stage_start = std::time::Instant::now();
+         x.validate()?;
+         let hidden = self.config.hidden_size;
+         if index >= self.config.num_hidden_layers
+@@ -293,6 +313,8 @@ impl<'a> Decoder<'a> {
+             &format!("{prefix}.self_attn.v_proj.weight"),
+             cpu,
+         )?;
++        #[cfg(test)]
++        let stage_start = record_stage(0, stage_start);
+         let heads = self.config.num_attention_heads;
+         let dim = hidden / heads;
+         for row in 0..rows {
+@@ -361,6 +383,8 @@ impl<'a> Decoder<'a> {
+             }
+             joined
+         };
++        #[cfg(test)]
++        let stage_start = record_stage(1, stage_start);
+         let mut residual = self.projection(
+             &Tensor::new(vec![rows, hidden], joined)?,
+             &format!("{prefix}.self_attn.o_proj.weight"),
+@@ -374,6 +398,8 @@ impl<'a> Decoder<'a> {
+             .tensor(&format!("{prefix}.post_attention_layernorm.weight"))?
+             .to_f32();
+         let normalized = ops::rms_norm(&residual, &postnorm, self.config.rms_norm_eps)?;
++        #[cfg(test)]
++        let stage_start = record_stage(2, stage_start);
+         let mlp = if index < self.config.first_k_dense_replace {
+             self.feed_forward(&normalized, &format!("{prefix}.mlp"), cpu)?
+         } else {
+@@ -382,10 +408,14 @@ impl<'a> Decoder<'a> {
+         for (dest, value) in residual.data.iter_mut().zip(mlp.data) {
+             *dest += value;
+         }
++        #[cfg(test)]
++        record_stage(3, stage_start);
+         Ok(residual)
+     }
+ 
+     pub fn logits(&self, hidden: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
++        #[cfg(test)]
++        let stage_start = std::time::Instant::now();
+         let width = self.config.hidden_size;
+         if hidden.data.len() < width {
+             return Err(OcrError::Shape("missing final hidden state".into()));
+@@ -396,7 +426,10 @@ impl<'a> Decoder<'a> {
+         )?;
+         let norm = self.weights.tensor("model.norm.weight")?.to_f32();
+         let normalized = ops::rms_norm(&last, &norm, self.config.rms_norm_eps)?;
+-        self.projection(&normalized, "lm_head.weight", cpu)
++        let result = self.projection(&normalized, "lm_head.weight", cpu);
++        #[cfg(test)]
++        record_stage(4, stage_start);
++        result
+     }
+ 
+     pub fn prefill(
+diff --git a/src/model/benchmark.rs b/src/model/benchmark.rs
+index 4ade58c..600b45b 100644
+--- a/src/model/benchmark.rs
++++ b/src/model/benchmark.rs
+@@ -50,6 +50,12 @@ fn fixed_work_decoder_benchmark() {
+         let start = Instant::now();
+         let (mut state, _) = decoder.prefill(&embeddings, &mut cpu).unwrap();
+         let prefill_seconds = start.elapsed().as_secs_f64();
++        for value in crate::decoder::STAGE_NS
++            .iter()
++            .chain(crate::decoder::STAGE_CALLS.iter())
++        {
++            value.store(0, std::sync::atomic::Ordering::Relaxed);
++        }
+         let start = Instant::now();
+         let mut checksum = 0u64;
+         let mut digest = Sha256::new();
+@@ -62,13 +68,25 @@ fn fixed_work_decoder_benchmark() {
+             }
+             std::hint::black_box(&logits);
+         }
++        let stage_ns = crate::decoder::STAGE_NS
++            .each_ref()
++            .map(|v| v.load(std::sync::atomic::Ordering::Relaxed));
++        let stage_calls = crate::decoder::STAGE_CALLS
++            .each_ref()
++            .map(|v| v.load(std::sync::atomic::Ordering::Relaxed));
++        assert_eq!(stage_calls, [6144, 6144, 6144, 6144, 512]);
++        let decode_seconds = start.elapsed().as_secs_f64();
++        assert!((stage_ns.iter().sum::<u64>() as f64 / 1e9) < decode_seconds);
+         println!(
+             "{}",
+             serde_json::json!({
+                 "benchmark": "native_fixed_work_decoder", "warmup": repetition == 0,
+                 "repetition": repetition, "threads": threads, "prefix_tokens": input.ids.len(),
+                 "decode_steps": 512, "prefill_seconds": prefill_seconds,
+-                "decode_with_checksum_seconds": start.elapsed().as_secs_f64(),
++                "decode_with_checksum_seconds": decode_seconds,
++                "stage_seconds": stage_ns.map(|v| v as f64 / 1e9),
++                "stage_calls": stage_calls,
++                "stage_names": ["input_norm_qkv", "rope_cache_attention", "output_projection_postnorm", "mlp_and_residual", "final_norm_vocabulary_head"],
+                 "logits_checksum": checksum, "logits_sha256": format!("{:x}", digest.finalize()),
+                 "overlay": overlay, "precision": model.precision(),
+                 "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS"

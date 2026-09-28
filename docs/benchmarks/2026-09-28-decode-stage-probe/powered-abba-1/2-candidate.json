@@ -1,0 +1,176 @@
+{
+  "phase": 2,
+  "variant": "candidate",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/decode-stage-probe/candidate",
+    "model::benchmark::fixed_work_decoder_benchmark",
+    "--ignored",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 4354965504,
+    "user_cpu_seconds": 82.078134,
+    "system_cpu_seconds": 26.732228,
+    "major_faults": 687,
+    "minor_faults": 761641
+  },
+  "power_before": {
+    "battery": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t61%; charging; 2:01 remaining present: true\n",
+    "profile": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "process_wall_seconds": 28.403682958014542,
+  "power_after": {
+    "battery": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t61%; charging; (no estimate) present: true\n",
+    "profile": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "samples": [
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.9794082079999997,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188943474296580907,
+      "logits_sha256": "3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da",
+      "overlay": "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 2.228380084,
+      "prefix_tokens": 1517,
+      "repetition": 0,
+      "stage_calls": [
+        6144,
+        6144,
+        6144,
+        6144,
+        512
+      ],
+      "stage_names": [
+        "input_norm_qkv",
+        "rope_cache_attention",
+        "output_projection_postnorm",
+        "mlp_and_residual",
+        "final_norm_vocabulary_head"
+      ],
+      "stage_seconds": [
+        0.750748007,
+        0.871105625,
+        0.273414914,
+        1.424176294,
+        0.517009903
+      ],
+      "threads": 8,
+      "warmup": true
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.789666666,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188943474296580907,
+      "logits_sha256": "3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da",
+      "overlay": "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 1.523125542,
+      "prefix_tokens": 1517,
+      "repetition": 1,
+      "stage_calls": [
+        6144,
+        6144,
+        6144,
+        6144,
+        512
+      ],
+      "stage_names": [
+        "input_norm_qkv",
+        "rope_cache_attention",
+        "output_projection_postnorm",
+        "mlp_and_residual",
+        "final_norm_vocabulary_head"
+      ],
+      "stage_seconds": [
+        0.710882093,
+        0.829955629,
+        0.260906225,
+        1.356048822,
+        0.495758719
+      ],
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.832649541,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188943474296580907,
+      "logits_sha256": "3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da",
+      "overlay": "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 1.520031875,
+      "prefix_tokens": 1517,
+      "repetition": 2,
+      "stage_calls": [
+        6144,
+        6144,
+        6144,
+        6144,
+        512
+      ],
+      "stage_names": [
+        "input_norm_qkv",
+        "rope_cache_attention",
+        "output_projection_postnorm",
+        "mlp_and_residual",
+        "final_norm_vocabulary_head"
+      ],
+      "stage_seconds": [
+        0.722734445,
+        0.840454876,
+        0.26095841,
+        1.368641031,
+        0.502642585
+      ],
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.805870916,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188943474296580907,
+      "logits_sha256": "3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da",
+      "overlay": "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 1.5135144999999999,
+      "prefix_tokens": 1517,
+      "repetition": 3,
+      "stage_calls": [
+        6144,
+        6144,
+        6144,
+        6144,
+        512
+      ],
+      "stage_names": [
+        "input_norm_qkv",
+        "rope_cache_attention",
+        "output_projection_postnorm",
+        "mlp_and_residual",
+        "final_norm_vocabulary_head"
+      ],
+      "stage_seconds": [
+        0.714702237,
+        0.832674173,
+        0.260504103,
+        1.365073483,
+        0.496610919
+      ],
+      "threads": 8,
+      "warmup": false
+    }
+  ]
+}

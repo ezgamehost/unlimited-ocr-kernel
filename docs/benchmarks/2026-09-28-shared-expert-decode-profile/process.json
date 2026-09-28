@@ -1,0 +1,973 @@
+{
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr",
+    "--model",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/upstream",
+    "--jsonl",
+    "--threads",
+    "8",
+    "--int8-weights",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations"
+  ],
+  "binary_sha256": "1846f3dd7495e3fb0e675ce38931de1daae4bda967f6ad13bba65e885a2e93b3",
+  "quality_process": {
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/kernel-baselines/uocr-1846f3dd7495e3fb0e675ce38931de1daae4bda967f6ad13bba65e885a2e93b3",
+      "--jsonl",
+      "--threads",
+      "8",
+      "--quantized-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations"
+    ],
+    "binary_sha256": "1846f3dd7495e3fb0e675ce38931de1daae4bda967f6ad13bba65e885a2e93b3",
+    "cases": [
+      {
+        "id": "english",
+        "path": "english.png",
+        "text": "MEETING NOTES\n\nDate: September 27, 2026\n\nThe research team reviewed the new document recognition system.\nEvery result must include the original input and a clear transcript.\nWe measure complete page latency, memory use, and character errors.\nFaster processing is useful only when the output remains accurate.\n\nActions for next week:\n1. Check English and Chinese documents.\n2. Test tables, small print, and unusual page dimensions.\n3. Save failures and incomplete outputs with the successful results.\n4. Compare identical inputs on the same computer.\n\nApproved by: Research Operations",
+        "sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          796,
+          444
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 18,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png",
+        "case": "corpus-english-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "english",
+        "path": "english.png",
+        "text": "MEETING NOTES\n\nDate: September 27, 2026\n\nThe research team reviewed the new document recognition system.\nEvery result must include the original input and a clear transcript.\nWe measure complete page latency, memory use, and character errors.\nFaster processing is useful only when the output remains accurate.\n\nActions for next week:\n1. Check English and Chinese documents.\n2. Test tables, small print, and unusual page dimensions.\n3. Save failures and incomplete outputs with the successful results.\n4. Compare identical inputs on the same computer.\n\nApproved by: Research Operations",
+        "sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          796,
+          444
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 18,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png",
+        "case": "corpus-english-matched",
+        "prompt": "<image>\ndocument parsing."
+      },
+      {
+        "id": "chinese",
+        "path": "chinese.png",
+        "text": "文档识别测试报告\n\n日期：二零二六年九月二十七日\n\n本报告用于检查中文文档识别的正确性。\n每次测试都应保存原始图片和完整识别结果。\n性能指标包括处理时间、内存使用量和字符错误率。\n提高运行速度的同时，必须保持文字识别准确。\n\n测试要求：\n第一，检查标题和正文的阅读顺序。\n第二，检查数字、标点符号和表格内容。\n第三，不得忽略失败或未完成的测试。\n第四，在相同设备上比较相同输入。\n\n负责人：研究团队",
+        "sha256": "a84ed9d6dbf0e3149eaedba453d910b2ad78d6ff0f4900a87f259d9776a8f922",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          646,
+          574
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+        "font_sha256": "876af2cd4854644e7f3e7feb2f688997fdb3343c6df6693611209c9dfb47ccec",
+        "font_size": 26,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/chinese.png",
+        "case": "corpus-chinese-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "chinese",
+        "path": "chinese.png",
+        "text": "文档识别测试报告\n\n日期：二零二六年九月二十七日\n\n本报告用于检查中文文档识别的正确性。\n每次测试都应保存原始图片和完整识别结果。\n性能指标包括处理时间、内存使用量和字符错误率。\n提高运行速度的同时，必须保持文字识别准确。\n\n测试要求：\n第一，检查标题和正文的阅读顺序。\n第二，检查数字、标点符号和表格内容。\n第三，不得忽略失败或未完成的测试。\n第四，在相同设备上比较相同输入。\n\n负责人：研究团队",
+        "sha256": "a84ed9d6dbf0e3149eaedba453d910b2ad78d6ff0f4900a87f259d9776a8f922",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          646,
+          574
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+        "font_sha256": "876af2cd4854644e7f3e7feb2f688997fdb3343c6df6693611209c9dfb47ccec",
+        "font_size": 26,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/chinese.png",
+        "case": "corpus-chinese-matched",
+        "prompt": "<image>\ndocument parsing."
+      },
+      {
+        "id": "table",
+        "path": "table.png",
+        "text": "PURCHASE ORDER\n\nOrder: PO-2026-0927\nCurrency: USD\n\nItem              Qty    Unit price      Amount\nPaper reams        12         6.25       75.00\nInk cartridges      4        32.50      130.00\nArchive boxes      18         4.75       85.50\nShipping            1        12.00       12.00\n\nSubtotal                               302.50\nTax                                     24.20\nTotal                                  326.70\n\nPayment due: October 27, 2026",
+        "sha256": "8b7670c3fe05f5531efba8ba079b0b7a31925be81ec9acc08eec57972c57160b",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          659,
+          492
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 21,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/table.png",
+        "case": "corpus-table-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "table",
+        "path": "table.png",
+        "text": "PURCHASE ORDER\n\nOrder: PO-2026-0927\nCurrency: USD\n\nItem              Qty    Unit price      Amount\nPaper reams        12         6.25       75.00\nInk cartridges      4        32.50      130.00\nArchive boxes      18         4.75       85.50\nShipping            1        12.00       12.00\n\nSubtotal                               302.50\nTax                                     24.20\nTotal                                  326.70\n\nPayment due: October 27, 2026",
+        "sha256": "8b7670c3fe05f5531efba8ba079b0b7a31925be81ec9acc08eec57972c57160b",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          659,
+          492
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 21,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/table.png",
+        "case": "corpus-table-matched",
+        "prompt": "<image>\ndocument parsing."
+      },
+      {
+        "id": "dense",
+        "path": "dense.png",
+        "text": "TECHNICAL VALIDATION RECORD\n\n01. Sample 1001: measured value 7.25; status verified.\nThe original record is retained for independent checking.\n02. Sample 1002: measured value 14.25; status verified.\nThe original record is retained for independent checking.\n03. Sample 1003: measured value 21.25; status verified.\nThe original record is retained for independent checking.\n04. Sample 1004: measured value 28.25; status verified.\nThe original record is retained for independent checking.\n05. Sample 1005: measured value 35.25; status verified.\nThe original record is retained for independent checking.\n06. Sample 1006: measured value 42.25; status verified.\nThe original record is retained for independent checking.\n07. Sample 1007: measured value 49.25; status verified.\nThe original record is retained for independent checking.\n08. Sample 1008: measured value 56.25; status verified.\nThe original record is retained for independent checking.\n09. Sample 1009: measured value 63.25; status verified.\nThe original record is retained for independent checking.\n10. Sample 1010: measured value 70.25; status verified.\nThe original record is retained for independent checking.\n11. Sample 1011: measured value 77.25; status verified.\nThe original record is retained for independent checking.\n12. Sample 1012: measured value 84.25; status verified.\nThe original record is retained for independent checking.\n13. Sample 1013: measured value 91.25; status verified.\nThe original record is retained for independent checking.\n14. Sample 1014: measured value 98.25; status verified.\nThe original record is retained for independent checking.\n15. Sample 1015: measured value 105.25; status verified.\nThe original record is retained for independent checking.\n16. Sample 1016: measured value 112.25; status verified.\nThe original record is retained for independent checking.\n17. Sample 1017: measured value 119.25; status verified.\nThe original record is retained for independent checking.\n18. Sample 1018: measured value 126.25; status verified.\nThe original record is retained for independent checking.\n19. Sample 1019: measured value 133.25; status verified.\nThe original record is retained for independent checking.\n20. Sample 1020: measured value 140.25; status verified.\nThe original record is retained for independent checking.\n21. Sample 1021: measured value 147.25; status verified.\nThe original record is retained for independent checking.\n22. Sample 1022: measured value 154.25; status verified.\nThe original record is retained for independent checking.\n23. Sample 1023: measured value 161.25; status verified.\nThe original record is retained for independent checking.\n24. Sample 1024: measured value 168.25; status verified.\nThe original record is retained for independent checking.\n25. Sample 1025: measured value 175.25; status verified.\nThe original record is retained for independent checking.\n26. Sample 1026: measured value 182.25; status verified.\nThe original record is retained for independent checking.\n27. Sample 1027: measured value 189.25; status verified.\nThe original record is retained for independent checking.\n28. Sample 1028: measured value 196.25; status verified.\nThe original record is retained for independent checking.",
+        "sha256": "736bad4c8337ce1e57aae9cf29d5dd1d38add9d7a53a3a4ab7bc3f7299911842",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          561,
+          1319
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 15,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/dense.png",
+        "case": "corpus-dense-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "dense",
+        "path": "dense.png",
+        "text": "TECHNICAL VALIDATION RECORD\n\n01. Sample 1001: measured value 7.25; status verified.\nThe original record is retained for independent checking.\n02. Sample 1002: measured value 14.25; status verified.\nThe original record is retained for independent checking.\n03. Sample 1003: measured value 21.25; status verified.\nThe original record is retained for independent checking.\n04. Sample 1004: measured value 28.25; status verified.\nThe original record is retained for independent checking.\n05. Sample 1005: measured value 35.25; status verified.\nThe original record is retained for independent checking.\n06. Sample 1006: measured value 42.25; status verified.\nThe original record is retained for independent checking.\n07. Sample 1007: measured value 49.25; status verified.\nThe original record is retained for independent checking.\n08. Sample 1008: measured value 56.25; status verified.\nThe original record is retained for independent checking.\n09. Sample 1009: measured value 63.25; status verified.\nThe original record is retained for independent checking.\n10. Sample 1010: measured value 70.25; status verified.\nThe original record is retained for independent checking.\n11. Sample 1011: measured value 77.25; status verified.\nThe original record is retained for independent checking.\n12. Sample 1012: measured value 84.25; status verified.\nThe original record is retained for independent checking.\n13. Sample 1013: measured value 91.25; status verified.\nThe original record is retained for independent checking.\n14. Sample 1014: measured value 98.25; status verified.\nThe original record is retained for independent checking.\n15. Sample 1015: measured value 105.25; status verified.\nThe original record is retained for independent checking.\n16. Sample 1016: measured value 112.25; status verified.\nThe original record is retained for independent checking.\n17. Sample 1017: measured value 119.25; status verified.\nThe original record is retained for independent checking.\n18. Sample 1018: measured value 126.25; status verified.\nThe original record is retained for independent checking.\n19. Sample 1019: measured value 133.25; status verified.\nThe original record is retained for independent checking.\n20. Sample 1020: measured value 140.25; status verified.\nThe original record is retained for independent checking.\n21. Sample 1021: measured value 147.25; status verified.\nThe original record is retained for independent checking.\n22. Sample 1022: measured value 154.25; status verified.\nThe original record is retained for independent checking.\n23. Sample 1023: measured value 161.25; status verified.\nThe original record is retained for independent checking.\n24. Sample 1024: measured value 168.25; status verified.\nThe original record is retained for independent checking.\n25. Sample 1025: measured value 175.25; status verified.\nThe original record is retained for independent checking.\n26. Sample 1026: measured value 182.25; status verified.\nThe original record is retained for independent checking.\n27. Sample 1027: measured value 189.25; status verified.\nThe original record is retained for independent checking.\n28. Sample 1028: measured value 196.25; status verified.\nThe original record is retained for independent checking.",
+        "sha256": "736bad4c8337ce1e57aae9cf29d5dd1d38add9d7a53a3a4ab7bc3f7299911842",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          561,
+          1319
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 15,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/dense.png",
+        "case": "corpus-dense-matched",
+        "prompt": "<image>\ndocument parsing."
+      },
+      {
+        "id": "receipt",
+        "path": "receipt.png",
+        "text": "HARBOR STATIONERY\nReceipt R-08421\n2026-09-28 09:35\n\nDescription          Qty    Total\nPocket notebook        3    9.75\nBlue ink pen           5    7.50\nDocument folder        2    4.20\n\nSubtotal                   21.45\nTax                         1.72\nAmount paid                23.17\nCard ending                 6038\n\nItems may be returned within\n30 days with this receipt.\nThank you for your visit.",
+        "sha256": "c321d851be414272b01626a291def6b16aca47c004e889b771e66cbc2da0c3ac",
+        "width": 480,
+        "height": 640,
+        "expected_crop_grid": [
+          1,
+          1
+        ],
+        "expected_image_tokens": 273,
+        "line_bounds": [
+          [
+            32,
+            35,
+            202,
+            47
+          ],
+          [
+            32,
+            60,
+            182,
+            75
+          ],
+          [
+            32,
+            85,
+            192,
+            97
+          ],
+          [
+            32,
+            107,
+            32,
+            107
+          ],
+          [
+            32,
+            135,
+            362,
+            150
+          ],
+          [
+            32,
+            160,
+            352,
+            172
+          ],
+          [
+            32,
+            185,
+            352,
+            200
+          ],
+          [
+            32,
+            210,
+            352,
+            222
+          ],
+          [
+            32,
+            232,
+            32,
+            232
+          ],
+          [
+            32,
+            260,
+            352,
+            272
+          ],
+          [
+            32,
+            285,
+            352,
+            297
+          ],
+          [
+            32,
+            310,
+            352,
+            325
+          ],
+          [
+            32,
+            335,
+            352,
+            350
+          ],
+          [
+            32,
+            357,
+            32,
+            357
+          ],
+          [
+            32,
+            385,
+            312,
+            400
+          ],
+          [
+            32,
+            410,
+            292,
+            425
+          ],
+          [
+            32,
+            435,
+            282,
+            450
+          ]
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 16,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/receipt.png",
+        "case": "heldout-receipt-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "wide_report",
+        "path": "wide_report.png",
+        "text": "WATER QUALITY FIELD REPORT\nStation: Willow Creek East     Survey: WC-1186     Date: 28 September 2026\n\nThe morning survey covered the upstream bridge and the southern footpath.\nThree sealed samples were collected before the first scheduled discharge.\nSample A: 08:15, temperature 18.4 C, pH 7.2, conductivity 412 uS/cm.\nSample B: 08:27, temperature 18.6 C, pH 7.1, conductivity 409 uS/cm.\nSample C: 08:42, temperature 18.5 C, pH 7.3, conductivity 415 uS/cm.\n\nNo visible surface film was observed. The water appeared clear at all locations.\nEach sample bottle was labelled, photographed, and placed in the transport case.\nLaboratory results are pending; these observations are not a safety certification.\n\nPrepared by: Field Operations     Reviewed by: Laboratory Services",
+        "sha256": "a9bb7f5678b6935e040fa2054cbbf1f291ca45e405eb9744a7713cbe917165d1",
+        "width": 1280,
+        "height": 640,
+        "expected_crop_grid": [
+          2,
+          1
+        ],
+        "expected_image_tokens": 483,
+        "line_bounds": [
+          [
+            39,
+            46,
+            402,
+            66
+          ],
+          [
+            40,
+            80,
+            810,
+            102
+          ],
+          [
+            40,
+            110,
+            40,
+            110
+          ],
+          [
+            40,
+            150,
+            813,
+            172
+          ],
+          [
+            40,
+            185,
+            776,
+            207
+          ],
+          [
+            40,
+            220,
+            752,
+            242
+          ],
+          [
+            40,
+            255,
+            756,
+            277
+          ],
+          [
+            40,
+            290,
+            754,
+            312
+          ],
+          [
+            40,
+            320,
+            40,
+            320
+          ],
+          [
+            40,
+            360,
+            838,
+            382
+          ],
+          [
+            40,
+            395,
+            863,
+            417
+          ],
+          [
+            40,
+            430,
+            850,
+            452
+          ],
+          [
+            40,
+            460,
+            40,
+            460
+          ],
+          [
+            40,
+            500,
+            716,
+            522
+          ]
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Georgia.ttf",
+        "font_sha256": "4f54eb299fccea7f103edeb0d92437359bfd4441811d53222b82b335369f6218",
+        "font_size": 23,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/wide_report.png",
+        "case": "heldout-wide_report-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "bilingual_notice",
+        "path": "bilingual_notice.png",
+        "text": "社区图书馆开放通知\nCOMMUNITY LIBRARY NOTICE\n\n开放日期：二零二六年十月五日\nOpening date: 5 October 2026\n\n周一至周五：上午九点至下午六点\nSaturday: 10:00 to 16:00\n星期日闭馆。\n\n一楼设有借阅服务台和报刊阅读区。\n二楼提供自习座位和小组讨论室。\n请保持安静，并将手机调至静音。\n\nBorrow up to six books for three weeks.\nReturn books at the main entrance desk.\nPlease bring your library card.\n\n咨询电话：010-5550-2186\n服务邮箱：library@example.org\n欢迎居民和访客使用图书馆服务。",
+        "sha256": "5cde119fff9d3b2a30ada522613db7ce5ecdf6472ca398095a396eca6d8b7b56",
+        "width": 960,
+        "height": 960,
+        "expected_crop_grid": [
+          2,
+          2
+        ],
+        "expected_image_tokens": 693,
+        "line_bounds": [
+          [
+            40,
+            46,
+            265,
+            69
+          ],
+          [
+            40,
+            88,
+            410,
+            106
+          ],
+          [
+            40,
+            118,
+            40,
+            118
+          ],
+          [
+            40,
+            163,
+            390,
+            186
+          ],
+          [
+            40,
+            205,
+            378,
+            228
+          ],
+          [
+            40,
+            235,
+            40,
+            235
+          ],
+          [
+            40,
+            280,
+            415,
+            304
+          ],
+          [
+            40,
+            322,
+            316,
+            345
+          ],
+          [
+            40,
+            358,
+            190,
+            381
+          ],
+          [
+            40,
+            391,
+            40,
+            391
+          ],
+          [
+            40,
+            435,
+            440,
+            459
+          ],
+          [
+            40,
+            475,
+            415,
+            499
+          ],
+          [
+            40,
+            513,
+            415,
+            538
+          ],
+          [
+            40,
+            547,
+            40,
+            547
+          ],
+          [
+            40,
+            595,
+            482,
+            618
+          ],
+          [
+            40,
+            634,
+            495,
+            652
+          ],
+          [
+            40,
+            673,
+            376,
+            696
+          ],
+          [
+            40,
+            703,
+            40,
+            703
+          ],
+          [
+            40,
+            748,
+            335,
+            771
+          ],
+          [
+            40,
+            786,
+            398,
+            813
+          ],
+          [
+            40,
+            826,
+            415,
+            850
+          ]
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
+        "font_sha256": "876af2cd4854644e7f3e7feb2f688997fdb3343c6df6693611209c9dfb47ccec",
+        "font_size": 25,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/bilingual_notice.png",
+        "case": "heldout-bilingual_notice-original",
+        "prompt": "<image>document parsing."
+      },
+      {
+        "id": "archive_register",
+        "path": "archive_register.png",
+        "text": "ARCHIVE TRANSFER REGISTER\nBatch AT-5603 / Storage room B7\n\n01. File AX-7311: 24 sheets; destination: sealed cabinet.\n    Seal 92017; received at 14:01; condition checked by clerk 2.\n02. File AX-7312: 37 sheets; destination: review desk.\n    Seal 92034; received at 14:02; condition checked by clerk 3.\n03. File AX-7313: 50 sheets; destination: map drawer.\n    Seal 92051; received at 14:03; condition checked by clerk 1.\n04. File AX-7314: 63 sheets; destination: north shelf.\n    Seal 92068; received at 14:04; condition checked by clerk 2.\n05. File AX-7315: 76 sheets; destination: sealed cabinet.\n    Seal 92085; received at 14:05; condition checked by clerk 3.\n06. File AX-7316: 89 sheets; destination: review desk.\n    Seal 92102; received at 14:06; condition checked by clerk 1.\n07. File AX-7317: 23 sheets; destination: map drawer.\n    Seal 92119; received at 14:07; condition checked by clerk 2.\n08. File AX-7318: 36 sheets; destination: north shelf.\n    Seal 92136; received at 14:08; condition checked by clerk 3.\n09. File AX-7319: 49 sheets; destination: sealed cabinet.\n    Seal 92153; received at 14:09; condition checked by clerk 1.\n10. File AX-7320: 62 sheets; destination: review desk.\n    Seal 92170; received at 14:10; condition checked by clerk 2.\n11. File AX-7321: 75 sheets; destination: map drawer.\n    Seal 92187; received at 14:11; condition checked by clerk 3.\n12. File AX-7322: 88 sheets; destination: north shelf.\n    Seal 92204; received at 14:12; condition checked by clerk 1.\n13. File AX-7323: 22 sheets; destination: sealed cabinet.\n    Seal 92221; received at 14:13; condition checked by clerk 2.\n14. File AX-7324: 35 sheets; destination: review desk.\n    Seal 92238; received at 14:14; condition checked by clerk 3.\n15. File AX-7325: 48 sheets; destination: map drawer.\n    Seal 92255; received at 14:15; condition checked by clerk 1.\n16. File AX-7326: 61 sheets; destination: north shelf.\n    Seal 92272; received at 14:16; condition checked by clerk 2.\n17. File AX-7327: 74 sheets; destination: sealed cabinet.\n    Seal 92289; received at 14:17; condition checked by clerk 3.\n18. File AX-7328: 87 sheets; destination: review desk.\n    Seal 92306; received at 14:18; condition checked by clerk 1.\n19. File AX-7329: 21 sheets; destination: map drawer.\n    Seal 92323; received at 14:19; condition checked by clerk 2.\n20. File AX-7330: 34 sheets; destination: north shelf.\n    Seal 92340; received at 14:20; condition checked by clerk 3.\n21. File AX-7331: 47 sheets; destination: sealed cabinet.\n    Seal 92357; received at 14:21; condition checked by clerk 1.\n22. File AX-7332: 60 sheets; destination: review desk.\n    Seal 92374; received at 14:22; condition checked by clerk 2.\n23. File AX-7333: 73 sheets; destination: map drawer.\n    Seal 92391; received at 14:23; condition checked by clerk 3.\n24. File AX-7334: 86 sheets; destination: north shelf.\n    Seal 92408; received at 14:24; condition checked by clerk 1.\n25. File AX-7335: 20 sheets; destination: sealed cabinet.\n    Seal 92425; received at 14:25; condition checked by clerk 2.\n26. File AX-7336: 33 sheets; destination: review desk.\n    Seal 92442; received at 14:26; condition checked by clerk 3.",
+        "sha256": "9fc07f3e2fcd3579149c9549232d68242f050d6e91e5e7e8f827aa25966d055a",
+        "width": 1024,
+        "height": 1536,
+        "expected_crop_grid": [
+          2,
+          3
+        ],
+        "expected_image_tokens": 903,
+        "line_bounds": [
+          [
+            39,
+            44,
+            302,
+            56
+          ],
+          [
+            40,
+            68,
+            296,
+            85
+          ],
+          [
+            40,
+            90,
+            40,
+            90
+          ],
+          [
+            40,
+            118,
+            453,
+            134
+          ],
+          [
+            40,
+            143,
+            499,
+            160
+          ],
+          [
+            40,
+            168,
+            437,
+            184
+          ],
+          [
+            40,
+            193,
+            504,
+            210
+          ],
+          [
+            40,
+            218,
+            441,
+            235
+          ],
+          [
+            40,
+            243,
+            498,
+            260
+          ],
+          [
+            40,
+            268,
+            433,
+            284
+          ],
+          [
+            40,
+            293,
+            506,
+            310
+          ],
+          [
+            40,
+            318,
+            456,
+            334
+          ],
+          [
+            40,
+            343,
+            503,
+            360
+          ],
+          [
+            40,
+            368,
+            439,
+            384
+          ],
+          [
+            40,
+            393,
+            500,
+            410
+          ],
+          [
+            40,
+            418,
+            441,
+            435
+          ],
+          [
+            40,
+            443,
+            499,
+            460
+          ],
+          [
+            40,
+            468,
+            433,
+            484
+          ],
+          [
+            40,
+            493,
+            501,
+            510
+          ],
+          [
+            40,
+            518,
+            459,
+            534
+          ],
+          [
+            40,
+            543,
+            498,
+            560
+          ],
+          [
+            40,
+            568,
+            439,
+            584
+          ],
+          [
+            40,
+            593,
+            499,
+            610
+          ],
+          [
+            40,
+            618,
+            436,
+            635
+          ],
+          [
+            40,
+            643,
+            495,
+            660
+          ],
+          [
+            40,
+            668,
+            434,
+            684
+          ],
+          [
+            40,
+            693,
+            500,
+            710
+          ],
+          [
+            40,
+            718,
+            457,
+            734
+          ],
+          [
+            40,
+            743,
+            499,
+            760
+          ],
+          [
+            40,
+            768,
+            437,
+            784
+          ],
+          [
+            40,
+            793,
+            501,
+            810
+          ],
+          [
+            40,
+            818,
+            442,
+            835
+          ],
+          [
+            40,
+            843,
+            497,
+            860
+          ],
+          [
+            40,
+            868,
+            431,
+            884
+          ],
+          [
+            40,
+            893,
+            502,
+            910
+          ],
+          [
+            40,
+            918,
+            456,
+            934
+          ],
+          [
+            40,
+            943,
+            501,
+            960
+          ],
+          [
+            40,
+            968,
+            438,
+            984
+          ],
+          [
+            40,
+            993,
+            499,
+            1010
+          ],
+          [
+            40,
+            1018,
+            441,
+            1035
+          ],
+          [
+            40,
+            1043,
+            501,
+            1060
+          ],
+          [
+            40,
+            1068,
+            435,
+            1084
+          ],
+          [
+            40,
+            1093,
+            504,
+            1110
+          ],
+          [
+            40,
+            1118,
+            454,
+            1134
+          ],
+          [
+            40,
+            1143,
+            497,
+            1160
+          ],
+          [
+            40,
+            1168,
+            441,
+            1184
+          ],
+          [
+            40,
+            1193,
+            504,
+            1210
+          ],
+          [
+            40,
+            1218,
+            442,
+            1235
+          ],
+          [
+            40,
+            1243,
+            500,
+            1260
+          ],
+          [
+            40,
+            1268,
+            436,
+            1284
+          ],
+          [
+            40,
+            1293,
+            503,
+            1310
+          ],
+          [
+            40,
+            1318,
+            459,
+            1334
+          ],
+          [
+            40,
+            1343,
+            504,
+            1360
+          ],
+          [
+            40,
+            1368,
+            439,
+            1384
+          ],
+          [
+            40,
+            1393,
+            505,
+            1410
+          ]
+        ],
+        "font": "/System/Library/Fonts/Supplemental/Georgia.ttf",
+        "font_sha256": "4f54eb299fccea7f103edeb0d92437359bfd4441811d53222b82b335369f6218",
+        "font_size": 17,
+        "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/archive_register.png",
+        "case": "heldout-archive_register-original",
+        "prompt": "<image>document parsing."
+      }
+    ],
+    "overlay_manifest": {
+      "schema_version": 1,
+      "format": "uocr-q8-block32-v1",
+      "block_size": 32,
+      "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+      "output_sha256": "b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441",
+      "matrix_count": 2197,
+      "bytes": 3114913992
+    },
+    "overlay_sha256": "b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441",
+    "baseline": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-current-q8/quality",
+    "baseline_sha256": "c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
+    "baseline_responses_sha256": "dd986089f5a92f84aea1b2c905f388820344d7d151084cb60e9b924c07450a5c",
+    "thread_environment": {
+      "VECLIB_MAXIMUM_THREADS": "8",
+      "OMP_NUM_THREADS": "8"
+    },
+    "purpose": "Exact-output correctness gate, not performance timing.",
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 5629214720,
+      "user_cpu_seconds": 374.639332,
+      "system_cpu_seconds": 84.733527,
+      "major_faults": 992,
+      "minor_faults": 1103294
+    }
+  },
+  "comparison": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-current-q8/powered-abba-1",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t59%; charging; 2:10 remaining present: true\n",
+  "power_source": "ac",
+  "power_profile": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n",
+  "stage": "decode",
+  "sampling_delay_seconds": 8.527273792,
+  "sampling_duration_seconds": 3,
+  "note": "Profile overhead included. Inspect stacks for stage attribution; aggregate thread samples are not wall-time percentages.",
+  "load_event": {
+    "backend": "auto",
+    "event": "loaded",
+    "load_seconds": 5.720545334,
+    "precision": "int8_weights_dynamic_activations",
+    "threads": 8
+  },
+  "warmup_wall_seconds": 13.665202750009485,
+  "sample_start_after_request_seconds": 8.529369042022154,
+  "sample_end_after_request_seconds": 11.890303667023545,
+  "sample_exit_code": 0,
+  "profiled_wall_seconds": 13.616021500027273,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 6325157888,
+    "user_cpu_seconds": 87.255197,
+    "system_cpu_seconds": 20.945429999999998,
+    "major_faults": 293,
+    "minor_faults": 950236
+  },
+  "failure": null,
+  "power_after": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t59%; charging; 2:06 remaining present: true\n",
+  "power_profile_after": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n"
+}

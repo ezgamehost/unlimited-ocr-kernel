@@ -1,0 +1,32 @@
+[
+  {
+    "stage": "input_norm_qkv",
+    "median_seconds": 0.7170835375,
+    "median_milliseconds_per_step": 1.4005537841796873,
+    "median_share_of_decode_with_checksum": 0.18853472039325472
+  },
+  {
+    "stage": "rope_cache_attention",
+    "median_seconds": 0.8332430085,
+    "median_milliseconds_per_step": 1.6274277509765624,
+    "median_share_of_decode_with_checksum": 0.21908516915868775
+  },
+  {
+    "stage": "output_projection_postnorm",
+    "median_seconds": 0.2609323175,
+    "median_milliseconds_per_step": 0.5096334326171874,
+    "median_share_of_decode_with_checksum": 0.06864735423835144
+  },
+  {
+    "stage": "mlp_and_residual",
+    "median_seconds": 1.360540468,
+    "median_milliseconds_per_step": 2.6573056015625,
+    "median_share_of_decode_with_checksum": 0.3574642423781004
+  },
+  {
+    "stage": "final_norm_vocabulary_head",
+    "median_seconds": 0.49698936,
+    "median_milliseconds_per_step": 0.97068234375,
+    "median_share_of_decode_with_checksum": 0.13061272019948306
+  }
+]
