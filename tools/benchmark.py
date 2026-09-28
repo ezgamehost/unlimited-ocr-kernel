@@ -82,9 +82,12 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
     rss = re.search(r"(\d+)\s+maximum resident set size", log)
     vision = re.findall(r"mtmd batch encoding done in (\d+) ms", log)
     count = int(steps[2]) if steps else None
-    # CLI decodes each emitted token; a successful run below its cap stopped at EOG.
+    # The first token can come from prefill, leaving cap-1 eval runs when the
+    # output cap is reached. Timing alone cannot distinguish that boundary
+    # from EOS: exclude it from completed latency aggregates conservatively.
     finish = "error" if code != 0 else (
-        "unknown" if count is None else "token_limit" if count >= token_limit else "eos")
+        "unknown" if count is None or count == token_limit - 1
+        else "token_limit" if count >= token_limit else "eos")
     return {
         "status": "ok" if code == 0 else "error", "exit_code": code,
         "timed_out": timed_out, "finish_reason": finish,

@@ -13,6 +13,25 @@ from tools.score import character_error_rate, normalize_ocr
 
 
 class BenchmarkTests(unittest.TestCase):
+    def test_real_cli_cap_minus_one_log_is_not_eos(self):
+        fixture = Path(__file__).resolve().parents[2] / "docs/benchmarks/2026-09-28-max32/llama-q8-256.stderr.txt"
+        code = "import pathlib,sys; sys.stderr.write(pathlib.Path(sys.argv[1]).read_text())"
+        with tempfile.TemporaryDirectory() as directory:
+            result = run_llama([sys.executable, "-c", code, str(fixture)],
+                               Path(directory) / "page", 256, 30)
+        self.assertEqual(result["decode_steps"], 255)
+        self.assertEqual(result["finish_reason"], "unknown")
+        self.assertEqual(aggregate([result])["completed"], 0)
+        self.assertIsNone(aggregate([result])["median_seconds"])
+
+    def test_cli_finish_boundaries_include_prefill_first_token(self):
+        for runs, limit, expected in [(0, 1, "unknown"), (254, 256, "eos"),
+                                      (255, 256, "unknown"), (256, 256, "token_limit")]:
+            with self.subTest(runs=runs, limit=limit), tempfile.TemporaryDirectory() as directory:
+                code = f"import sys; sys.stderr.write('eval time = 1.0 ms / {runs} runs\\n')"
+                result = run_llama([sys.executable, "-c", code], Path(directory) / "page", limit, 30)
+                self.assertEqual(result["finish_reason"], expected)
+
     def test_terminal_eos_is_removed_only_with_matching_token_evidence(self):
         eos = "<｜end of sentence｜>"
         response = {"content": "quoted " + eos + " value" + eos,

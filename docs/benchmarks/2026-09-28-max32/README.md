@@ -28,8 +28,8 @@ attributing the cause. Neither diagnostic is counted as successful OCR.
 The legacy CLI parser initially labeled llama's 255 eval runs at a 256-token cap
 as EOS. That inference is invalid because the first token comes from prefill.
 The diagnostic record retains the old label for audit and marks the finish
-reason unknown. The raw logs and output are unchanged. Fixing that heuristic is
-pending; the completed resident comparison uses explicit server stop metadata
+reason unknown. The raw logs and output are unchanged. The [CLI heuristic fix](../2026-09-28-cli-completion/README.md) now excludes
+this ambiguous boundary; the completed resident comparison uses explicit server stop metadata
 and is unaffected by this CLI-only ambiguity.
 
 All commands, binary identity, thread settings, output, resource records and

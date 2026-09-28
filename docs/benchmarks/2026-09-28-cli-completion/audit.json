@@ -1,0 +1,42 @@
+{
+  "scope": "Versioned benchmark JSON records with llama-mtmd-cli commands and decode_steps; exact cap-minus-one boundary only. Does not independently validate all other stop causes.",
+  "checked_records": 5,
+  "affected_eos_records": [],
+  "records": [
+    {
+      "file": "docs/benchmarks/2026-09-28-max32/llama-q8-256-record.json",
+      "record": "$",
+      "cap": 256,
+      "decode_steps": 255,
+      "finish_reason": "unknown"
+    },
+    {
+      "file": "docs/benchmarks/2026-09-28-llama-tiles32/table-000.json",
+      "record": "$",
+      "cap": 2048,
+      "decode_steps": 248,
+      "finish_reason": "eos"
+    },
+    {
+      "file": "docs/benchmarks/2026-09-28-llama-tiles32/english-000.json",
+      "record": "$",
+      "cap": 2048,
+      "decode_steps": 250,
+      "finish_reason": "eos"
+    },
+    {
+      "file": "docs/benchmarks/2026-09-28-llama-tiles32/dense-000.json",
+      "record": "$",
+      "cap": 2048,
+      "decode_steps": 768,
+      "finish_reason": "eos"
+    },
+    {
+      "file": "docs/benchmarks/2026-09-28-llama-tiles32/chinese-000.json",
+      "record": "$",
+      "cap": 2048,
+      "decode_steps": 289,
+      "finish_reason": "eos"
+    }
+  ]
+}
