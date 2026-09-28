@@ -1,0 +1,29 @@
+{
+  "image_id": "receipt",
+  "iteration": 0,
+  "warmup": false,
+  "index": 11,
+  "image_sha256": "c321d851be414272b01626a291def6b16aca47c004e889b771e66cbc2da0c3ac",
+  "status": "ok",
+  "finish_reason": "eos",
+  "first_token_seconds": 2.3970414999930654,
+  "decode_seconds": 1e-06,
+  "decode_steps": 0,
+  "prompt_with_vision_seconds": 2.3911529999999996,
+  "cache_tokens": 0,
+  "precision": "F32+Q8_0 decoder, F16+F32 projector (storage)",
+  "wall_seconds": 2.397191208001459,
+  "emitted_tokens": 0,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 278,
+    "prompt_ms": 2391.153,
+    "prompt_per_token_ms": 8.601269784172661,
+    "prompt_per_second": 116.2619037761281,
+    "predicted_n": 1,
+    "predicted_ms": 0.001,
+    "predicted_per_token_ms": 0.0,
+    "predicted_per_second": 0.0
+  },
+  "cer": 1.0
+}

@@ -125,10 +125,21 @@ precision, attention policies, generation lengths and process lifetimes. The
 completed 40 measured requests per engine: Rust's median page speed was
 1.08–1.28× llama.cpp's, with matching text CER and 26% lower peak child RSS.
 Rust still had slower decode throughput and slightly worse dense-page p95.
-Fresh-process/BF16 comparisons and resource/API hardening remain unfinished.
+On the [frozen-page repeated check](docs/benchmarks/2026-09-28-heldout-repeated/README.md),
+the two pages accurate in both engines showed mixed, small timing differences.
+Native transcribed the archive accurately while llama repeated/reordered text.
+The [llama BF16 baseline](docs/benchmarks/2026-09-28-bf16-baseline/README.md)
+is also complete, with host paging documented. Full precision/fresh-process
+acceptance and final review remain unfinished.
 
 For the pinned llama.cpp comparison, use an explicit newline after `<image>`:
 its image processor inserts that newline automatically. The [matched-prompt
 pilot](docs/benchmarks/2026-09-28-thread-controls/README.md) records the exact
 thread settings, raw outputs and why the earlier dense-page token counts differed.
 This comparison setting does not change the runtime's default prompt.
+The newline is not quality-neutral: it makes the frozen receipt return empty
+text, while the unchanged native default recognizes it with zero CER in both
+BF16 and INT8. The [original-model diagnostic](docs/benchmarks/2026-09-28-receipt-diagnostic/README.md)
+reproduces that first-token distinction in FP32 and BF16. Use the original
+default prompt for normal inference; retain the newline protocol only when
+explicitly measuring that matched-prefix configuration.

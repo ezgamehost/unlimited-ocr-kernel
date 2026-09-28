@@ -1,0 +1,27 @@
+{
+  "image_id": "receipt",
+  "iteration": 1,
+  "warmup": false,
+  "index": 14,
+  "image_sha256": "c321d851be414272b01626a291def6b16aca47c004e889b771e66cbc2da0c3ac",
+  "status": "ok",
+  "finish_reason": "eos",
+  "first_token_seconds": 2.069446708,
+  "precision": "int8_weights_dynamic_activations",
+  "decode_seconds": 0.0,
+  "decode_steps": 0,
+  "vision_seconds": 1.535754834,
+  "prefill_seconds": 0.517920917,
+  "wall_seconds": 2.0695732920139562,
+  "emitted_tokens": 0,
+  "timings": {
+    "decode_seconds": 0.0,
+    "decode_steps": 0,
+    "first_token_seconds": 2.069446708,
+    "prefill_seconds": 0.517920917,
+    "preprocess_seconds": 0.015689125,
+    "total_seconds": 2.069448791,
+    "vision_seconds": 1.535754834
+  },
+  "cer": 1.0
+}

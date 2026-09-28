@@ -37,3 +37,10 @@ input generation are retained here. Runtime binary SHA256 is unchanged from
 the repeated resident comparison. No model/runtime code was changed for this
 check. Worker sweep and maximum-crop results do not replace the pending BF16,
 fresh-process, held-out tuning and public-input hardening checks.
+
+A [later original-prompt check](../2026-09-28-max32-original-prompt/README.md)
+shows a materially different result with the unchanged native default: both
+BF16 and INT8 reach EOS at 930 tokens with CER 0.069117, omitting sections 01–02
+and repeating section 26. The counting-loop measurements above apply to the
+matched-newline protocol. Neither result is rewritten or treated as fully
+correct OCR; the remaining original-prompt errors still need upstream checking.

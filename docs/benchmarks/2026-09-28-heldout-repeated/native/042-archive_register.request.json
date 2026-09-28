@@ -1,0 +1,7 @@
+{
+  "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/archive_register.png",
+  "prompt": "<image>\ndocument parsing.",
+  "generation": {
+    "max_tokens": 8192
+  }
+}

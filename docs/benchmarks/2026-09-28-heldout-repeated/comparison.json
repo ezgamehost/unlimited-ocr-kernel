@@ -1,0 +1,217 @@
+{
+  "native": {
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 6251036672,
+      "user_cpu_seconds": 1276.084656,
+      "system_cpu_seconds": 352.48129,
+      "major_faults": 49555,
+      "minor_faults": 1891424
+    },
+    "startup_seconds": 7.1121483750175685,
+    "images": {
+      "receipt": {
+        "cer": 1.0,
+        "emitted_tokens": 0,
+        "zero_cer_nonempty_requests": 0,
+        "empty_output_requests": 10,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 2.1664164995017927,
+          "p95_nearest_rank": 2.423371999990195
+        },
+        "nonempty_first_token_seconds": null,
+        "decode_tokens_per_second": null
+      },
+      "wide_report": {
+        "cer": 0.0,
+        "emitted_tokens": 355,
+        "zero_cer_nonempty_requests": 10,
+        "empty_output_requests": 0,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 5.491466041508829,
+          "p95_nearest_rank": 5.7468433330068365
+        },
+        "nonempty_first_token_seconds": {
+          "samples": 10,
+          "median": 3.2137000625,
+          "p95_nearest_rank": 3.4688471659999998
+        },
+        "decode_tokens_per_second": {
+          "samples": 10,
+          "median": 157.9727754139435,
+          "p95_nearest_rank": 158.98025432504784
+        }
+      },
+      "bilingual_notice": {
+        "cer": 0.0,
+        "emitted_tokens": 384,
+        "zero_cer_nonempty_requests": 10,
+        "empty_output_requests": 0,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 6.92065245800768,
+          "p95_nearest_rank": 7.110349374997895
+        },
+        "nonempty_first_token_seconds": {
+          "samples": 10,
+          "median": 4.3294083335,
+          "p95_nearest_rank": 4.501716833
+        },
+        "decode_tokens_per_second": {
+          "samples": 10,
+          "median": 152.15193274573454,
+          "p95_nearest_rank": 153.42900674741824
+        }
+      },
+      "archive_register": {
+        "cer": 0.0,
+        "emitted_tokens": 1790,
+        "zero_cer_nonempty_requests": 10,
+        "empty_output_requests": 0,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 17.828841208509402,
+          "p95_nearest_rank": 18.042190374981146
+        },
+        "nonempty_first_token_seconds": {
+          "samples": 10,
+          "median": 5.4610533755,
+          "p95_nearest_rank": 5.697315708
+        },
+        "decode_tokens_per_second": {
+          "samples": 10,
+          "median": 147.29026593383566,
+          "p95_nearest_rank": 148.20460798916372
+        }
+      }
+    }
+  },
+  "llama": {
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 9090121728,
+      "user_cpu_seconds": 3388.607271,
+      "system_cpu_seconds": 33.814083,
+      "major_faults": 192938,
+      "minor_faults": 2012496
+    },
+    "startup_seconds": 4.703961291001178,
+    "images": {
+      "receipt": {
+        "cer": 1.0,
+        "emitted_tokens": 0,
+        "zero_cer_nonempty_requests": 0,
+        "empty_output_requests": 10,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 2.3837966870050877,
+          "p95_nearest_rank": 2.6411585829919204
+        },
+        "nonempty_first_token_seconds": null,
+        "decode_tokens_per_second": null
+      },
+      "wide_report": {
+        "cer": 0.0,
+        "emitted_tokens": 355,
+        "zero_cer_nonempty_requests": 10,
+        "empty_output_requests": 0,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 5.4422736455017,
+          "p95_nearest_rank": 6.08492470800411
+        },
+        "nonempty_first_token_seconds": {
+          "samples": 10,
+          "median": 3.9418318745010765,
+          "p95_nearest_rank": 4.049078542011557
+        },
+        "decode_tokens_per_second": {
+          "samples": 10,
+          "median": 241.61218161773974,
+          "p95_nearest_rank": 243.26381926937256
+        }
+      },
+      "bilingual_notice": {
+        "cer": 0.0,
+        "emitted_tokens": 384,
+        "zero_cer_nonempty_requests": 10,
+        "empty_output_requests": 0,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 7.17174827150302,
+          "p95_nearest_rank": 7.348488624993479
+        },
+        "nonempty_first_token_seconds": {
+          "samples": 10,
+          "median": 5.503837645504973,
+          "p95_nearest_rank": 5.694139917002758
+        },
+        "decode_tokens_per_second": {
+          "samples": 10,
+          "median": 230.55555771384974,
+          "p95_nearest_rank": 234.39045054239418
+        }
+      },
+      "archive_register": {
+        "cer": 0.43879533678756477,
+        "emitted_tokens": 2497,
+        "zero_cer_nonempty_requests": 0,
+        "empty_output_requests": 0,
+        "wall_seconds": {
+          "samples": 10,
+          "median": 20.598117708519567,
+          "p95_nearest_rank": 20.905750874982914
+        },
+        "nonempty_first_token_seconds": {
+          "samples": 10,
+          "median": 7.1039004790072795,
+          "p95_nearest_rank": 7.345708624983672
+        },
+        "decode_tokens_per_second": {
+          "samples": 10,
+          "median": 186.53074638334468,
+          "p95_nearest_rank": 188.28899744516636
+        }
+      }
+    }
+  },
+  "comparison": {
+    "receipt": {
+      "both_zero_cer_nonempty": false,
+      "median_speed_ratio_llama_over_native": null,
+      "exact_raw_output_match": true,
+      "note": "Ratio withheld unless both configurations have nonempty zero-CER output on every measured request."
+    },
+    "wide_report": {
+      "both_zero_cer_nonempty": true,
+      "median_speed_ratio_llama_over_native": 0.9910420285520671,
+      "exact_raw_output_match": false,
+      "note": "Ratio withheld unless both configurations have nonempty zero-CER output on every measured request."
+    },
+    "bilingual_notice": {
+      "both_zero_cer_nonempty": true,
+      "median_speed_ratio_llama_over_native": 1.036282101293037,
+      "exact_raw_output_match": false,
+      "note": "Ratio withheld unless both configurations have nonempty zero-CER output on every measured request."
+    },
+    "archive_register": {
+      "both_zero_cer_nonempty": false,
+      "median_speed_ratio_llama_over_native": null,
+      "exact_raw_output_match": false,
+      "note": "Ratio withheld unless both configurations have nonempty zero-CER output on every measured request."
+    }
+  },
+  "notes": [
+    "All 48 requests per engine audited; 2 warmups and 10 measured requests per page.",
+    "Nearest-rank p95 is the maximum of ten samples; no samples discarded.",
+    "EOS-only summaries establish protocol completion, not OCR correctness.",
+    "Empty outputs have no decode throughput or content-arrival estimate.",
+    "Native internal TTFT differs from llama streamed-token arrival.",
+    "Native prefix-plus-128 KV and 35-gram suppression differ from llama full attention without equivalent suppression.",
+    "Weight formats differ; sequential runs on a shared Mac, not isolated kernel comparisons."
+  ]
+}

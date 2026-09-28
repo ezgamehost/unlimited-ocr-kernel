@@ -15,8 +15,10 @@ repeated latency results. The native binary is unchanged by this pilot.
 
 **The receipt fails in all three configurations:** each returns empty text and
 immediate EOS. It is not a successfully recognized page. This rules out dynamic
-INT8 quantization alone as the cause, but an original-upstream inference check
-is still required before attributing the failure to the model itself. The
+INT8 quantization alone as the cause. A subsequent
+[upstream prompt diagnostic](../2026-09-28-receipt-diagnostic/README.md) traced
+immediate EOS to the matched newline; the unchanged native original default
+recognizes the receipt with zero CER in both precisions. The
 receipt remains in the frozen corpus; no text or image is changed to improve
 this result.
 
