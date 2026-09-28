@@ -1,0 +1,5 @@
+{
+  "status": "rejected power transition",
+  "runner_exit_code": 1,
+  "reason": "Power changed from battery to AC during candidate phase 1; post-phase power guard failed. No complete ABBA summary exists. Phase-1 resource object was not persisted by the original runner before the failing power check. Raw test log retained; this series must not be used for performance claims."
+}

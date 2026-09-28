@@ -1,0 +1,12 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0599]: no method named `shared_expert_worker` found for struct `cpu::CpuContext` in the current scope
+  --> src/cpu/mod.rs:94:30
+   |
+23 | pub struct CpuContext {
+   | --------------------- method `shared_expert_worker` not found for this struct
+...
+94 |             let worker = cpu.shared_expert_worker(7, 2);
+   |                              ^^^^^^^^^^^^^^^^^^^^ method not found in `cpu::CpuContext`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `uocr` (lib test) due to 1 previous error

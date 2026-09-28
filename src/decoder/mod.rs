@@ -177,7 +177,11 @@ impl<'a> Decoder<'a> {
                     (0..task_count)
                         .into_par_iter()
                         .map(|task| {
-                            let mut worker = cpu.serial_worker(task_count);
+                            let mut worker = if task == 0 {
+                                cpu.shared_expert_worker(task_count, self.config.n_shared_experts)
+                            } else {
+                                cpu.serial_worker(task_count)
+                            };
                             let name = if task == 0 {
                                 format!("{prefix}.shared_experts")
                             } else {
