@@ -1,0 +1,6 @@
+{
+  "binary_sha256": "2290e91db0a9304f8256a0a928e5dd9547a02e9206d67f2401696d5de98b5e29",
+  "preserved_binary": "artifacts/kernel-baselines/uocr-2290e91db0a9304f8256a0a928e5dd9547a02e9206d67f2401696d5de98b5e29",
+  "quality_cases": 12,
+  "exact": true
+}

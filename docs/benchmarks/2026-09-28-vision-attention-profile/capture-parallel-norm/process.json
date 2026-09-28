@@ -1,0 +1,42 @@
+{
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr",
+    "--model",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/upstream",
+    "--jsonl",
+    "--threads",
+    "8",
+    "--int8-weights",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+    "--int8-activations"
+  ],
+  "binary_sha256": "7baaad44d8ae6f56fd6f470d29271a0b0529be83a8eacd53b69d60c9140c08ba",
+  "quality_process": null,
+  "comparison": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-2",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t42%; charging; 2:11 remaining present: true\n",
+  "sampling_delay_seconds": 0.2,
+  "sampling_duration_seconds": 5,
+  "note": "Profile overhead included. Inspect stacks for stage attribution; aggregate thread samples are not wall-time percentages.",
+  "load_event": {
+    "backend": "auto",
+    "event": "loaded",
+    "load_seconds": 4.748713458,
+    "precision": "int4_body_int8_head_dynamic_int8_activations",
+    "threads": 8
+  },
+  "warmup_wall_seconds": 9.906587415985996,
+  "sample_start_after_request_seconds": 0.21002608301932923,
+  "sample_end_after_request_seconds": 5.488877333002165,
+  "sample_exit_code": 0,
+  "profiled_wall_seconds": 9.825286708015483,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 5054054400,
+    "user_cpu_seconds": 52.255722,
+    "system_cpu_seconds": 9.602657,
+    "major_faults": 302,
+    "minor_faults": 703269
+  },
+  "failure": null
+}

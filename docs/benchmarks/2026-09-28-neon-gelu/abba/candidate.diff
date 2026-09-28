@@ -1,0 +1,29 @@
+diff --git a/src/cpu/mod.rs b/src/cpu/mod.rs
+index 2c3cad8..55b8612 100644
+--- a/src/cpu/mod.rs
++++ b/src/cpu/mod.rs
+@@ -5,6 +5,8 @@ mod accelerate;
+ mod blas_threads;
+ pub mod int4;
+ mod neon;
++#[cfg(target_arch = "aarch64")]
++mod neon_gelu;
+ pub mod ops;
+ pub mod quantized;
+ 
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index 274ff63..1650390 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -252,6 +252,11 @@ fn parallel_activation(values: &mut [f32], cpu: &CpuContext, operation: fn(&mut
+ 
+ /// Preserve scalar erf arithmetic while distributing independent elements.
+ pub fn gelu_parallel(values: &mut [f32], cpu: &CpuContext) {
++    #[cfg(target_arch = "aarch64")]
++    if cpu.backend != Backend::Scalar {
++        parallel_activation(values, cpu, super::neon_gelu::gelu_in_place);
++        return;
++    }
+     parallel_activation(values, cpu, gelu);
+ }
+ 

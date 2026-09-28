@@ -1,0 +1,211 @@
+{
+  "variants": {
+    "baseline": {
+      "median_seconds": 5.87876125,
+      "minimum": 5.835930417,
+      "maximum": 5.969511167
+    },
+    "neon": {
+      "median_seconds": 5.715417271,
+      "minimum": 5.704391375,
+      "maximum": 5.817250375
+    }
+  },
+  "embedding_hashes": [
+    "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213"
+  ],
+  "observations": [
+    {
+      "iteration": 0,
+      "seconds": 6.207988333,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": true,
+      "variant": "baseline",
+      "phase": 0
+    },
+    {
+      "iteration": 1,
+      "seconds": 5.866258917,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "baseline",
+      "phase": 0
+    },
+    {
+      "iteration": 2,
+      "seconds": 5.8793412499999995,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "baseline",
+      "phase": 0
+    },
+    {
+      "iteration": 3,
+      "seconds": 5.897563041,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "baseline",
+      "phase": 0
+    },
+    {
+      "iteration": 0,
+      "seconds": 5.760136958,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": true,
+      "variant": "neon",
+      "phase": 1
+    },
+    {
+      "iteration": 1,
+      "seconds": 5.704837375,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "neon",
+      "phase": 1
+    },
+    {
+      "iteration": 2,
+      "seconds": 5.720016542,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "neon",
+      "phase": 1
+    },
+    {
+      "iteration": 3,
+      "seconds": 5.723072666,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "neon",
+      "phase": 1
+    },
+    {
+      "iteration": 0,
+      "seconds": 5.911232167,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": true,
+      "variant": "neon",
+      "phase": 2
+    },
+    {
+      "iteration": 1,
+      "seconds": 5.710818,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "neon",
+      "phase": 2
+    },
+    {
+      "iteration": 2,
+      "seconds": 5.704391375,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "neon",
+      "phase": 2
+    },
+    {
+      "iteration": 3,
+      "seconds": 5.817250375,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "neon",
+      "phase": 2
+    },
+    {
+      "iteration": 0,
+      "seconds": 6.05210725,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": true,
+      "variant": "baseline",
+      "phase": 3
+    },
+    {
+      "iteration": 1,
+      "seconds": 5.969511167,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "baseline",
+      "phase": 3
+    },
+    {
+      "iteration": 2,
+      "seconds": 5.835930417,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "baseline",
+      "phase": 3
+    },
+    {
+      "iteration": 3,
+      "seconds": 5.87818125,
+      "sha256": "a2b4ecf2092508904b5bd359c86fbce682c801ffd7cd93336658b25c7acc7213",
+      "shape": [
+        1513,
+        1280
+      ],
+      "warmup": false,
+      "variant": "baseline",
+      "phase": 3
+    }
+  ]
+}

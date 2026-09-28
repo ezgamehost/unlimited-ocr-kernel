@@ -252,6 +252,11 @@ fn parallel_activation(values: &mut [f32], cpu: &CpuContext, operation: fn(&mut 
 
 /// Preserve scalar erf arithmetic while distributing independent elements.
 pub fn gelu_parallel(values: &mut [f32], cpu: &CpuContext) {
+    #[cfg(target_arch = "aarch64")]
+    if cpu.backend != Backend::Scalar {
+        parallel_activation(values, cpu, super::neon_gelu::gelu_in_place);
+        return;
+    }
     parallel_activation(values, cpu, gelu);
 }
 

@@ -40,7 +40,11 @@ Experiment sequence:
    preserved final CLI identity. Report any bit/numerical/token change. Full-page
    system comparisons remain separate from operator/vision timing.
 
-This is an unimplemented candidate. Independent attention-head scheduling and
+Implemented and verified: full-vision ABBA median 5.878761250 → 5.715417271 s,
+all sixteen embeddings identical; twelve complete OCR cases exact. See
+`docs/benchmarks/2026-09-28-neon-gelu/README.md`. Real model activations served
+as the representative activation workload. Full-page rebenchmark remains pending.
+Independent attention-head scheduling and
 other measured bottlenecks remain alternatives if this experiment does not pay
 off. Broader quality, precision/startup comparisons and final review remain in
 scope; this plan does not replace them.

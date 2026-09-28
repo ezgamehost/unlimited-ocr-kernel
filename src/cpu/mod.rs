@@ -5,6 +5,8 @@ mod accelerate;
 mod blas_threads;
 pub mod int4;
 mod neon;
+#[cfg(target_arch = "aarch64")]
+mod neon_gelu;
 pub mod ops;
 pub mod quantized;
 

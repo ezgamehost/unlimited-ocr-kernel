@@ -1,0 +1,9 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `gelu_in_place` in module `super`
+ --> src/cpu/neon_gelu.rs:9:16
+  |
+9 |         super::gelu_in_place(&mut storage[offset..offset + input.len()]);
+  |                ^^^^^^^^^^^^^ not found in `super`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 1 previous error

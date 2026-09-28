@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "baseline": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-norm/parallel",
+      "binary_sha256": "3618136ae27876bc9ed646adf92345d2916b85111ee0aa5f7d90ec920f72a275",
+      "source_sha256": {
+        "src/cpu/ops.rs": "d25ef614537be107593cfae5adae9c886225e4b09e0794a4795692c1ca571e9e",
+        "src/vision/mod.rs": "c2cd432de95e303912616ba11a2b384d0bc4508d5221e8a45c4d562a71e2dec9",
+        "src/vision/sam.rs": "60ab343f395e201d2da6ab97e9cb4821fd50f9893d7a05e3e3ee8513f73d9ec3",
+        "src/vision/clip.rs": "7b81b8dc1ca50513b27e22846d41ac1ffea8ece89d194b131fe4e56df7d242b6",
+        "examples/bench_vision_tiles.rs": "9cdb8d682db742395b6cf54c4c29015d645acd9316632b04b62952ed2b168f4e"
+      }
+    },
+    "neon": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/vision-gelu/neon-small",
+      "binary_sha256": "e30f1936891b5b5d25fc9a425371735f0508283bb85663bf526065f4162d153a",
+      "source_sha256": {
+        "src/cpu/ops.rs": "0728d001f98fc7b56b1a47f38faa7b8a8c6f4f64b0d9c80e74434010a65c993a",
+        "src/vision/mod.rs": "c2cd432de95e303912616ba11a2b384d0bc4508d5221e8a45c4d562a71e2dec9",
+        "src/vision/sam.rs": "60ab343f395e201d2da6ab97e9cb4821fd50f9893d7a05e3e3ee8513f73d9ec3",
+        "src/vision/clip.rs": "7b81b8dc1ca50513b27e22846d41ac1ffea8ece89d194b131fe4e56df7d242b6",
+        "src/cpu/mod.rs": "42f95f6249078753c60492ea556fda2832dcb8007a815204fb61d25e1ab89c4a",
+        "src/cpu/neon_gelu.rs": "65d5c9859dbec084e7e8a698a564f902a0f7c2c25eba43a05ffd36f662ba4019",
+        "examples/bench_vision_tiles.rs": "9cdb8d682db742395b6cf54c4c29015d645acd9316632b04b62952ed2b168f4e"
+      }
+    }
+  },
+  "model_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+  "source_commit": "46c792bf3051e1b73729b386a82a55d0aa5c01e0"
+}
