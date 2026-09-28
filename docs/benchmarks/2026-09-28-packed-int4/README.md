@@ -1,9 +1,10 @@
-# Packed INT4 preparation and representation audit
+# Packed INT4 runtime and verification
 
 The packed overlay is 1,730,753,240 bytes versus 3,114,914,040 bytes for the
 unpacked INT4 simulation: a 44.4366% file-size reduction including FP32 scales
-and headers. This is not a runtime speed or peak-memory result. Packed matrix
-kernels, loader dispatch and full inference acceptance are still pending.
+and headers. File size is separate from the decoder timing and process memory
+measurements below. Kernels and loader integration are implemented; repeated
+full-page performance acceptance remains pending.
 
 Format `uocr-q4-block32-v1` uses U8 tensors shaped `[rows, ceil(cols/32), 16]` and
 F32 `.q4_scales` tensors shaped `[rows, ceil(cols/32)]`. Each block byte j stores
@@ -82,3 +83,33 @@ peaks and all per-process resources are retained. This initial candidate is
 not accepted as an overall speed improvement: its prefill regression needs
 correction. These compare the same Q4 numerical model in two storage formats,
 not Q8 quality or llama.cpp.
+
+Blockwise conversion follow-up (`block-fixed-work/`) removes per-element weight
+indexing and repeated scale lookup during prefill expansion. Each packed block
+is decoded in low/high halves with one scale, enabling contiguous conversion.
+The same exact-bit matrix tests and full suite pass (56 passed, 8 ignored),
+and clippy passes. A new ABBA run, again six measured samples per variant,
+retains the identical SHA256 across all sixteen repetitions:
+
+| Median phase | Unpacked Q4 simulation | Packed Q4, block conversion |
+| --- | ---: | ---: |
+| Prefill, 1517 tokens | 1.458282 s | 1.603446 s |
+| 512 decode steps, including both checksums | 3.852107 s | 3.192495 s |
+
+Decode throughput is 1.2066x the same numerical model's unpacked implementation;
+prefill remains 9.95% slower. Packed process peaks are 3,491,840,000 and
+3,491,889,152 bytes, versus 4,475,961,344 and 4,334,583,808 bytes for simulation
+(20.73% lower using the median of each pair). This is a decoder-only comparison
+on a shared M4 Pro, not a full-page, cold-start or llama.cpp speedup claim.
+Packing reduces the overlay file by 44.44%, independently of process memory.
+Repeated full-page acceptance and broader quality checks remain outstanding.
+
+
+The rebuilt block-conversion executable also repeats the eight-page exact
+text/token/EOS gate successfully (`block-equivalence/`). Its SHA256 is
+`3630a42e6c1342b6cb8e6c831d2cb38ad1ed49d5762c6577e583fd135f1363d0`.
+The block conversion is retained: it removes most of the initial prefill
+regression while retaining the decode gain and exact arithmetic. The median
+combined prefill plus 512-step decode is 4.791718 s versus 5.307588 s for the
+unpacked simulation (10.77% higher throughput for this fixed workload).
+This does not close the full-page comparison or final-review gates.

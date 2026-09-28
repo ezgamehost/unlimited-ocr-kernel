@@ -75,9 +75,27 @@ impl Int4Matrix {
 
     pub fn dequantize(&self) -> Result<Tensor> {
         let mut data = vec![0.; self.rows * self.cols];
-        for (row, output) in data.chunks_exact_mut(self.cols).enumerate() {
-            for (col, value) in output.iter_mut().enumerate() {
-                *value = self.code(row, col) as f32 * self.scales[row * self.blocks + col / BLOCK];
+        for ((weights, scales), output) in self
+            .weights
+            .chunks_exact(self.blocks * 16)
+            .zip(self.scales.chunks_exact(self.blocks))
+            .zip(data.chunks_exact_mut(self.cols))
+        {
+            for ((packed, &scale), output) in weights
+                .as_chunks::<16>()
+                .0
+                .iter()
+                .zip(scales)
+                .zip(output.chunks_mut(BLOCK))
+            {
+                let split = output.len().min(16);
+                let (low, high) = output.split_at_mut(split);
+                for (value, &byte) in low.iter_mut().zip(packed) {
+                    *value = signed(byte) as f32 * scale;
+                }
+                for (value, &byte) in high.iter_mut().zip(packed) {
+                    *value = signed(byte >> 4) as f32 * scale;
+                }
             }
         }
         Tensor::new(vec![self.rows, self.cols], data)

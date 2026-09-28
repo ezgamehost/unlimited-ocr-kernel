@@ -1,4 +1,5 @@
 """Run packed Q4 and require exact OCR output equivalence to frozen simulation."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -17,7 +18,10 @@ def save(path, value):
 
 
 def main():
-    output = ROOT / 'packed-equivalence'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output-name', default='packed-equivalence')
+    args = parser.parse_args()
+    output = ROOT / args.output_name
     output.mkdir(exist_ok=False)
     original = json.loads((ORACLE / 'process.json').read_text())
     requests = json.loads((ORACLE / 'requests.json').read_text())

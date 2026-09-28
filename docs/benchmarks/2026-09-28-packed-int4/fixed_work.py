@@ -1,4 +1,5 @@
 """Order-reversed native Q4 packed versus Q4-in-I8 fixed-work comparison."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -17,9 +18,13 @@ def save(path, value):
 
 
 def main():
-    directory = ROOT / 'fixed-work'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output-name', default='fixed-work')
+    parser.add_argument('--build-log', default='fixed-work-build.log')
+    args = parser.parse_args()
+    directory = ROOT / args.output_name
     directory.mkdir(exist_ok=False)
-    build = (ROOT / 'fixed-work-build.log').read_text()
+    build = (ROOT / args.build_log).read_text()
     binary = Path(build.split('Executable unittests src/lib.rs (')[1].split(')')[0]).resolve()
     binary_hash = hashlib.sha256(binary.read_bytes()).hexdigest()
     variants = {'simulation': 'artifacts/unlimited-ocr-q4-sim-in-q8.safetensors',

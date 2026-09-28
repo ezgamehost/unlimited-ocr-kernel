@@ -1,0 +1,66 @@
+[
+  {
+    "case": "corpus-english",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 250,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "corpus-chinese",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 289,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "corpus-table",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 247,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "corpus-dense",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 768,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "heldout-receipt",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 272,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "heldout-wide_report",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 355,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "heldout-bilingual_notice",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 384,
+    "image_tokens_equal": true
+  },
+  {
+    "case": "heldout-archive_register",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "tokens": 1790,
+    "image_tokens_equal": true
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/chinese.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/table.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/dense.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/receipt.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/wide_report.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/bilingual_notice.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  },
+  {
+    "image": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/heldout/archive_register.png",
+    "prompt": "<image>document parsing.",
+    "generation": {
+      "max_tokens": 8192,
+      "ngram_size": 35,
+      "ngram_window": 128
+    }
+  }
+]

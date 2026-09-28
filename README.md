@@ -89,6 +89,21 @@ in the four-page pilot where native BF16 had none. See the retained
 [INT8 format and preparation](docs/benchmarks/2026-09-28-int8-kernels/README.md)
 and [page results](docs/benchmarks/2026-09-28-parallel-activations/README.md).
 
+## Experimental packed INT4 decoder
+
+```sh
+.venv/bin/python -m tools.quantize --int4 --output artifacts/unlimited-ocr-q4-block32.safetensors
+target/release/uocr --image benchmarks/corpus/english.png --threads 8 --json \
+  --quantized-weights artifacts/unlimited-ocr-q4-block32.safetensors --int8-activations
+```
+
+The signed block32 format keeps FP32 scales and uses ARM SDOT with runtime
+feature detection, plus a portable fallback. The original checkpoint is still
+required for unquantized tensors. All eight synthetic selection pages match the
+unpacked INT4 simulation's text and tokens exactly. Broader quality validation
+and repeated full-page performance acceptance remain pending; see the
+[packed INT4 evidence](docs/benchmarks/2026-09-28-packed-int4/README.md).
+
 ## Rust API and checks
 
 `Model::load` loads the original checkpoint; `Model::load_with_quantization`

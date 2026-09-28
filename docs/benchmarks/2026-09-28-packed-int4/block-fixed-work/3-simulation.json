@@ -1,0 +1,97 @@
+{
+  "index": 3,
+  "variant": "simulation",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/deps/uocr-17f9463a030211d5",
+    "model::benchmark::fixed_work_decoder_benchmark",
+    "--ignored",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "binary_sha256": "10a903a895a0684a4abf43831feb5d6f8cb110a941fc892867b0bbae0a5dea1d",
+  "overlay_manifest": {
+    "schema_version": 1,
+    "format": "uocr-q8-block32-v1",
+    "block_size": 32,
+    "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+    "output_sha256": "693e0503d1faa1ec5e1b4fa2ff6d97c583cce9dd4682a3342cca9d75e8cc4071",
+    "matrix_count": 2197,
+    "bytes": 3114914040,
+    "simulated_weight_bits": 4,
+    "storage_bits": 8,
+    "purpose": "INT4 accuracy simulation in INT8 storage; no packing or speedup claim"
+  },
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 4334583808,
+    "user_cpu_seconds": 82.807539,
+    "system_cpu_seconds": 23.432967,
+    "major_faults": 53,
+    "minor_faults": 764837
+  },
+  "wall_seconds": 27.86237129100482,
+  "samples": [
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.896343125,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187807368359416105,
+      "logits_sha256": "abf6835c8398b0f760f50a31f053e4633656b6fa9675d5b6305317ecc384ed3f",
+      "overlay": "artifacts/unlimited-ocr-q4-sim-in-q8.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 2.2179719589999998,
+      "prefix_tokens": 1517,
+      "repetition": 0,
+      "threads": 8,
+      "warmup": true
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.853386833,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187807368359416105,
+      "logits_sha256": "abf6835c8398b0f760f50a31f053e4633656b6fa9675d5b6305317ecc384ed3f",
+      "overlay": "artifacts/unlimited-ocr-q4-sim-in-q8.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 1.452217083,
+      "prefix_tokens": 1517,
+      "repetition": 1,
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.8508275,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187807368359416105,
+      "logits_sha256": "abf6835c8398b0f760f50a31f053e4633656b6fa9675d5b6305317ecc384ed3f",
+      "overlay": "artifacts/unlimited-ocr-q4-sim-in-q8.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 1.44594,
+      "prefix_tokens": 1517,
+      "repetition": 2,
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 3.853877667,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 187807368359416105,
+      "logits_sha256": "abf6835c8398b0f760f50a31f053e4633656b6fa9675d5b6305317ecc384ed3f",
+      "overlay": "artifacts/unlimited-ocr-q4-sim-in-q8.safetensors",
+      "precision": "int8_weights_dynamic_activations",
+      "prefill_seconds": 1.450903125,
+      "prefix_tokens": 1517,
+      "repetition": 3,
+      "threads": 8,
+      "warmup": false
+    }
+  ]
+}
