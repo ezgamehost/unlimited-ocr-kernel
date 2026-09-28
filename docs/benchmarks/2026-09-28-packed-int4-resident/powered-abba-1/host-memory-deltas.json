@@ -1,0 +1,12 @@
+{
+  "interval_seconds": 1245.535996,
+  "deltas": {
+    "Pageins": 952219,
+    "Pageouts": 16923,
+    "Swapins": 22661,
+    "Swapouts": 0,
+    "Compressions": 3961203,
+    "Decompressions": 3655022
+  },
+  "note": "Host-wide cumulative counter differences, not child-attributed. Start snapshot was captured after the first process became ready."
+}

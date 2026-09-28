@@ -1,0 +1,493 @@
+{
+  "audited_requests": 96,
+  "all_eos": true,
+  "engines": {
+    "native": {
+      "images": {
+        "table": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            247
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 10.424613020994002,
+            "p95_nearest_rank": 10.472940874984488,
+            "minimum": 10.199759916984476,
+            "maximum": 10.472940874984488
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 8.83633425,
+            "p95_nearest_rank": 8.876157125,
+            "minimum": 8.620365666,
+            "maximum": 8.876157125
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 157.18104024080887,
+            "p95_nearest_rank": 159.39705260239413,
+            "minimum": 155.46906065487806,
+            "maximum": 159.39705260239413
+          }
+        },
+        "chinese": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            289
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 10.70717216648336,
+            "p95_nearest_rank": 10.816975291993003,
+            "minimum": 10.621850458002882,
+            "maximum": 10.816975291993003
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 8.8514815205,
+            "p95_nearest_rank": 8.952626708,
+            "minimum": 8.769155208,
+            "maximum": 8.952626708
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 157.37064207392007,
+            "p95_nearest_rank": 159.53172279144295,
+            "minimum": 156.4003820622133,
+            "maximum": 159.53172279144295
+          }
+        },
+        "dense": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            768
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 13.837218062501051,
+            "p95_nearest_rank": 13.935795459023211,
+            "minimum": 13.567326000018511,
+            "maximum": 13.935795459023211
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 8.900130125,
+            "p95_nearest_rank": 8.95803025,
+            "minimum": 8.635980583,
+            "maximum": 8.95803025
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 157.39403903164344,
+            "p95_nearest_rank": 158.4752721648135,
+            "minimum": 156.4153627530195,
+            "maximum": 158.4752721648135
+          }
+        },
+        "english": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            250
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 10.472646458511008,
+            "p95_nearest_rank": 10.591785084019648,
+            "minimum": 10.242690000013681,
+            "maximum": 10.591785084019648
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 8.857315021,
+            "p95_nearest_rank": 8.978809583,
+            "minimum": 8.649095666000001,
+            "maximum": 8.978809583
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 158.0362535516432,
+            "p95_nearest_rank": 159.08210035346232,
+            "minimum": 156.57353709840172,
+            "maximum": 159.08210035346232
+          }
+        }
+      },
+      "phases": [
+        {
+          "phase": 0,
+          "engine": "native",
+          "resources": {
+            "exit_code": 0,
+            "forced_kill": false,
+            "peak_rss_bytes": 5043339264,
+            "user_cpu_seconds": 700.392587,
+            "system_cpu_seconds": 170.409405,
+            "major_faults": 653,
+            "minor_faults": 733640
+          },
+          "startup_wall_seconds": 4.770348707999801,
+          "per_image_wall": {
+            "english": {
+              "n": 5,
+              "median": 10.373805042007007,
+              "p95_nearest_rank": 10.478012915991712,
+              "minimum": 10.242690000013681,
+              "maximum": 10.478012915991712
+            },
+            "chinese": {
+              "n": 5,
+              "median": 10.684891542012338,
+              "p95_nearest_rank": 10.698513916984666,
+              "minimum": 10.621850458002882,
+              "maximum": 10.698513916984666
+            },
+            "table": {
+              "n": 5,
+              "median": 10.404356499988353,
+              "p95_nearest_rank": 10.411810166988289,
+              "minimum": 10.199759916984476,
+              "maximum": 10.411810166988289
+            },
+            "dense": {
+              "n": 5,
+              "median": 13.818689999985509,
+              "p95_nearest_rank": 13.826412666996475,
+              "minimum": 13.567326000018511,
+              "maximum": 13.826412666996475
+            }
+          },
+          "binary_sha256": "7990f781a918f3f0cfe68fa5d6294f504d56fb6f45524589ef584d6ed948de58"
+        },
+        {
+          "phase": 3,
+          "engine": "native",
+          "resources": {
+            "exit_code": 0,
+            "forced_kill": false,
+            "peak_rss_bytes": 5082300416,
+            "user_cpu_seconds": 700.927771,
+            "system_cpu_seconds": 173.285864,
+            "major_faults": 611,
+            "minor_faults": 730584
+          },
+          "startup_wall_seconds": 4.886491084005684,
+          "per_image_wall": {
+            "english": {
+              "n": 5,
+              "median": 10.505797374993563,
+              "p95_nearest_rank": 10.591785084019648,
+              "minimum": 10.472319542022888,
+              "maximum": 10.591785084019648
+            },
+            "chinese": {
+              "n": 5,
+              "median": 10.760440374986501,
+              "p95_nearest_rank": 10.816975291993003,
+              "minimum": 10.715830415982055,
+              "maximum": 10.816975291993003
+            },
+            "table": {
+              "n": 5,
+              "median": 10.45180775001063,
+              "p95_nearest_rank": 10.472940874984488,
+              "minimum": 10.437415874999715,
+              "maximum": 10.472940874984488
+            },
+            "dense": {
+              "n": 5,
+              "median": 13.859977166983299,
+              "p95_nearest_rank": 13.935795459023211,
+              "minimum": 13.848023458005628,
+              "maximum": 13.935795459023211
+            }
+          },
+          "binary_sha256": "7990f781a918f3f0cfe68fa5d6294f504d56fb6f45524589ef584d6ed948de58"
+        }
+      ]
+    },
+    "llama": {
+      "images": {
+        "table": {
+          "cer": [
+            0.00398406374501992
+          ],
+          "emitted_tokens": [
+            248
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 12.776525562498136,
+            "p95_nearest_rank": 13.424586375011131,
+            "minimum": 12.603267416008748,
+            "maximum": 13.424586375011131
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 11.578531915991334,
+            "p95_nearest_rank": 12.22913754201727,
+            "minimum": 11.403783415997168,
+            "maximum": 12.22913754201727
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 207.22076137218914,
+            "p95_nearest_rank": 208.19324362555102,
+            "minimum": 190.10590738776085,
+            "maximum": 208.19324362555102
+          }
+        },
+        "chinese": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            289
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 13.091578375489917,
+            "p95_nearest_rank": 13.362419457989745,
+            "minimum": 12.801830209005857,
+            "maximum": 13.362419457989745
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 11.630760584012023,
+            "p95_nearest_rank": 11.795222082990222,
+            "minimum": 11.421779708995018,
+            "maximum": 11.795222082990222
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 206.29341624684736,
+            "p95_nearest_rank": 209.51639411411176,
+            "minimum": 180.07150521085813,
+            "maximum": 209.51639411411176
+          }
+        },
+        "dense": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            768
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 15.56357739600935,
+            "p95_nearest_rank": 15.918995916988933,
+            "minimum": 15.330342333996668,
+            "maximum": 15.918995916988933
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 11.698447520495392,
+            "p95_nearest_rank": 12.00168908300111,
+            "minimum": 11.470975457981694,
+            "maximum": 12.00168908300111
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 198.21995859778067,
+            "p95_nearest_rank": 199.46875859527245,
+            "minimum": 196.0702217329544,
+            "maximum": 199.46875859527245
+          }
+        },
+        "english": {
+          "cer": [
+            0.0
+          ],
+          "emitted_tokens": [
+            250
+          ],
+          "output_variants": 1,
+          "wall_seconds": {
+            "n": 10,
+            "median": 12.866444083498209,
+            "p95_nearest_rank": 13.23945945801097,
+            "minimum": 12.661912915995345,
+            "maximum": 13.23945945801097
+          },
+          "first_token_seconds": {
+            "n": 10,
+            "median": 11.655836583508062,
+            "p95_nearest_rank": 12.013728499994613,
+            "minimum": 11.462297082995065,
+            "maximum": 12.013728499994613
+          },
+          "decode_tokens_per_second": {
+            "n": 10,
+            "median": 206.68836244233208,
+            "p95_nearest_rank": 209.48322165084508,
+            "minimum": 201.19088911082477,
+            "maximum": 209.48322165084508
+          }
+        }
+      },
+      "phases": [
+        {
+          "phase": 1,
+          "engine": "llama",
+          "resources": {
+            "exit_code": 0,
+            "forced_kill": false,
+            "peak_rss_bytes": 10472325120,
+            "user_cpu_seconds": 2584.319861,
+            "system_cpu_seconds": 18.855449,
+            "major_faults": 192648,
+            "minor_faults": 1285901
+          },
+          "startup_wall_seconds": 4.821500207995996,
+          "per_image_wall": {
+            "english": {
+              "n": 5,
+              "median": 12.837671040993882,
+              "p95_nearest_rank": 13.23945945801097,
+              "minimum": 12.661912915995345,
+              "maximum": 13.23945945801097
+            },
+            "chinese": {
+              "n": 5,
+              "median": 12.850003791012568,
+              "p95_nearest_rank": 13.182906375004677,
+              "minimum": 12.801830209005857,
+              "maximum": 13.182906375004677
+            },
+            "table": {
+              "n": 5,
+              "median": 12.664638666989049,
+              "p95_nearest_rank": 12.776535624987446,
+              "minimum": 12.603267416008748,
+              "maximum": 12.776535624987446
+            },
+            "dense": {
+              "n": 5,
+              "median": 15.422305084008258,
+              "p95_nearest_rank": 15.70547758298926,
+              "minimum": 15.330342333996668,
+              "maximum": 15.70547758298926
+            }
+          },
+          "binary_sha256": "6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6"
+        },
+        {
+          "phase": 2,
+          "engine": "llama",
+          "resources": {
+            "exit_code": 0,
+            "forced_kill": false,
+            "peak_rss_bytes": 9725722624,
+            "user_cpu_seconds": 2592.700114,
+            "system_cpu_seconds": 22.495703,
+            "major_faults": 17564,
+            "minor_faults": 1553565
+          },
+          "startup_wall_seconds": 3.2367554160009604,
+          "per_image_wall": {
+            "english": {
+              "n": 5,
+              "median": 12.873969584004954,
+              "p95_nearest_rank": 12.997845915990183,
+              "minimum": 12.768125250004232,
+              "maximum": 12.997845915990183
+            },
+            "chinese": {
+              "n": 5,
+              "median": 13.196360875008395,
+              "p95_nearest_rank": 13.362419457989745,
+              "minimum": 13.027020584006095,
+              "maximum": 13.362419457989745
+            },
+            "table": {
+              "n": 5,
+              "median": 13.060210875002667,
+              "p95_nearest_rank": 13.424586375011131,
+              "minimum": 12.749745667009847,
+              "maximum": 13.424586375011131
+            },
+            "dense": {
+              "n": 5,
+              "median": 15.59803983400343,
+              "p95_nearest_rank": 15.918995916988933,
+              "minimum": 15.412332416017307,
+              "maximum": 15.918995916988933
+            }
+          },
+          "binary_sha256": "6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6"
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "table": {
+      "median_speed_ratio_llama_over_native": 1.2256114962510019,
+      "cer_equal": false,
+      "emitted_tokens_equal": false,
+      "native_cer": [
+        0.0
+      ],
+      "llama_cer": [
+        0.00398406374501992
+      ]
+    },
+    "chinese": {
+      "median_speed_ratio_llama_over_native": 1.2226924319448658,
+      "cer_equal": true,
+      "emitted_tokens_equal": true,
+      "native_cer": [
+        0.0
+      ],
+      "llama_cer": [
+        0.0
+      ]
+    },
+    "dense": {
+      "median_speed_ratio_llama_over_native": 1.124762024108498,
+      "cer_equal": true,
+      "emitted_tokens_equal": true,
+      "native_cer": [
+        0.0
+      ],
+      "llama_cer": [
+        0.0
+      ]
+    },
+    "english": {
+      "median_speed_ratio_llama_over_native": 1.2285761898361218,
+      "cer_equal": true,
+      "emitted_tokens_equal": true,
+      "native_cer": [
+        0.0
+      ],
+      "llama_cer": [
+        0.0
+      ]
+    }
+  },
+  "notes": [
+    "ABBA process order; two warmups and ten measurements per image/engine.",
+    "Nearest-rank p95 with ten measurements is the maximum; all outliers retained.",
+    "Hybrid Q4/Q8-head vs llama Q8_0, differing vision storage and attention/repetition policies.",
+    "CER and generation length differences are reported; these are system-level results.",
+    "TTFT/decode clock boundaries differ by engine; raw timings retained.",
+    "Startup and exact-child lifetime RSS are per-process observations, not per-page measurements.",
+    "Shared M4 Pro; no universal speed or host-isolation claim."
+  ]
+}

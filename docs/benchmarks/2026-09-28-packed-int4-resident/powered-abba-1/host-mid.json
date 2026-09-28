@@ -1,0 +1,23 @@
+{
+  "utc": "2026-09-28T19:14:09.623457+00:00",
+  "battery": {
+    "returncode": 0,
+    "stdout": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t9%; charging; (no estimate) present: true\n",
+    "stderr": ""
+  },
+  "thermal": {
+    "returncode": 0,
+    "stdout": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+    "stderr": ""
+  },
+  "vm_stat": {
+    "returncode": 0,
+    "stdout": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4127.\nPages active:                                 487174.\nPages inactive:                               485301.\nPages speculative:                              1001.\nPages throttled:                                   0.\nPages wired down:                             169327.\nPages purgeable:                                 410.\n\"Translation faults\":                     1479644948.\nPages copy-on-write:                        33088053.\nPages zero filled:                         810505335.\nPages reactivated:                         229161800.\nPages purged:                               13764133.\nFile-backed pages:                            279090.\nAnonymous pages:                              694386.\nPages stored in compressor:                  2035823.\nPages occupied by compressor:                 381322.\nDecompressions:                            209750204.\nCompressions:                              281085970.\nPageins:                                   128944796.\nPageouts:                                    3023175.\nSwapins:                                     2302821.\nSwapouts:                                    3542241.\n",
+    "stderr": ""
+  },
+  "swapusage": {
+    "returncode": 0,
+    "stdout": "vm.swapusage: total = 11264.00M  used = 10002.31M  free = 1261.69M  (encrypted)\n",
+    "stderr": ""
+  }
+}

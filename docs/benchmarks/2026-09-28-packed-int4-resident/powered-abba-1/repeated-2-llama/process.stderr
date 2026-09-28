@@ -1,0 +1,1020 @@
+0.00.071.727 I srv  llama_server: initializing ...
+0.00.071.735 I cmn  common_param: common_params_print_info: build 11223 (4da633776) with AppleClang 21.0.0.21000101 for Darwin arm64
+0.00.071.736 I cmn  common_param: common_params_print_info: verbosity = 4 (adjust with the `-lv N` CLI arg)
+0.00.071.736 I cmn  common_param: device_info:
+0.00.071.740 I cmn  common_param:   - MTL0    : Apple M4 Pro (18186 MiB, 18185 MiB free)
+0.00.071.741 I cmn  common_param:   - BLAS    : Accelerate (0 MiB, 0 MiB free)
+0.00.071.747 I cmn  common_param:   - CPU     : Apple M4 Pro (24576 MiB, 24576 MiB free)
+0.00.071.760 I cmn  common_param: system_info: n_threads = 8 (n_threads_batch = 8) / 14 | MTL : EMBED_LIBRARY = 1 | CPU : NEON = 1 | ARM_FMA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | ACCELERATE = 1 | REPACK = 1 | 
+0.00.071.796 I srv  init_listene: running without SSL
+0.00.071.896 I srv          init: using 13 threads for HTTP server
+0.00.071.922 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.073.336 I srv    load_model: loading model '/private/tmp/unlimited-ocr-baseline/models/model.gguf'
+0.00.073.337 I srv    load_model: local path '/private/tmp/unlimited-ocr-baseline/models/model.gguf'
+0.00.077.031 I srv    load_model: [mtmd] estimated worst-case memory usage of mmproj is 786.99 MiB (took 3.69 ms)
+0.00.077.038 I cmn  common_init_: fitting params to device memory ...
+0.00.077.038 I cmn  common_init_: (for bugs during this step try to reproduce them with -fit off, or provide --verbose logs if the bug only occurs with -fit on)
+0.00.077.043 I common_params_fit_impl: getting device memory data for initial parameters:
+0.00.164.736 I common_memory_breakdown_print: | memory breakdown [MiB] | total   free    self   model   context   compute    unaccounted |
+0.00.164.739 I common_memory_breakdown_print: |   - Host               |                 2255 =   171 +    1920 +     164                |
+0.00.164.739 I common_memory_breakdown_print: |   - CPU_REPACK         |                 2805 =  2805 +       0 +       0                |
+0.00.170.057 I common_params_fit_impl: projected to use 2255 MiB of host memory vs. 24576 MiB of total host memory
+0.00.170.071 I common_params_fit_impl: will leave 22320 >= 1024 MiB of system memory, no changes needed
+0.00.170.072 I common_fit_params: successfully fit params to free device memory
+0.00.170.073 I common_fit_params: fitting params to free memory took 0.09 seconds
+0.00.187.194 I llama_model_loader: loaded meta data with 35 key-value pairs and 155 tensors from /private/tmp/unlimited-ocr-baseline/models/model.gguf (version GGUF V3 (latest))
+0.00.187.199 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.00.187.201 I llama_model_loader: - kv   0:                       general.architecture str              = deepseek2-ocr
+0.00.187.202 I llama_model_loader: - kv   1:                    tokenizer.chat_template str              = {% for m in messages %}{{m['content']...
+0.00.187.202 I llama_model_loader: - kv   2:                               general.type str              = model
+0.00.187.203 I llama_model_loader: - kv   3:                               general.name str              = Unlimited OCR
+0.00.187.203 I llama_model_loader: - kv   4:                         general.size_label str              = 64x550M
+0.00.187.204 I llama_model_loader: - kv   5:                  deepseek2-ocr.block_count u32              = 12
+0.00.187.204 I llama_model_loader: - kv   6:               deepseek2-ocr.context_length u32              = 32768
+0.00.187.204 I llama_model_loader: - kv   7:             deepseek2-ocr.embedding_length u32              = 1280
+0.00.187.205 I llama_model_loader: - kv   8:          deepseek2-ocr.feed_forward_length u32              = 6848
+0.00.187.205 I llama_model_loader: - kv   9:         deepseek2-ocr.attention.head_count u32              = 10
+0.00.187.205 I llama_model_loader: - kv  10:      deepseek2-ocr.attention.head_count_kv u32              = 10
+0.00.187.207 I llama_model_loader: - kv  11: deepseek2-ocr.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.00.187.207 I llama_model_loader: - kv  12:                 deepseek2-ocr.expert_count u32              = 64
+0.00.187.208 I llama_model_loader: - kv  13:            deepseek2-ocr.expert_used_count u32              = 6
+0.00.187.208 I llama_model_loader: - kv  14:           deepseek2-ocr.expert_group_count u32              = 1
+0.00.187.208 I llama_model_loader: - kv  15:      deepseek2-ocr.expert_group_used_count u32              = 1
+0.00.187.208 I llama_model_loader: - kv  16:    deepseek2-ocr.leading_dense_block_count u32              = 1
+0.00.187.209 I llama_model_loader: - kv  17:                   deepseek2-ocr.vocab_size u32              = 129280
+0.00.187.209 I llama_model_loader: - kv  18:   deepseek2-ocr.expert_feed_forward_length u32              = 896
+0.00.187.209 I llama_model_loader: - kv  19:          deepseek2-ocr.expert_shared_count u32              = 2
+0.00.187.209 I llama_model_loader: - kv  20:         deepseek2-ocr.rope.dimension_count u32              = 0
+0.00.187.210 I llama_model_loader: - kv  21:     deepseek2-ocr.attention.sliding_window u32              = 128
+0.00.187.210 I llama_model_loader: - kv  22:                       tokenizer.ggml.model str              = gpt2
+0.00.187.210 I llama_model_loader: - kv  23:                         tokenizer.ggml.pre str              = deepseek-v3
+0.00.196.879 I llama_model_loader: - kv  24:                      tokenizer.ggml.tokens arr[str,129280]  = ["<｜begin of sentence｜>", "<｜en...
+0.00.199.458 I llama_model_loader: - kv  25:                  tokenizer.ggml.token_type arr[i32,129280]  = [3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.00.208.644 I llama_model_loader: - kv  26:                      tokenizer.ggml.merges arr[str,127741]  = ["Ġ t", "Ġ a", "i n", "Ġ Ġ", "h e...
+0.00.208.647 I llama_model_loader: - kv  27:                tokenizer.ggml.bos_token_id u32              = 0
+0.00.208.648 I llama_model_loader: - kv  28:                tokenizer.ggml.eos_token_id u32              = 1
+0.00.208.648 I llama_model_loader: - kv  29:            tokenizer.ggml.padding_token_id u32              = 2
+0.00.208.648 I llama_model_loader: - kv  30:               tokenizer.ggml.add_bos_token bool             = true
+0.00.208.649 I llama_model_loader: - kv  31:               tokenizer.ggml.add_sep_token bool             = false
+0.00.208.649 I llama_model_loader: - kv  32:               tokenizer.ggml.add_eos_token bool             = false
+0.00.208.649 I llama_model_loader: - kv  33:               general.quantization_version u32              = 2
+0.00.208.650 I llama_model_loader: - kv  34:                          general.file_type u32              = 7
+0.00.208.650 I llama_model_loader: - type  f32:   36 tensors
+0.00.208.651 I llama_model_loader: - type q8_0:  119 tensors
+0.00.208.651 I print_info: file format = GGUF V3 (latest)
+0.00.208.652 I print_info: file type   = Q8_0
+0.00.208.653 I print_info: file size   = 2.91 GiB (8.51 BPW) 
+0.00.232.063 I load: 0 unused tokens
+0.00.238.107 W load: special_eos_id is not in special_eog_ids - the tokenizer config may be incorrect
+0.00.238.109 I load: printing all EOG tokens:
+0.00.238.109 I load:   - 1 ('<｜end of sentence｜>')
+0.00.238.167 I load: special tokens cache size = 830
+0.00.257.067 I load: token to piece cache size = 0.8178 MB
+0.00.257.074 I print_info: arch                  = deepseek2-ocr
+0.00.257.074 I print_info: vocab_only            = 0
+0.00.257.074 I print_info: no_alloc              = 0
+0.00.257.075 I print_info: n_ctx_train           = 32768
+0.00.257.075 I print_info: n_embd_inp            = 1280
+0.00.257.075 I print_info: n_embd                = 1280
+0.00.257.077 I print_info: n_embd_out            = 1280
+0.00.257.078 I print_info: n_layer               = 12
+0.00.257.078 I print_info: n_layer_all           = 12
+0.00.257.081 I print_info: n_head                = 10
+0.00.257.082 I print_info: n_head_kv             = 10
+0.00.257.082 I print_info: n_rot                 = 0
+0.00.257.082 I print_info: n_swa                 = 0
+0.00.257.082 I print_info: is_swa_any            = 0
+0.00.257.082 I print_info: non_causal_type       = 0
+0.00.257.082 I print_info: n_embd_head_k         = 128
+0.00.257.083 I print_info: n_embd_head_v         = 128
+0.00.257.083 I print_info: n_gqa                 = 1
+0.00.257.084 I print_info: n_embd_k_gqa          = 1280
+0.00.257.084 I print_info: n_embd_v_gqa          = 1280
+0.00.257.085 I print_info: f_norm_eps            = 0.0e+00
+0.00.257.085 I print_info: f_norm_rms_eps        = 1.0e-06
+0.00.257.085 I print_info: f_clamp_kqv           = 0.0e+00
+0.00.257.085 I print_info: f_max_alibi_bias      = 0.0e+00
+0.00.257.085 I print_info: f_logit_scale         = 0.0e+00
+0.00.257.086 I print_info: f_attn_scale          = 0.0e+00
+0.00.257.086 I print_info: f_attn_value_scale    = 0.0000
+0.00.257.086 I print_info: n_ff                  = 6848
+0.00.257.086 I print_info: n_expert              = 64
+0.00.257.087 I print_info: n_expert_used         = 6
+0.00.257.087 I print_info: n_expert_groups       = 1
+0.00.257.087 I print_info: n_group_used          = 1
+0.00.257.087 I print_info: causal attn           = 1
+0.00.257.087 I print_info: pooling type          = -1
+0.00.257.087 I print_info: rope type             = 0
+0.00.257.087 I print_info: rope scaling          = linear
+0.00.257.088 I print_info: freq_base_train       = 10000.0
+0.00.257.088 I print_info: freq_scale_train      = 1
+0.00.257.088 I print_info: n_ctx_orig_yarn       = 32768
+0.00.257.088 I print_info: rope_yarn_log_mul     = 0.0000
+0.00.257.088 I print_info: rope_finetuned        = unknown
+0.00.257.089 I print_info: model type            = 3B
+0.00.257.089 I print_info: model params          = 2.93 B
+0.00.257.089 I print_info: general.name          = Unlimited OCR
+0.00.257.090 I print_info: n_layer_dense_lead    = 1
+0.00.257.090 I print_info: n_lora_q              = 0
+0.00.257.090 I print_info: n_lora_kv             = 0
+0.00.257.090 I print_info: n_embd_head_k_mla     = 128
+0.00.257.090 I print_info: n_embd_head_v_mla     = 128
+0.00.257.090 I print_info: n_ff_exp              = 896
+0.00.257.090 I print_info: n_expert_shared       = 2
+0.00.257.091 I print_info: expert_weights_scale  = 0.0
+0.00.257.091 I print_info: expert_weights_norm   = 0
+0.00.257.091 I print_info: expert_gating_func    = softmax
+0.00.257.092 I print_info: vocab type            = BPE
+0.00.257.092 I print_info: n_vocab               = 129280
+0.00.257.092 I print_info: n_merges              = 127741
+0.00.257.092 I print_info: BOS token             = 0 '<｜begin of sentence｜>'
+0.00.257.092 I print_info: EOS token             = 1 '<｜end of sentence｜>'
+0.00.257.092 I print_info: PAD token             = 2 '<｜ pad ｜>'
+0.00.257.093 I print_info: LF token              = 201 'Ċ'
+0.00.257.093 I print_info: FIM PRE token         = 128801 '<｜fim▁begin｜>'
+0.00.257.093 I print_info: FIM SUF token         = 128800 '<｜fim▁hole｜>'
+0.00.257.093 I print_info: FIM MID token         = 128802 '<｜fim▁end｜>'
+0.00.257.093 I print_info: EOG token             = 1 '<｜end of sentence｜>'
+0.00.257.094 I print_info: max token length      = 256
+0.00.257.094 I load_tensors: loading model tensors, this can take a while... (load_mode = mmap)
+0.00.456.279 I load_tensors: offloading 0 repeating layers to GPU
+0.00.456.280 I load_tensors: offloaded 0/13 layers to GPU
+0.00.456.281 I load_tensors:   CPU_Mapped model buffer size =  2731.94 MiB
+0.00.456.282 I load_tensors:   CPU_REPACK model buffer size =  2805.08 MiB
+0.02.291.147 I cmn  common_init_: added <｜end of sentence｜> logit bias = -inf
+0.02.291.497 I llama_context: constructing llama_context
+0.02.291.499 I llama_context: n_seq_max             = 1
+0.02.291.500 I llama_context: n_ctx                 = 32768
+0.02.291.500 I llama_context: n_ctx_seq             = 32768
+0.02.291.500 I llama_context: n_batch               = 2048
+0.02.291.500 I llama_context: n_ubatch              = 512
+0.02.291.500 I llama_context: causal_attn           = 1
+0.02.291.501 I llama_context: flash_attn            = auto
+0.02.291.501 I llama_context: kv_unified            = false
+0.02.291.502 I llama_context: freq_base             = 10000.0
+0.02.291.502 I llama_context: freq_scale            = 1
+0.02.291.502 I llama_context: n_rs_seq              = 0
+0.02.291.502 I llama_context: n_outputs_max         = 1
+0.02.291.502 I llama_context: n_outputs_max_per_seq = 1
+0.02.291.535 I llama_context:        CPU  output buffer size =     0.49 MiB
+0.02.291.646 I llama_kv_cache:        CPU KV buffer size =  1920.00 MiB
+0.02.375.074 I llama_kv_cache: size = 1920.00 MiB ( 32768 cells,  12 layers,  1/1 seqs), K (f16):  960.00 MiB, V (f16):  960.00 MiB
+0.02.375.077 I llama_kv_cache: attn_rot_k = 0, n_embd_head_k_all = 128
+0.02.375.077 I llama_kv_cache: attn_rot_v = 0, n_embd_head_k_all = 128
+0.02.375.083 I sched_reserve: reserving ...
+0.02.375.345 I resolve_fused_ops: Flash Attention enabled
+0.02.375.346 I resolve_fused_ops: resolving fused DeepSeek V4 HC support:
+0.02.375.480 I resolve_fused_ops: fused DeepSeek V4 HC pre enabled
+0.02.375.605 I resolve_fused_ops: fused DeepSeek V4 HC comb enabled
+0.02.375.738 I resolve_fused_ops: fused DeepSeek V4 HC post enabled
+0.02.376.246 I sched_reserve:        CPU compute buffer size =    82.14 MiB
+0.02.376.250 I sched_reserve: graph (pp bs=512, tg bs=1): nodes = 642 / 642, splits = 21 / 1, input objects = 4 / 4, input tensors = 6 / 6
+0.02.376.250 I sched_reserve: reserve took 1.17 ms, sched copies = 1
+0.02.376.292 I cmn          init: llama threadpool init, n_threads = 8
+0.02.377.032 I clip_model_loader: model name:   Unlimited OCR
+0.02.377.034 I clip_model_loader: description:  
+0.02.377.035 I clip_model_loader: GGUF version: 3
+0.02.377.035 I clip_model_loader: alignment:    32
+0.02.377.035 I clip_model_loader: n_tensors:    476
+0.02.377.035 I clip_model_loader: n_kv:         25
+0.02.377.036 I 
+0.02.377.037 I clip_model_loader: has vision encoder
+0.02.377.579 I clip_ctx: CLIP using CPU backend
+0.02.377.608 I load_hparams: projector:          deepseekocr
+0.02.377.610 I load_hparams: n_embd:             1024
+0.02.377.611 I load_hparams: n_head:             16
+0.02.377.613 I load_hparams: n_ff:               64
+0.02.377.614 I load_hparams: n_layer:            24
+0.02.377.614 I load_hparams: ffn_op:             gelu
+0.02.377.614 I load_hparams: projection_dim:     1280
+0.02.377.614 I 
+--- vision hparams ---
+0.02.377.614 I load_hparams: image_size:         1024
+0.02.377.614 I load_hparams: patch_size:         16
+0.02.377.614 I load_hparams: has_llava_proj:     0
+0.02.377.615 I load_hparams: minicpmv_version:   0
+0.02.377.615 I load_hparams: n_merge:            1
+0.02.377.615 I load_hparams: n_wa_pattern: 0
+0.02.377.615 I load_hparams: preproc_tiles:      2 - 32
+0.02.377.615 I 
+0.02.377.616 I load_hparams: model size:         786.99 MiB
+0.02.377.616 I load_hparams: metadata size:      0.17 MiB
+0.02.810.907 I get_dummy_batch: warmup with image size = 1024 x 1024
+0.02.812.571 I srv    load_model: loaded multimodal model, '/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf'
+0.03.168.670 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 32768, kv_unified = 'false'
+0.03.168.680 I spec common_specu: no implementations specified for speculative decoding
+0.03.168.699 I slot   load_model: id  0 | task -1 | new slot, n_ctx = 32768
+0.03.168.735 I srv    load_model: prompt cache is disabled - use `--cache-ram N` to enable it
+0.03.168.736 I srv    load_model: for more info see https://github.com/ggml-org/llama.cpp/pull/16391
+0.03.168.737 I srv    load_model: context checkpoints enabled, max = 32, min spacing = 8192
+0.03.170.528 I srv          init: init: chat template, example_format: 'You are a helpful assistantHelloHi thereHow are you?'
+0.03.170.863 I srv          init: init: chat template, thinking = 0
+0.03.170.877 I srv          init: preserve_reasoning kwarg: not supported by template
+0.03.170.886 I srv  llama_server: model loaded
+0.03.170.898 I srv  llama_server: listening on http://127.0.0.1:59689
+0.03.170.920 I srv  update_slots: all slots are idle
+0.03.216.456 I srv  server_strea: conv_id= (empty=1)
+0.03.320.572 I slot get_availabl: id  0 | task -1 |  - skipping, slot is empty
+0.03.320.574 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.03.320.594 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.03.320.599 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.03.320.600 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.03.320.604 I slot   operator(): id  0 | task 0 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+0.03.320.612 I slot   operator(): id  0 | task 0 | cached n_tokens = 0, memory_seq_rm [0, end)
+0.03.367.373 I slot   operator(): id  0 | task 0 | cached n_tokens = 1, memory_seq_rm [1, end)
+0.03.367.391 I slot process_mtmd: id  0 | task 0 | encoding mtmd batch from idx = 1, n_chunks = 3
+0.03.371.692 I reserve_compute_meta:        CPU compute buffer size =  1777.57 MiB
+0.03.371.696 I reserve_compute_meta: graph splits = 1, nodes = 1586
+0.03.371.717 I warmup: flash attention is enabled
+0.10.122.680 I decoding image batch 1/1, n_tokens_batch = 310
+0.10.714.036 I image decoded (batch 1/1) in 591 ms
+0.10.714.095 I decoding image batch 1/1, n_tokens_batch = 310
+0.10.900.522 I image decoded (batch 1/1) in 187 ms
+0.10.900.559 I decoding image batch 1/1, n_tokens_batch = 310
+0.11.106.434 I image decoded (batch 1/1) in 206 ms
+0.11.106.485 I slot process_mtmd: id  0 | task 0 | encoding mtmd batch from idx = 931, n_chunks = 1
+0.13.180.492 I decoding image batch 1/1, n_tokens_batch = 310
+0.13.397.713 I image decoded (batch 1/1) in 217 ms
+0.13.399.139 I slot process_mtmd: id  0 | task 0 | encoding mtmd batch from idx = 1241, n_chunks = 1
+0.15.564.831 I decoding image batch 1/1, n_tokens_batch = 273
+0.15.775.718 I image decoded (batch 1/1) in 211 ms
+0.15.775.773 I slot init_sampler: id  0 | task 0 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+0.17.100.848 I slot print_timing: id  0 | task 0 | prompt eval time =   12503.14 ms /  1518 tokens (    8.24 ms per token,   121.41 tokens per second)
+0.17.100.851 I slot print_timing: id  0 | task 0 |        eval time =    1277.08 ms /   249 tokens (    5.15 ms per token,   194.19 tokens per second)
+0.17.100.852 I slot print_timing: id  0 | task 0 |       total time =   13780.22 ms /  1767 tokens
+0.17.100.852 I slot print_timing: id  0 | task 0 |    graphs reused =        246
+0.17.100.888 I slot      release: id  0 | task 0 | stop processing: n_tokens = 1766, truncated = 0
+0.17.100.894 I srv  update_slots: all slots are idle
+0.17.111.193 I srv  server_strea: conv_id= (empty=1)
+0.17.150.075 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+0.17.150.077 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126098172576
+0.17.150.096 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.17.150.101 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.17.150.102 I slot launch_slot_: id  0 | task 251 | processing task, is_child = 0
+0.17.150.104 I slot   operator(): id  0 | task 251 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+0.17.150.110 I slot   operator(): id  0 | task 251 | cached n_tokens = 0, memory_seq_rm [0, end)
+0.17.152.936 I slot   operator(): id  0 | task 251 | cached n_tokens = 1, memory_seq_rm [1, end)
+0.17.152.955 I slot process_mtmd: id  0 | task 251 | encoding mtmd batch from idx = 1, n_chunks = 3
+0.23.408.341 I decoding image batch 1/1, n_tokens_batch = 310
+0.23.585.341 I image decoded (batch 1/1) in 177 ms
+0.23.585.375 I decoding image batch 1/1, n_tokens_batch = 310
+0.23.776.467 I image decoded (batch 1/1) in 191 ms
+0.23.776.500 I decoding image batch 1/1, n_tokens_batch = 310
+0.23.978.413 I image decoded (batch 1/1) in 202 ms
+0.23.978.439 I slot process_mtmd: id  0 | task 251 | encoding mtmd batch from idx = 931, n_chunks = 1
+0.26.063.907 I decoding image batch 1/1, n_tokens_batch = 310
+0.26.283.559 I image decoded (batch 1/1) in 220 ms
+0.26.283.588 I slot process_mtmd: id  0 | task 251 | encoding mtmd batch from idx = 1241, n_chunks = 1
+0.28.462.523 I decoding image batch 1/1, n_tokens_batch = 273
+0.28.671.414 I image decoded (batch 1/1) in 209 ms
+0.28.671.450 I slot init_sampler: id  0 | task 251 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+0.30.111.332 I slot print_timing: id  0 | task 251 | prompt eval time =   11532.58 ms /  1518 tokens (    7.60 ms per token,   131.63 tokens per second)
+0.30.111.336 I slot print_timing: id  0 | task 251 |        eval time =    1428.63 ms /   290 tokens (    4.94 ms per token,   202.29 tokens per second)
+0.30.111.348 I slot print_timing: id  0 | task 251 |       total time =   12961.22 ms /  1808 tokens
+0.30.111.350 I slot print_timing: id  0 | task 251 |    graphs reused =        532
+0.30.111.356 I slot      release: id  0 | task 251 | stop processing: n_tokens = 1807, truncated = 0
+0.30.111.374 I srv  update_slots: all slots are idle
+0.30.117.652 I srv  server_strea: conv_id= (empty=1)
+0.30.152.877 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+0.30.152.879 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126111183044
+0.30.152.893 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.30.152.896 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.30.152.897 I slot launch_slot_: id  0 | task 543 | processing task, is_child = 0
+0.30.152.900 I slot   operator(): id  0 | task 543 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+0.30.152.905 I slot   operator(): id  0 | task 543 | cached n_tokens = 0, memory_seq_rm [0, end)
+0.30.155.687 I slot   operator(): id  0 | task 543 | cached n_tokens = 1, memory_seq_rm [1, end)
+0.30.155.706 I slot process_mtmd: id  0 | task 543 | encoding mtmd batch from idx = 1, n_chunks = 3
+0.36.422.772 I decoding image batch 1/1, n_tokens_batch = 310
+0.36.597.586 I image decoded (batch 1/1) in 175 ms
+0.36.597.616 I decoding image batch 1/1, n_tokens_batch = 310
+0.36.785.537 I image decoded (batch 1/1) in 188 ms
+0.36.785.567 I decoding image batch 1/1, n_tokens_batch = 310
+0.36.987.303 I image decoded (batch 1/1) in 201 ms
+0.36.987.329 I slot process_mtmd: id  0 | task 543 | encoding mtmd batch from idx = 931, n_chunks = 1
+0.39.061.886 I decoding image batch 1/1, n_tokens_batch = 310
+0.39.284.235 I image decoded (batch 1/1) in 222 ms
+0.39.284.262 I slot process_mtmd: id  0 | task 543 | encoding mtmd batch from idx = 1241, n_chunks = 1
+0.41.454.855 I decoding image batch 1/1, n_tokens_batch = 273
+0.41.662.484 I image decoded (batch 1/1) in 208 ms
+0.41.662.523 I slot init_sampler: id  0 | task 543 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+0.44.673.821 I slot print_timing: id  0 | task 543 | n_gen =    601, tg = 199.98 t/s, tg_3s = 200.31 t/s
+0.45.563.483 I slot print_timing: id  0 | task 543 | prompt eval time =   11520.55 ms /  1518 tokens (    7.59 ms per token,   131.76 tokens per second)
+0.45.563.486 I slot print_timing: id  0 | task 543 |        eval time =    3890.03 ms /   769 tokens (    5.07 ms per token,   197.43 tokens per second)
+0.45.563.487 I slot print_timing: id  0 | task 543 |       total time =   15410.57 ms /  2287 tokens
+0.45.563.487 I slot print_timing: id  0 | task 543 |    graphs reused =       1296
+0.45.563.494 I slot      release: id  0 | task 543 | stop processing: n_tokens = 2286, truncated = 0
+0.45.563.508 I srv  update_slots: all slots are idle
+0.46.590.822 I srv  server_strea: conv_id= (empty=1)
+0.46.620.616 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+0.46.620.618 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126126635182
+0.46.620.633 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.46.620.637 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.46.620.638 I slot launch_slot_: id  0 | task 1314 | processing task, is_child = 0
+0.46.620.641 I slot   operator(): id  0 | task 1314 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+0.46.620.647 I slot   operator(): id  0 | task 1314 | cached n_tokens = 0, memory_seq_rm [0, end)
+0.46.623.813 I slot   operator(): id  0 | task 1314 | cached n_tokens = 1, memory_seq_rm [1, end)
+0.46.623.831 I slot process_mtmd: id  0 | task 1314 | encoding mtmd batch from idx = 1, n_chunks = 3
+0.52.821.503 I decoding image batch 1/1, n_tokens_batch = 310
+0.52.993.580 I image decoded (batch 1/1) in 172 ms
+0.52.993.614 I decoding image batch 1/1, n_tokens_batch = 310
+0.53.187.049 I image decoded (batch 1/1) in 193 ms
+0.53.187.098 I decoding image batch 1/1, n_tokens_batch = 310
+0.53.395.033 I image decoded (batch 1/1) in 208 ms
+0.53.395.067 I slot process_mtmd: id  0 | task 1314 | encoding mtmd batch from idx = 931, n_chunks = 1
+0.55.463.306 I decoding image batch 1/1, n_tokens_batch = 310
+0.55.683.800 I image decoded (batch 1/1) in 221 ms
+0.55.683.828 I slot process_mtmd: id  0 | task 1314 | encoding mtmd batch from idx = 1241, n_chunks = 1
+0.57.881.539 I decoding image batch 1/1, n_tokens_batch = 273
+0.58.089.569 I image decoded (batch 1/1) in 208 ms
+0.58.089.611 I slot init_sampler: id  0 | task 1314 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+0.59.325.289 I slot print_timing: id  0 | task 1314 | prompt eval time =   11480.54 ms /  1518 tokens (    7.56 ms per token,   132.22 tokens per second)
+0.59.325.292 I slot print_timing: id  0 | task 1314 |        eval time =    1224.10 ms /   251 tokens (    4.90 ms per token,   204.23 tokens per second)
+0.59.325.293 I slot print_timing: id  0 | task 1314 |       total time =   12704.64 ms /  1769 tokens
+0.59.325.293 I slot print_timing: id  0 | task 1314 |    graphs reused =       1544
+0.59.325.299 I slot      release: id  0 | task 1314 | stop processing: n_tokens = 1768, truncated = 0
+0.59.325.317 I srv  update_slots: all slots are idle
+0.59.356.971 I srv  server_strea: conv_id= (empty=1)
+0.59.389.442 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+0.59.389.445 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126140396987
+0.59.389.459 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.59.389.463 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.59.389.464 I slot launch_slot_: id  0 | task 1567 | processing task, is_child = 0
+0.59.389.466 I slot   operator(): id  0 | task 1567 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+0.59.389.472 I slot   operator(): id  0 | task 1567 | cached n_tokens = 0, memory_seq_rm [0, end)
+0.59.392.314 I slot   operator(): id  0 | task 1567 | cached n_tokens = 1, memory_seq_rm [1, end)
+0.59.392.333 I slot process_mtmd: id  0 | task 1567 | encoding mtmd batch from idx = 1, n_chunks = 3
+1.05.609.741 I decoding image batch 1/1, n_tokens_batch = 310
+1.05.785.026 I image decoded (batch 1/1) in 175 ms
+1.05.785.054 I decoding image batch 1/1, n_tokens_batch = 310
+1.05.976.487 I image decoded (batch 1/1) in 192 ms
+1.05.976.519 I decoding image batch 1/1, n_tokens_batch = 310
+1.06.181.674 I image decoded (batch 1/1) in 205 ms
+1.06.181.706 I slot process_mtmd: id  0 | task 1567 | encoding mtmd batch from idx = 931, n_chunks = 1
+1.08.246.647 I decoding image batch 1/1, n_tokens_batch = 310
+1.08.465.162 I image decoded (batch 1/1) in 218 ms
+1.08.465.191 I slot process_mtmd: id  0 | task 1567 | encoding mtmd batch from idx = 1241, n_chunks = 1
+1.10.644.294 I decoding image batch 1/1, n_tokens_batch = 273
+1.10.852.733 I image decoded (batch 1/1) in 209 ms
+1.10.852.770 I slot init_sampler: id  0 | task 1567 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+1.13.869.895 I slot print_timing: id  0 | task 1567 | n_gen =    598, tg = 198.68 t/s, tg_3s = 199.01 t/s
+1.14.767.898 I slot print_timing: id  0 | task 1567 | prompt eval time =   11475.56 ms /  1518 tokens (    7.56 ms per token,   132.28 tokens per second)
+1.14.767.901 I slot print_timing: id  0 | task 1567 |        eval time =    3902.86 ms /   769 tokens (    5.08 ms per token,   196.78 tokens per second)
+1.14.767.901 I slot print_timing: id  0 | task 1567 |       total time =   15378.42 ms /  2287 tokens
+1.14.767.902 I slot print_timing: id  0 | task 1567 |    graphs reused =       2308
+1.14.767.909 I slot      release: id  0 | task 1567 | stop processing: n_tokens = 2286, truncated = 0
+1.14.767.919 I srv  update_slots: all slots are idle
+1.15.795.807 I srv  server_strea: conv_id= (empty=1)
+1.15.825.944 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+1.15.825.947 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126155839597
+1.15.825.964 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+1.15.825.968 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+1.15.825.968 I slot launch_slot_: id  0 | task 2338 | processing task, is_child = 0
+1.15.825.971 I slot   operator(): id  0 | task 2338 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+1.15.825.977 I slot   operator(): id  0 | task 2338 | cached n_tokens = 0, memory_seq_rm [0, end)
+1.15.829.194 I slot   operator(): id  0 | task 2338 | cached n_tokens = 1, memory_seq_rm [1, end)
+1.15.829.212 I slot process_mtmd: id  0 | task 2338 | encoding mtmd batch from idx = 1, n_chunks = 3
+1.22.414.499 I decoding image batch 1/1, n_tokens_batch = 310
+1.22.901.114 I image decoded (batch 1/1) in 486 ms
+1.22.901.176 I decoding image batch 1/1, n_tokens_batch = 310
+1.23.084.903 I image decoded (batch 1/1) in 184 ms
+1.23.084.928 I decoding image batch 1/1, n_tokens_batch = 310
+1.23.286.812 I image decoded (batch 1/1) in 202 ms
+1.23.286.844 I slot process_mtmd: id  0 | task 2338 | encoding mtmd batch from idx = 931, n_chunks = 1
+1.25.354.904 I decoding image batch 1/1, n_tokens_batch = 310
+1.25.573.437 I image decoded (batch 1/1) in 219 ms
+1.25.573.465 I slot process_mtmd: id  0 | task 2338 | encoding mtmd batch from idx = 1241, n_chunks = 1
+1.27.792.080 I decoding image batch 1/1, n_tokens_batch = 273
+1.28.009.285 I image decoded (batch 1/1) in 217 ms
+1.28.009.320 I slot init_sampler: id  0 | task 2338 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+1.29.218.809 I slot print_timing: id  0 | task 2338 | prompt eval time =   12198.00 ms /  1518 tokens (    8.04 ms per token,   124.45 tokens per second)
+1.29.218.812 I slot print_timing: id  0 | task 2338 |        eval time =    1194.82 ms /   249 tokens (    4.82 ms per token,   207.56 tokens per second)
+1.29.218.813 I slot print_timing: id  0 | task 2338 |       total time =   13392.82 ms /  1767 tokens
+1.29.218.813 I slot print_timing: id  0 | task 2338 |    graphs reused =       2554
+1.29.218.830 I slot      release: id  0 | task 2338 | stop processing: n_tokens = 1766, truncated = 0
+1.29.218.838 I srv  update_slots: all slots are idle
+1.29.226.602 I srv  server_strea: conv_id= (empty=1)
+1.29.257.638 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+1.29.257.640 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126170290518
+1.29.257.653 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+1.29.257.657 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+1.29.257.658 I slot launch_slot_: id  0 | task 2589 | processing task, is_child = 0
+1.29.257.660 I slot   operator(): id  0 | task 2589 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+1.29.257.666 I slot   operator(): id  0 | task 2589 | cached n_tokens = 0, memory_seq_rm [0, end)
+1.29.260.651 I slot   operator(): id  0 | task 2589 | cached n_tokens = 1, memory_seq_rm [1, end)
+1.29.260.670 I slot process_mtmd: id  0 | task 2589 | encoding mtmd batch from idx = 1, n_chunks = 3
+1.35.506.293 I decoding image batch 1/1, n_tokens_batch = 310
+1.35.682.551 I image decoded (batch 1/1) in 177 ms
+1.35.682.584 I decoding image batch 1/1, n_tokens_batch = 310
+1.35.870.619 I image decoded (batch 1/1) in 188 ms
+1.35.870.648 I decoding image batch 1/1, n_tokens_batch = 310
+1.36.072.059 I image decoded (batch 1/1) in 201 ms
+1.36.072.087 I slot process_mtmd: id  0 | task 2589 | encoding mtmd batch from idx = 931, n_chunks = 1
+1.38.155.988 I decoding image batch 1/1, n_tokens_batch = 310
+1.38.372.353 I image decoded (batch 1/1) in 217 ms
+1.38.372.382 I slot process_mtmd: id  0 | task 2589 | encoding mtmd batch from idx = 1241, n_chunks = 1
+1.40.560.935 I decoding image batch 1/1, n_tokens_batch = 273
+1.40.772.318 I image decoded (batch 1/1) in 212 ms
+1.40.772.354 I slot init_sampler: id  0 | task 2589 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+1.41.993.101 I slot print_timing: id  0 | task 2589 | prompt eval time =   11526.15 ms /  1518 tokens (    7.59 ms per token,   131.70 tokens per second)
+1.41.993.105 I slot print_timing: id  0 | task 2589 |        eval time =    1209.28 ms /   251 tokens (    4.84 ms per token,   206.73 tokens per second)
+1.41.993.105 I slot print_timing: id  0 | task 2589 |       total time =   12735.43 ms /  1769 tokens
+1.41.993.105 I slot print_timing: id  0 | task 2589 |    graphs reused =       2802
+1.41.993.112 I slot      release: id  0 | task 2589 | stop processing: n_tokens = 1768, truncated = 0
+1.41.993.121 I srv  update_slots: all slots are idle
+1.42.026.708 I srv  server_strea: conv_id= (empty=1)
+1.42.057.134 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+1.42.057.136 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126183064800
+1.42.057.152 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+1.42.057.156 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+1.42.057.157 I slot launch_slot_: id  0 | task 2842 | processing task, is_child = 0
+1.42.057.159 I slot   operator(): id  0 | task 2842 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+1.42.057.164 I slot   operator(): id  0 | task 2842 | cached n_tokens = 0, memory_seq_rm [0, end)
+1.42.060.047 I slot   operator(): id  0 | task 2842 | cached n_tokens = 1, memory_seq_rm [1, end)
+1.42.060.068 I slot process_mtmd: id  0 | task 2842 | encoding mtmd batch from idx = 1, n_chunks = 3
+1.48.363.458 I decoding image batch 1/1, n_tokens_batch = 310
+1.48.540.454 I image decoded (batch 1/1) in 177 ms
+1.48.540.492 I decoding image batch 1/1, n_tokens_batch = 310
+1.48.730.759 I image decoded (batch 1/1) in 190 ms
+1.48.730.788 I decoding image batch 1/1, n_tokens_batch = 310
+1.48.935.252 I image decoded (batch 1/1) in 204 ms
+1.48.935.280 I slot process_mtmd: id  0 | task 2842 | encoding mtmd batch from idx = 931, n_chunks = 1
+1.51.018.178 I decoding image batch 1/1, n_tokens_batch = 310
+1.51.237.135 I image decoded (batch 1/1) in 219 ms
+1.51.237.163 I slot process_mtmd: id  0 | task 2842 | encoding mtmd batch from idx = 1241, n_chunks = 1
+1.53.441.869 I decoding image batch 1/1, n_tokens_batch = 273
+1.53.652.656 I image decoded (batch 1/1) in 211 ms
+1.53.652.693 I slot init_sampler: id  0 | task 2842 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+1.55.242.534 I slot print_timing: id  0 | task 2842 | prompt eval time =   11607.16 ms /  1518 tokens (    7.65 ms per token,   130.78 tokens per second)
+1.55.242.537 I slot print_timing: id  0 | task 2842 |        eval time =    1578.20 ms /   290 tokens (    5.46 ms per token,   183.12 tokens per second)
+1.55.242.538 I slot print_timing: id  0 | task 2842 |       total time =   13185.37 ms /  1808 tokens
+1.55.242.538 I slot print_timing: id  0 | task 2842 |    graphs reused =       3088
+1.55.242.554 I slot      release: id  0 | task 2842 | stop processing: n_tokens = 1807, truncated = 0
+1.55.242.571 I srv  update_slots: all slots are idle
+1.55.248.225 I srv  server_strea: conv_id= (empty=1)
+1.55.290.965 I slot get_availabl: id  0 | task -1 |  - checking sim = 1.000 (1518/1518) > 0.100
+1.55.290.967 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.840
+1.55.290.982 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+1.55.290.986 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+1.55.290.987 I slot launch_slot_: id  0 | task 3134 | processing task, is_child = 0
+1.55.290.989 I slot   operator(): id  0 | task 3134 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+1.55.290.995 I slot   operator(): id  0 | task 3134 | cached n_tokens = 0, memory_seq_rm [0, end)
+1.55.295.000 I slot   operator(): id  0 | task 3134 | cached n_tokens = 1, memory_seq_rm [1, end)
+1.55.295.021 I slot process_mtmd: id  0 | task 3134 | encoding mtmd batch from idx = 1, n_chunks = 3
+2.01.642.157 I decoding image batch 1/1, n_tokens_batch = 310
+2.01.815.356 I image decoded (batch 1/1) in 174 ms
+2.01.815.386 I decoding image batch 1/1, n_tokens_batch = 310
+2.02.004.917 I image decoded (batch 1/1) in 189 ms
+2.02.004.948 I decoding image batch 1/1, n_tokens_batch = 310
+2.02.221.163 I image decoded (batch 1/1) in 216 ms
+2.02.221.188 I slot process_mtmd: id  0 | task 3134 | encoding mtmd batch from idx = 931, n_chunks = 1
+2.04.360.741 I decoding image batch 1/1, n_tokens_batch = 310
+2.04.584.991 I image decoded (batch 1/1) in 224 ms
+2.04.585.019 I slot process_mtmd: id  0 | task 3134 | encoding mtmd batch from idx = 1241, n_chunks = 1
+2.06.781.930 I decoding image batch 1/1, n_tokens_batch = 273
+2.06.992.487 I image decoded (batch 1/1) in 211 ms
+2.06.992.521 I slot init_sampler: id  0 | task 3134 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+2.08.608.725 I slot print_timing: id  0 | task 3134 | prompt eval time =   11712.81 ms /  1518 tokens (    7.72 ms per token,   129.60 tokens per second)
+2.08.608.729 I slot print_timing: id  0 | task 3134 |        eval time =    1604.92 ms /   290 tokens (    5.55 ms per token,   180.07 tokens per second)
+2.08.608.729 I slot print_timing: id  0 | task 3134 |       total time =   13317.72 ms /  1808 tokens
+2.08.608.730 I slot print_timing: id  0 | task 3134 |    graphs reused =       3374
+2.08.608.737 I slot      release: id  0 | task 3134 | stop processing: n_tokens = 1807, truncated = 0
+2.08.608.775 I srv  update_slots: all slots are idle
+2.08.616.240 I srv  server_strea: conv_id= (empty=1)
+2.08.661.469 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+2.08.661.471 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126209680425
+2.08.661.487 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+2.08.661.492 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+2.08.661.492 I slot launch_slot_: id  0 | task 3426 | processing task, is_child = 0
+2.08.661.494 I slot   operator(): id  0 | task 3426 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+2.08.661.500 I slot   operator(): id  0 | task 3426 | cached n_tokens = 0, memory_seq_rm [0, end)
+2.08.669.703 I slot   operator(): id  0 | task 3426 | cached n_tokens = 1, memory_seq_rm [1, end)
+2.08.669.723 I slot process_mtmd: id  0 | task 3426 | encoding mtmd batch from idx = 1, n_chunks = 3
+2.15.046.784 I decoding image batch 1/1, n_tokens_batch = 310
+2.15.455.527 I image decoded (batch 1/1) in 409 ms
+2.15.455.583 I decoding image batch 1/1, n_tokens_batch = 310
+2.15.642.243 I image decoded (batch 1/1) in 186 ms
+2.15.642.277 I decoding image batch 1/1, n_tokens_batch = 310
+2.15.847.693 I image decoded (batch 1/1) in 206 ms
+2.15.847.725 I slot process_mtmd: id  0 | task 3426 | encoding mtmd batch from idx = 931, n_chunks = 1
+2.17.936.493 I decoding image batch 1/1, n_tokens_batch = 310
+2.18.154.933 I image decoded (batch 1/1) in 218 ms
+2.18.154.965 I slot process_mtmd: id  0 | task 3426 | encoding mtmd batch from idx = 1241, n_chunks = 1
+2.20.357.654 I decoding image batch 1/1, n_tokens_batch = 273
+2.20.569.284 I image decoded (batch 1/1) in 211 ms
+2.20.569.339 I slot init_sampler: id  0 | task 3426 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+2.23.619.816 I slot print_timing: id  0 | task 3426 | n_gen =    597, tg = 198.39 t/s, tg_3s = 198.72 t/s
+2.24.532.555 I slot print_timing: id  0 | task 3426 | prompt eval time =   11954.08 ms /  1518 tokens (    7.87 ms per token,   126.99 tokens per second)
+2.24.532.559 I slot print_timing: id  0 | task 3426 |        eval time =    3916.96 ms /   769 tokens (    5.10 ms per token,   196.07 tokens per second)
+2.24.532.559 I slot print_timing: id  0 | task 3426 |       total time =   15871.05 ms /  2287 tokens
+2.24.532.560 I slot print_timing: id  0 | task 3426 |    graphs reused =       4138
+2.24.532.576 I slot      release: id  0 | task 3426 | stop processing: n_tokens = 2286, truncated = 0
+2.24.532.591 I srv  update_slots: all slots are idle
+2.25.563.364 I srv  server_strea: conv_id= (empty=1)
+2.25.597.440 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+2.25.597.449 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126225604264
+2.25.597.478 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+2.25.597.482 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+2.25.597.483 I slot launch_slot_: id  0 | task 4197 | processing task, is_child = 0
+2.25.597.486 I slot   operator(): id  0 | task 4197 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+2.25.597.492 I slot   operator(): id  0 | task 4197 | cached n_tokens = 0, memory_seq_rm [0, end)
+2.25.600.596 I slot   operator(): id  0 | task 4197 | cached n_tokens = 1, memory_seq_rm [1, end)
+2.25.600.615 I slot process_mtmd: id  0 | task 4197 | encoding mtmd batch from idx = 1, n_chunks = 3
+2.31.810.753 I decoding image batch 1/1, n_tokens_batch = 310
+2.31.986.000 I image decoded (batch 1/1) in 175 ms
+2.31.986.034 I decoding image batch 1/1, n_tokens_batch = 310
+2.32.172.679 I image decoded (batch 1/1) in 187 ms
+2.32.172.709 I decoding image batch 1/1, n_tokens_batch = 310
+2.32.376.774 I image decoded (batch 1/1) in 204 ms
+2.32.376.802 I slot process_mtmd: id  0 | task 4197 | encoding mtmd batch from idx = 931, n_chunks = 1
+2.34.455.614 I decoding image batch 1/1, n_tokens_batch = 310
+2.34.676.630 I image decoded (batch 1/1) in 221 ms
+2.34.676.660 I slot process_mtmd: id  0 | task 4197 | encoding mtmd batch from idx = 1241, n_chunks = 1
+2.36.871.625 I decoding image batch 1/1, n_tokens_batch = 273
+2.37.086.896 I image decoded (batch 1/1) in 215 ms
+2.37.086.927 I slot init_sampler: id  0 | task 4197 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+2.38.311.113 I slot print_timing: id  0 | task 4197 | prompt eval time =   11500.91 ms /  1518 tokens (    7.58 ms per token,   131.99 tokens per second)
+2.38.311.116 I slot print_timing: id  0 | task 4197 |        eval time =    1212.70 ms /   249 tokens (    4.89 ms per token,   204.50 tokens per second)
+2.38.311.117 I slot print_timing: id  0 | task 4197 |       total time =   12713.60 ms /  1767 tokens
+2.38.311.117 I slot print_timing: id  0 | task 4197 |    graphs reused =       4384
+2.38.311.125 I slot      release: id  0 | task 4197 | stop processing: n_tokens = 1766, truncated = 0
+2.38.311.134 I srv  update_slots: all slots are idle
+2.38.319.140 I srv  server_strea: conv_id= (empty=1)
+2.38.349.513 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+2.38.349.515 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126239382813
+2.38.349.530 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+2.38.349.535 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+2.38.349.535 I slot launch_slot_: id  0 | task 4448 | processing task, is_child = 0
+2.38.349.538 I slot   operator(): id  0 | task 4448 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+2.38.349.544 I slot   operator(): id  0 | task 4448 | cached n_tokens = 0, memory_seq_rm [0, end)
+2.38.352.331 I slot   operator(): id  0 | task 4448 | cached n_tokens = 1, memory_seq_rm [1, end)
+2.38.352.351 I slot process_mtmd: id  0 | task 4448 | encoding mtmd batch from idx = 1, n_chunks = 3
+2.44.633.965 I decoding image batch 1/1, n_tokens_batch = 310
+2.44.811.666 I image decoded (batch 1/1) in 178 ms
+2.44.811.703 I decoding image batch 1/1, n_tokens_batch = 310
+2.45.005.791 I image decoded (batch 1/1) in 194 ms
+2.45.005.819 I decoding image batch 1/1, n_tokens_batch = 310
+2.45.212.411 I image decoded (batch 1/1) in 207 ms
+2.45.212.442 I slot process_mtmd: id  0 | task 4448 | encoding mtmd batch from idx = 931, n_chunks = 1
+2.47.336.402 I decoding image batch 1/1, n_tokens_batch = 310
+2.47.556.397 I image decoded (batch 1/1) in 220 ms
+2.47.556.428 I slot process_mtmd: id  0 | task 4448 | encoding mtmd batch from idx = 1241, n_chunks = 1
+2.49.844.679 I decoding image batch 1/1, n_tokens_batch = 273
+2.50.061.669 I image decoded (batch 1/1) in 217 ms
+2.50.061.730 I slot init_sampler: id  0 | task 4448 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+2.51.315.720 I slot print_timing: id  0 | task 4448 | prompt eval time =   11723.57 ms /  1518 tokens (    7.72 ms per token,   129.48 tokens per second)
+2.51.315.723 I slot print_timing: id  0 | task 4448 |        eval time =    1242.60 ms /   251 tokens (    4.97 ms per token,   201.19 tokens per second)
+2.51.315.724 I slot print_timing: id  0 | task 4448 |       total time =   12966.17 ms /  1769 tokens
+2.51.315.724 I slot print_timing: id  0 | task 4448 |    graphs reused =       4632
+2.51.315.732 I slot      release: id  0 | task 4448 | stop processing: n_tokens = 1768, truncated = 0
+2.51.315.749 I srv  update_slots: all slots are idle
+2.51.347.440 I srv  server_strea: conv_id= (empty=1)
+2.51.381.261 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+2.51.381.264 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126252387420
+2.51.381.279 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+2.51.381.284 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+2.51.381.285 I slot launch_slot_: id  0 | task 4701 | processing task, is_child = 0
+2.51.381.287 I slot   operator(): id  0 | task 4701 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+2.51.381.292 I slot   operator(): id  0 | task 4701 | cached n_tokens = 0, memory_seq_rm [0, end)
+2.51.384.190 I slot   operator(): id  0 | task 4701 | cached n_tokens = 1, memory_seq_rm [1, end)
+2.51.384.225 I slot process_mtmd: id  0 | task 4701 | encoding mtmd batch from idx = 1, n_chunks = 3
+2.57.733.983 I decoding image batch 1/1, n_tokens_batch = 310
+2.57.920.952 I image decoded (batch 1/1) in 187 ms
+2.57.920.988 I decoding image batch 1/1, n_tokens_batch = 310
+2.58.110.268 I image decoded (batch 1/1) in 189 ms
+2.58.110.294 I decoding image batch 1/1, n_tokens_batch = 310
+2.58.324.267 I image decoded (batch 1/1) in 214 ms
+2.58.324.292 I slot process_mtmd: id  0 | task 4701 | encoding mtmd batch from idx = 931, n_chunks = 1
+3.00.422.471 I decoding image batch 1/1, n_tokens_batch = 310
+3.00.646.679 I image decoded (batch 1/1) in 224 ms
+3.00.646.709 I slot process_mtmd: id  0 | task 4701 | encoding mtmd batch from idx = 1241, n_chunks = 1
+3.02.873.378 I decoding image batch 1/1, n_tokens_batch = 273
+3.03.096.735 I image decoded (batch 1/1) in 223 ms
+3.03.096.766 I slot init_sampler: id  0 | task 4701 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+3.04.502.507 I slot print_timing: id  0 | task 4701 | prompt eval time =   11727.11 ms /  1518 tokens (    7.73 ms per token,   129.44 tokens per second)
+3.04.502.510 I slot print_timing: id  0 | task 4701 |        eval time =    1394.09 ms /   290 tokens (    4.82 ms per token,   207.30 tokens per second)
+3.04.502.510 I slot print_timing: id  0 | task 4701 |       total time =   13121.21 ms /  1808 tokens
+3.04.502.510 I slot print_timing: id  0 | task 4701 |    graphs reused =       4918
+3.04.502.518 I slot      release: id  0 | task 4701 | stop processing: n_tokens = 1807, truncated = 0
+3.04.502.541 I srv  update_slots: all slots are idle
+3.04.507.607 I srv  server_strea: conv_id= (empty=1)
+3.04.539.363 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+3.04.539.365 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126265574206
+3.04.539.380 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+3.04.539.384 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+3.04.539.384 I slot launch_slot_: id  0 | task 4993 | processing task, is_child = 0
+3.04.539.387 I slot   operator(): id  0 | task 4993 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+3.04.539.393 I slot   operator(): id  0 | task 4993 | cached n_tokens = 0, memory_seq_rm [0, end)
+3.04.543.407 I slot   operator(): id  0 | task 4993 | cached n_tokens = 1, memory_seq_rm [1, end)
+3.04.543.426 I slot process_mtmd: id  0 | task 4993 | encoding mtmd batch from idx = 1, n_chunks = 3
+3.10.855.486 I decoding image batch 1/1, n_tokens_batch = 310
+3.11.054.057 I image decoded (batch 1/1) in 198 ms
+3.11.054.090 I decoding image batch 1/1, n_tokens_batch = 310
+3.11.242.750 I image decoded (batch 1/1) in 189 ms
+3.11.242.777 I decoding image batch 1/1, n_tokens_batch = 310
+3.11.450.418 I image decoded (batch 1/1) in 208 ms
+3.11.450.450 I slot process_mtmd: id  0 | task 4993 | encoding mtmd batch from idx = 931, n_chunks = 1
+3.13.570.704 I decoding image batch 1/1, n_tokens_batch = 310
+3.13.794.499 I image decoded (batch 1/1) in 224 ms
+3.13.794.530 I slot process_mtmd: id  0 | task 4993 | encoding mtmd batch from idx = 1241, n_chunks = 1
+3.15.999.293 I decoding image batch 1/1, n_tokens_batch = 273
+3.16.212.206 I image decoded (batch 1/1) in 213 ms
+3.16.212.267 I slot init_sampler: id  0 | task 4993 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+3.17.566.715 I slot print_timing: id  0 | task 4993 | prompt eval time =   11722.77 ms /  1518 tokens (    7.72 ms per token,   129.49 tokens per second)
+3.17.566.719 I slot print_timing: id  0 | task 4993 |        eval time =    1304.54 ms /   249 tokens (    5.26 ms per token,   190.11 tokens per second)
+3.17.566.719 I slot print_timing: id  0 | task 4993 |       total time =   13027.31 ms /  1767 tokens
+3.17.566.719 I slot print_timing: id  0 | task 4993 |    graphs reused =       5164
+3.17.566.758 I slot      release: id  0 | task 4993 | stop processing: n_tokens = 1766, truncated = 0
+3.17.566.772 I srv  update_slots: all slots are idle
+3.17.574.398 I srv  server_strea: conv_id= (empty=1)
+3.17.610.454 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+3.17.610.456 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126278638446
+3.17.610.470 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+3.17.610.475 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+3.17.610.475 I slot launch_slot_: id  0 | task 5244 | processing task, is_child = 0
+3.17.610.478 I slot   operator(): id  0 | task 5244 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+3.17.610.482 I slot   operator(): id  0 | task 5244 | cached n_tokens = 0, memory_seq_rm [0, end)
+3.17.613.274 I slot   operator(): id  0 | task 5244 | cached n_tokens = 1, memory_seq_rm [1, end)
+3.17.613.294 I slot process_mtmd: id  0 | task 5244 | encoding mtmd batch from idx = 1, n_chunks = 3
+3.23.923.192 I decoding image batch 1/1, n_tokens_batch = 310
+3.24.098.701 I image decoded (batch 1/1) in 176 ms
+3.24.098.739 I decoding image batch 1/1, n_tokens_batch = 310
+3.24.289.686 I image decoded (batch 1/1) in 191 ms
+3.24.289.716 I decoding image batch 1/1, n_tokens_batch = 310
+3.24.494.520 I image decoded (batch 1/1) in 205 ms
+3.24.494.547 I slot process_mtmd: id  0 | task 5244 | encoding mtmd batch from idx = 931, n_chunks = 1
+3.26.592.200 I decoding image batch 1/1, n_tokens_batch = 310
+3.26.812.572 I image decoded (batch 1/1) in 221 ms
+3.26.812.598 I slot process_mtmd: id  0 | task 5244 | encoding mtmd batch from idx = 1241, n_chunks = 1
+3.29.011.162 I decoding image batch 1/1, n_tokens_batch = 273
+3.29.224.721 I image decoded (batch 1/1) in 214 ms
+3.29.224.757 I slot init_sampler: id  0 | task 5244 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+3.30.447.358 I slot print_timing: id  0 | task 5244 | prompt eval time =   11625.68 ms /  1518 tokens (    7.66 ms per token,   130.57 tokens per second)
+3.30.447.362 I slot print_timing: id  0 | task 5244 |        eval time =    1211.19 ms /   251 tokens (    4.84 ms per token,   206.41 tokens per second)
+3.30.447.363 I slot print_timing: id  0 | task 5244 |       total time =   12836.87 ms /  1769 tokens
+3.30.447.363 I slot print_timing: id  0 | task 5244 |    graphs reused =       5412
+3.30.447.371 I slot      release: id  0 | task 5244 | stop processing: n_tokens = 1768, truncated = 0
+3.30.447.385 I srv  update_slots: all slots are idle
+3.30.479.681 I srv  server_strea: conv_id= (empty=1)
+3.30.514.390 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+3.30.514.392 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126291519059
+3.30.514.407 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+3.30.514.412 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+3.30.514.412 I slot launch_slot_: id  0 | task 5497 | processing task, is_child = 0
+3.30.514.415 I slot   operator(): id  0 | task 5497 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+3.30.514.419 I slot   operator(): id  0 | task 5497 | cached n_tokens = 0, memory_seq_rm [0, end)
+3.30.517.185 I slot   operator(): id  0 | task 5497 | cached n_tokens = 1, memory_seq_rm [1, end)
+3.30.517.204 I slot process_mtmd: id  0 | task 5497 | encoding mtmd batch from idx = 1, n_chunks = 3
+3.36.931.786 I decoding image batch 1/1, n_tokens_batch = 310
+3.37.108.124 I image decoded (batch 1/1) in 176 ms
+3.37.108.154 I decoding image batch 1/1, n_tokens_batch = 310
+3.37.299.715 I image decoded (batch 1/1) in 192 ms
+3.37.299.746 I decoding image batch 1/1, n_tokens_batch = 310
+3.37.506.174 I image decoded (batch 1/1) in 206 ms
+3.37.506.199 I slot process_mtmd: id  0 | task 5497 | encoding mtmd batch from idx = 931, n_chunks = 1
+3.39.594.676 I decoding image batch 1/1, n_tokens_batch = 310
+3.39.813.579 I image decoded (batch 1/1) in 219 ms
+3.39.813.606 I slot process_mtmd: id  0 | task 5497 | encoding mtmd batch from idx = 1241, n_chunks = 1
+3.42.008.985 I decoding image batch 1/1, n_tokens_batch = 273
+3.42.218.918 I image decoded (batch 1/1) in 210 ms
+3.42.218.952 I slot init_sampler: id  0 | task 5497 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+3.45.233.756 I slot print_timing: id  0 | task 5497 | n_gen =    603, tg = 200.42 t/s, tg_3s = 200.75 t/s
+3.46.113.495 I slot print_timing: id  0 | task 5497 | prompt eval time =   11715.60 ms /  1518 tokens (    7.72 ms per token,   129.57 tokens per second)
+3.46.113.498 I slot print_timing: id  0 | task 5497 |        eval time =    3883.47 ms /   769 tokens (    5.06 ms per token,   197.76 tokens per second)
+3.46.113.498 I slot print_timing: id  0 | task 5497 |       total time =   15599.07 ms /  2287 tokens
+3.46.113.498 I slot print_timing: id  0 | task 5497 |    graphs reused =       6176
+3.46.113.506 I slot      release: id  0 | task 5497 | stop processing: n_tokens = 2286, truncated = 0
+3.46.113.522 I srv  update_slots: all slots are idle
+3.47.141.338 I srv  server_strea: conv_id= (empty=1)
+3.47.172.373 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+3.47.172.375 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126307185194
+3.47.172.388 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+3.47.172.392 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+3.47.172.393 I slot launch_slot_: id  0 | task 6268 | processing task, is_child = 0
+3.47.172.395 I slot   operator(): id  0 | task 6268 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+3.47.172.401 I slot   operator(): id  0 | task 6268 | cached n_tokens = 0, memory_seq_rm [0, end)
+3.47.175.335 I slot   operator(): id  0 | task 6268 | cached n_tokens = 1, memory_seq_rm [1, end)
+3.47.175.354 I slot process_mtmd: id  0 | task 6268 | encoding mtmd batch from idx = 1, n_chunks = 3
+3.53.427.223 I decoding image batch 1/1, n_tokens_batch = 310
+3.53.625.014 I image decoded (batch 1/1) in 198 ms
+3.53.625.049 I decoding image batch 1/1, n_tokens_batch = 310
+3.53.816.373 I image decoded (batch 1/1) in 192 ms
+3.53.816.407 I decoding image batch 1/1, n_tokens_batch = 310
+3.54.019.416 I image decoded (batch 1/1) in 203 ms
+3.54.019.444 I slot process_mtmd: id  0 | task 6268 | encoding mtmd batch from idx = 931, n_chunks = 1
+3.56.113.608 I decoding image batch 1/1, n_tokens_batch = 310
+3.56.331.730 I image decoded (batch 1/1) in 218 ms
+3.56.331.758 I slot process_mtmd: id  0 | task 6268 | encoding mtmd batch from idx = 1241, n_chunks = 1
+3.58.539.525 I decoding image batch 1/1, n_tokens_batch = 273
+3.58.751.681 I image decoded (batch 1/1) in 212 ms
+3.58.751.717 I slot init_sampler: id  0 | task 6268 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+4.00.166.466 I slot print_timing: id  0 | task 6268 | prompt eval time =   11590.69 ms /  1518 tokens (    7.64 ms per token,   130.97 tokens per second)
+4.00.166.469 I slot print_timing: id  0 | task 6268 |        eval time =    1403.37 ms /   290 tokens (    4.86 ms per token,   205.93 tokens per second)
+4.00.166.470 I slot print_timing: id  0 | task 6268 |       total time =   12994.06 ms /  1808 tokens
+4.00.166.470 I slot print_timing: id  0 | task 6268 |    graphs reused =       6462
+4.00.166.478 I slot      release: id  0 | task 6268 | stop processing: n_tokens = 1807, truncated = 0
+4.00.166.509 I srv  update_slots: all slots are idle
+4.00.172.417 I srv  server_strea: conv_id= (empty=1)
+4.00.211.934 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+4.00.211.936 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126321238166
+4.00.211.951 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+4.00.211.955 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+4.00.211.955 I slot launch_slot_: id  0 | task 6560 | processing task, is_child = 0
+4.00.211.958 I slot   operator(): id  0 | task 6560 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+4.00.211.963 I slot   operator(): id  0 | task 6560 | cached n_tokens = 0, memory_seq_rm [0, end)
+4.00.214.724 I slot   operator(): id  0 | task 6560 | cached n_tokens = 1, memory_seq_rm [1, end)
+4.00.214.744 I slot process_mtmd: id  0 | task 6560 | encoding mtmd batch from idx = 1, n_chunks = 3
+4.06.538.353 I decoding image batch 1/1, n_tokens_batch = 310
+4.06.722.064 I image decoded (batch 1/1) in 183 ms
+4.06.722.093 I decoding image batch 1/1, n_tokens_batch = 310
+4.06.914.767 I image decoded (batch 1/1) in 193 ms
+4.06.914.798 I decoding image batch 1/1, n_tokens_batch = 310
+4.07.123.384 I image decoded (batch 1/1) in 209 ms
+4.07.123.418 I slot process_mtmd: id  0 | task 6560 | encoding mtmd batch from idx = 931, n_chunks = 1
+4.09.247.686 I decoding image batch 1/1, n_tokens_batch = 310
+4.09.551.755 I image decoded (batch 1/1) in 304 ms
+4.09.551.815 I slot process_mtmd: id  0 | task 6560 | encoding mtmd batch from idx = 1241, n_chunks = 1
+4.11.799.176 I decoding image batch 1/1, n_tokens_batch = 273
+4.12.021.031 I image decoded (batch 1/1) in 222 ms
+4.12.021.094 I slot init_sampler: id  0 | task 6560 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+4.13.256.173 I slot print_timing: id  0 | task 6560 | prompt eval time =   11846.89 ms /  1518 tokens (    7.80 ms per token,   128.13 tokens per second)
+4.13.256.176 I slot print_timing: id  0 | task 6560 |        eval time =    1197.31 ms /   249 tokens (    4.83 ms per token,   207.13 tokens per second)
+4.13.256.177 I slot print_timing: id  0 | task 6560 |       total time =   13044.20 ms /  1767 tokens
+4.13.256.177 I slot print_timing: id  0 | task 6560 |    graphs reused =       6708
+4.13.256.195 I slot      release: id  0 | task 6560 | stop processing: n_tokens = 1766, truncated = 0
+4.13.256.209 I srv  update_slots: all slots are idle
+4.13.263.946 I srv  server_strea: conv_id= (empty=1)
+4.13.299.941 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+4.13.299.943 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126334327883
+4.13.299.957 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+4.13.299.961 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+4.13.299.961 I slot launch_slot_: id  0 | task 6811 | processing task, is_child = 0
+4.13.299.963 I slot   operator(): id  0 | task 6811 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+4.13.299.968 I slot   operator(): id  0 | task 6811 | cached n_tokens = 0, memory_seq_rm [0, end)
+4.13.302.777 I slot   operator(): id  0 | task 6811 | cached n_tokens = 1, memory_seq_rm [1, end)
+4.13.302.795 I slot process_mtmd: id  0 | task 6811 | encoding mtmd batch from idx = 1, n_chunks = 3
+4.19.640.181 I decoding image batch 1/1, n_tokens_batch = 310
+4.19.817.496 I image decoded (batch 1/1) in 178 ms
+4.19.817.532 I decoding image batch 1/1, n_tokens_batch = 310
+4.20.010.542 I image decoded (batch 1/1) in 193 ms
+4.20.010.574 I decoding image batch 1/1, n_tokens_batch = 310
+4.20.217.327 I image decoded (batch 1/1) in 207 ms
+4.20.217.360 I slot process_mtmd: id  0 | task 6811 | encoding mtmd batch from idx = 931, n_chunks = 1
+4.22.322.500 I decoding image batch 1/1, n_tokens_batch = 310
+4.22.549.565 I image decoded (batch 1/1) in 227 ms
+4.22.549.595 I slot process_mtmd: id  0 | task 6811 | encoding mtmd batch from idx = 1241, n_chunks = 1
+4.24.765.790 I decoding image batch 1/1, n_tokens_batch = 273
+4.24.978.515 I image decoded (batch 1/1) in 213 ms
+4.24.978.551 I slot init_sampler: id  0 | task 6811 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+4.27.994.881 I slot print_timing: id  0 | task 6811 | n_gen =    604, tg = 200.66 t/s, tg_3s = 200.99 t/s
+4.28.860.464 I slot print_timing: id  0 | task 6811 | prompt eval time =   11689.84 ms /  1518 tokens (    7.70 ms per token,   129.86 tokens per second)
+4.28.860.468 I slot print_timing: id  0 | task 6811 |        eval time =    3870.65 ms /   769 tokens (    5.04 ms per token,   198.42 tokens per second)
+4.28.860.482 I slot print_timing: id  0 | task 6811 |       total time =   15560.49 ms /  2287 tokens
+4.28.860.486 I slot print_timing: id  0 | task 6811 |    graphs reused =       7472
+4.28.860.492 I slot      release: id  0 | task 6811 | stop processing: n_tokens = 2286, truncated = 0
+4.28.860.500 I srv  update_slots: all slots are idle
+4.29.889.971 I srv  server_strea: conv_id= (empty=1)
+4.29.919.811 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+4.29.919.813 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126349932180
+4.29.919.828 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+4.29.919.832 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+4.29.919.833 I slot launch_slot_: id  0 | task 7582 | processing task, is_child = 0
+4.29.919.836 I slot   operator(): id  0 | task 7582 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+4.29.919.841 I slot   operator(): id  0 | task 7582 | cached n_tokens = 0, memory_seq_rm [0, end)
+4.29.922.617 I slot   operator(): id  0 | task 7582 | cached n_tokens = 1, memory_seq_rm [1, end)
+4.29.922.636 I slot process_mtmd: id  0 | task 7582 | encoding mtmd batch from idx = 1, n_chunks = 3
+4.36.193.832 I decoding image batch 1/1, n_tokens_batch = 310
+4.36.366.335 I image decoded (batch 1/1) in 173 ms
+4.36.366.365 I decoding image batch 1/1, n_tokens_batch = 310
+4.36.558.296 I image decoded (batch 1/1) in 191 ms
+4.36.558.349 I decoding image batch 1/1, n_tokens_batch = 310
+4.36.766.524 I image decoded (batch 1/1) in 208 ms
+4.36.766.553 I slot process_mtmd: id  0 | task 7582 | encoding mtmd batch from idx = 931, n_chunks = 1
+4.38.866.716 I decoding image batch 1/1, n_tokens_batch = 310
+4.39.090.738 I image decoded (batch 1/1) in 224 ms
+4.39.090.773 I slot process_mtmd: id  0 | task 7582 | encoding mtmd batch from idx = 1241, n_chunks = 1
+4.41.312.723 I decoding image batch 1/1, n_tokens_batch = 273
+4.41.526.761 I image decoded (batch 1/1) in 214 ms
+4.41.526.799 I slot init_sampler: id  0 | task 7582 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+4.42.747.927 I slot print_timing: id  0 | task 7582 | prompt eval time =   11618.26 ms /  1518 tokens (    7.65 ms per token,   130.66 tokens per second)
+4.42.747.930 I slot print_timing: id  0 | task 7582 |        eval time =    1209.82 ms /   251 tokens (    4.84 ms per token,   206.64 tokens per second)
+4.42.747.931 I slot print_timing: id  0 | task 7582 |       total time =   12828.08 ms /  1769 tokens
+4.42.747.931 I slot print_timing: id  0 | task 7582 |    graphs reused =       7720
+4.42.747.938 I slot      release: id  0 | task 7582 | stop processing: n_tokens = 1768, truncated = 0
+4.42.747.952 I srv  update_slots: all slots are idle
+4.42.779.046 I srv  server_strea: conv_id= (empty=1)
+4.42.811.251 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+4.42.811.253 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126363819626
+4.42.811.267 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+4.42.811.270 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+4.42.811.271 I slot launch_slot_: id  0 | task 7835 | processing task, is_child = 0
+4.42.811.273 I slot   operator(): id  0 | task 7835 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+4.42.811.279 I slot   operator(): id  0 | task 7835 | cached n_tokens = 0, memory_seq_rm [0, end)
+4.42.814.174 I slot   operator(): id  0 | task 7835 | cached n_tokens = 1, memory_seq_rm [1, end)
+4.42.814.194 I slot process_mtmd: id  0 | task 7835 | encoding mtmd batch from idx = 1, n_chunks = 3
+4.49.138.012 I decoding image batch 1/1, n_tokens_batch = 310
+4.49.317.635 I image decoded (batch 1/1) in 180 ms
+4.49.317.668 I decoding image batch 1/1, n_tokens_batch = 310
+4.49.511.838 I image decoded (batch 1/1) in 194 ms
+4.49.511.866 I decoding image batch 1/1, n_tokens_batch = 310
+4.49.718.399 I image decoded (batch 1/1) in 207 ms
+4.49.718.426 I slot process_mtmd: id  0 | task 7835 | encoding mtmd batch from idx = 931, n_chunks = 1
+4.51.828.239 I decoding image batch 1/1, n_tokens_batch = 310
+4.52.052.320 I image decoded (batch 1/1) in 225 ms
+4.52.052.352 I slot process_mtmd: id  0 | task 7835 | encoding mtmd batch from idx = 1241, n_chunks = 1
+4.54.347.571 I decoding image batch 1/1, n_tokens_batch = 273
+4.54.559.540 I image decoded (batch 1/1) in 212 ms
+4.54.559.598 I slot init_sampler: id  0 | task 7835 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+4.55.974.263 I slot print_timing: id  0 | task 7835 | prompt eval time =   11759.76 ms /  1518 tokens (    7.75 ms per token,   129.08 tokens per second)
+4.55.974.266 I slot print_timing: id  0 | task 7835 |        eval time =    1403.22 ms /   290 tokens (    4.86 ms per token,   205.95 tokens per second)
+4.55.974.266 I slot print_timing: id  0 | task 7835 |       total time =   13162.98 ms /  1808 tokens
+4.55.974.266 I slot print_timing: id  0 | task 7835 |    graphs reused =       8006
+4.55.974.274 I slot      release: id  0 | task 7835 | stop processing: n_tokens = 1807, truncated = 0
+4.55.974.298 I srv  update_slots: all slots are idle
+4.55.980.677 I srv  server_strea: conv_id= (empty=1)
+4.56.019.417 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+4.56.019.425 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126377045962
+4.56.019.440 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+4.56.019.444 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+4.56.019.445 I slot launch_slot_: id  0 | task 8127 | processing task, is_child = 0
+4.56.019.448 I slot   operator(): id  0 | task 8127 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+4.56.019.453 I slot   operator(): id  0 | task 8127 | cached n_tokens = 0, memory_seq_rm [0, end)
+4.56.022.317 I slot   operator(): id  0 | task 8127 | cached n_tokens = 1, memory_seq_rm [1, end)
+4.56.022.336 I slot process_mtmd: id  0 | task 8127 | encoding mtmd batch from idx = 1, n_chunks = 3
+5.02.338.853 I decoding image batch 1/1, n_tokens_batch = 310
+5.02.513.620 I image decoded (batch 1/1) in 175 ms
+5.02.513.650 I decoding image batch 1/1, n_tokens_batch = 310
+5.02.704.087 I image decoded (batch 1/1) in 190 ms
+5.02.704.114 I decoding image batch 1/1, n_tokens_batch = 310
+5.02.910.285 I image decoded (batch 1/1) in 206 ms
+5.02.910.312 I slot process_mtmd: id  0 | task 8127 | encoding mtmd batch from idx = 931, n_chunks = 1
+5.05.010.218 I decoding image batch 1/1, n_tokens_batch = 310
+5.05.232.476 I image decoded (batch 1/1) in 223 ms
+5.05.232.506 I slot process_mtmd: id  0 | task 8127 | encoding mtmd batch from idx = 1241, n_chunks = 1
+5.07.433.757 I decoding image batch 1/1, n_tokens_batch = 273
+5.07.644.241 I image decoded (batch 1/1) in 210 ms
+5.07.644.275 I slot init_sampler: id  0 | task 8127 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+5.10.657.631 I slot print_timing: id  0 | task 8127 | n_gen =    607, tg = 201.85 t/s, tg_3s = 202.18 t/s
+5.11.508.264 I slot print_timing: id  0 | task 8127 | prompt eval time =   11635.95 ms /  1518 tokens (    7.67 ms per token,   130.46 tokens per second)
+5.11.508.267 I slot print_timing: id  0 | task 8127 |        eval time =    3852.85 ms /   769 tokens (    5.02 ms per token,   199.33 tokens per second)
+5.11.508.267 I slot print_timing: id  0 | task 8127 |       total time =   15488.80 ms /  2287 tokens
+5.11.508.268 I slot print_timing: id  0 | task 8127 |    graphs reused =       8770
+5.11.508.275 I slot      release: id  0 | task 8127 | stop processing: n_tokens = 2286, truncated = 0
+5.11.508.284 I srv  update_slots: all slots are idle
+5.12.535.985 I srv  server_strea: conv_id= (empty=1)
+5.12.565.298 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+5.12.565.300 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126392579963
+5.12.565.316 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+5.12.565.321 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+5.12.565.321 I slot launch_slot_: id  0 | task 8898 | processing task, is_child = 0
+5.12.565.325 I slot   operator(): id  0 | task 8898 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+5.12.565.330 I slot   operator(): id  0 | task 8898 | cached n_tokens = 0, memory_seq_rm [0, end)
+5.12.568.163 I slot   operator(): id  0 | task 8898 | cached n_tokens = 1, memory_seq_rm [1, end)
+5.12.568.182 I slot process_mtmd: id  0 | task 8898 | encoding mtmd batch from idx = 1, n_chunks = 3
+5.18.847.337 I decoding image batch 1/1, n_tokens_batch = 310
+5.19.021.010 I image decoded (batch 1/1) in 173 ms
+5.19.021.040 I decoding image batch 1/1, n_tokens_batch = 310
+5.19.215.690 I image decoded (batch 1/1) in 195 ms
+5.19.215.720 I decoding image batch 1/1, n_tokens_batch = 310
+5.19.421.810 I image decoded (batch 1/1) in 206 ms
+5.19.421.843 I slot process_mtmd: id  0 | task 8898 | encoding mtmd batch from idx = 931, n_chunks = 1
+5.21.518.587 I decoding image batch 1/1, n_tokens_batch = 310
+5.21.738.491 I image decoded (batch 1/1) in 220 ms
+5.21.738.519 I slot process_mtmd: id  0 | task 8898 | encoding mtmd batch from idx = 1241, n_chunks = 1
+5.23.958.758 I decoding image batch 1/1, n_tokens_batch = 273
+5.24.174.053 I image decoded (batch 1/1) in 215 ms
+5.24.174.086 I slot init_sampler: id  0 | task 8898 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+5.25.381.547 I slot print_timing: id  0 | task 8898 | prompt eval time =   11619.93 ms /  1518 tokens (    7.65 ms per token,   130.64 tokens per second)
+5.25.381.550 I slot print_timing: id  0 | task 8898 |        eval time =    1196.28 ms /   249 tokens (    4.82 ms per token,   207.31 tokens per second)
+5.25.381.551 I slot print_timing: id  0 | task 8898 |       total time =   12816.21 ms /  1767 tokens
+5.25.381.551 I slot print_timing: id  0 | task 8898 |    graphs reused =       9016
+5.25.381.559 I slot      release: id  0 | task 8898 | stop processing: n_tokens = 1766, truncated = 0
+5.25.381.567 I srv  update_slots: all slots are idle
+5.25.388.305 I srv  server_strea: conv_id= (empty=1)
+5.25.419.850 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.001 (1/1518) > 0.100
+5.25.419.852 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 1126406453247
+5.25.419.867 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+5.25.419.871 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+5.25.419.872 I slot launch_slot_: id  0 | task 9149 | processing task, is_child = 0
+5.25.419.874 I slot   operator(): id  0 | task 9149 | new prompt, n_ctx_slot = 32768, n_keep = 0, task.n_tokens = 1518
+5.25.419.889 I slot   operator(): id  0 | task 9149 | cached n_tokens = 0, memory_seq_rm [0, end)
+5.25.422.656 I slot   operator(): id  0 | task 9149 | cached n_tokens = 1, memory_seq_rm [1, end)
+5.25.422.676 I slot process_mtmd: id  0 | task 9149 | encoding mtmd batch from idx = 1, n_chunks = 3
+5.31.760.043 I decoding image batch 1/1, n_tokens_batch = 310
+5.31.942.333 I image decoded (batch 1/1) in 183 ms
+5.31.942.366 I decoding image batch 1/1, n_tokens_batch = 310
+5.32.136.748 I image decoded (batch 1/1) in 194 ms
+5.32.136.774 I decoding image batch 1/1, n_tokens_batch = 310
+5.32.343.563 I image decoded (batch 1/1) in 207 ms
+5.32.343.603 I slot process_mtmd: id  0 | task 9149 | encoding mtmd batch from idx = 931, n_chunks = 1
+5.34.451.736 I decoding image batch 1/1, n_tokens_batch = 310
+5.34.671.623 I image decoded (batch 1/1) in 220 ms
+5.34.671.653 I slot process_mtmd: id  0 | task 9149 | encoding mtmd batch from idx = 1241, n_chunks = 1
+5.36.859.928 I decoding image batch 1/1, n_tokens_batch = 273
+5.37.073.154 I image decoded (batch 1/1) in 213 ms
+5.37.073.194 I slot init_sampler: id  0 | task 9149 | init sampler, took 0.00 ms, tokens: text = 5, total = 1518
+5.38.298.648 I slot print_timing: id  0 | task 9149 | prompt eval time =   11664.43 ms /  1518 tokens (    7.68 ms per token,   130.14 tokens per second)
+5.38.298.651 I slot print_timing: id  0 | task 9149 |        eval time =    1214.31 ms /   251 tokens (    4.86 ms per token,   205.88 tokens per second)
+5.38.298.652 I slot print_timing: id  0 | task 9149 |       total time =   12878.75 ms /  1769 tokens
+5.38.298.652 I slot print_timing: id  0 | task 9149 |    graphs reused =       9264
+5.38.298.659 I slot      release: id  0 | task 9149 | stop processing: n_tokens = 1768, truncated = 0
+5.38.298.667 I srv  update_slots: all slots are idle
+5.38.328.802 I srv    operator(): operator(): cleaning up before exit...
+5.38.329.014 I common_memory_breakdown_print: | memory breakdown [MiB] | total   free    self   model   context   compute    unaccounted |
+5.38.329.016 I common_memory_breakdown_print: |   - Host               |                 4734 =  2731 +    1920 +      82                |
+5.38.329.016 I common_memory_breakdown_print: |   - CPU_REPACK         |                 2805 =  2805 +       0 +       0                |

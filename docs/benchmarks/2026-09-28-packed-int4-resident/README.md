@@ -1,7 +1,12 @@
 # Full-page pilot catches an INT4 prompt sensitivity
 
+The subsequent packed Q4-body/Q8-head comparison is now complete in
+[`powered-abba-1`](powered-abba-1/README.md): 96 audited requests, with Rust
+median complete-page speed ratios of 1.12–1.23 versus llama.cpp Q8_0. The pure-Q4
+failure and battery-interrupted run below remain separate historical evidence.
+
 All-Q4 did not pass the matched-prompt quality gate, so the planned repeated
-llama.cpp comparison has not run. Its four-page pilot reached EOS everywhere,
+all-Q4 llama.cpp comparison was not run. Its four-page pilot reached EOS everywhere,
 but the table returned an empty string (zero emitted tokens, CER1). English,
 Chinese and dense pages had CER0. The original-prompt table still works.
 `pilot/` retains the exact requests, responses, timing and process resources.
