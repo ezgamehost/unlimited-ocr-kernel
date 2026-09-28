@@ -1,0 +1,20 @@
+{
+  "binaries": {
+    "baseline": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/q8-scheduling/baseline",
+      "sha256": "3f1f59322ba6f224ad2b8190aa1a10593b0ca4ac3917db9757fd010c9a86ea08",
+      "source_sha256": "c4e297680cffc01d62ba5c5650ca323fab77b6a157d913648527e94c774c3bb1"
+    },
+    "eight": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/q4-eight-row/candidate",
+      "sha256": "7001626cd6741540eda2dd1fd9859372b54fece96e318f70ab679f386247fdec",
+      "source_sha256": {
+        "src/cpu/neon.rs": "16b05f4609fce007493d6fe4bac94239ff7afd031ebc0cb847d6848d57edd918",
+        "src/cpu/int4.rs": "9dd4bf4a23bf9dfc520efb14457e96518d7bd4e76d4e0d9824395ed8a7f2d524"
+      }
+    }
+  },
+  "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+  "overlay_sha256": "6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae",
+  "source_commit": "31821dd1509509064b326adc0415cc777325e160"
+}

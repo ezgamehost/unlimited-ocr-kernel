@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "baseline": {
+      "prefill_seconds": {
+        "median": 1.6149495004999999,
+        "minimum": 1.6019675,
+        "maximum": 1.62146425
+      },
+      "decode_with_checksum_seconds": {
+        "median": 3.404646021,
+        "minimum": 3.369943917,
+        "maximum": 3.415918333
+      }
+    },
+    "eight": {
+      "prefill_seconds": {
+        "median": 1.625146563,
+        "minimum": 1.614016417,
+        "maximum": 1.6302612079999999
+      },
+      "decode_with_checksum_seconds": {
+        "median": 3.438481104,
+        "minimum": 3.413909542,
+        "maximum": 3.45125775
+      }
+    }
+  },
+  "logits_sha256": "c129d845d9d0f6b2b1f7bc1aaa7741d1a9fb95b428a1016f519df94acb862f3a",
+  "measured_samples_per_variant": 6
+}

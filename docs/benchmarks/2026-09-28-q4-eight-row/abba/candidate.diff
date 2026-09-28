@@ -1,0 +1,193 @@
+diff --git a/src/cpu/int4.rs b/src/cpu/int4.rs
+index ca88f08..dcbf602 100644
+--- a/src/cpu/int4.rs
++++ b/src/cpu/int4.rs
+@@ -206,15 +206,33 @@ impl Int4Matrix {
+         };
+         let mut data = vec![0.; self.rows];
+         let compute = |(group, output): (usize, &mut [f32])| {
+-            let first = group * 4;
++            let first = group * 8;
+             #[cfg(target_arch = "aarch64")]
+             if cpu.backend != Backend::Scalar
+                 && std::arch::is_aarch64_feature_detected!("dotprod")
+                 && self.cols.is_multiple_of(BLOCK)
+-                && output.len() == 4
++                && output.len() == 8
+             {
+-                // SAFETY: dotprod detected; validated four rows of complete
++                // SAFETY: dotprod detected; validated eight rows of complete
+                 // block32 packed weights and matching activation/scales.
++                let values = unsafe {
++                    super::neon::dot_int4_eight_rows(
++                        &self.weights[first * self.blocks * 16..(first + 8) * self.blocks * 16],
++                        codes,
++                        &self.scales[first * self.blocks..(first + 8) * self.blocks],
++                        scales,
++                    )
++                };
++                output.copy_from_slice(&values);
++                return;
++            }
++            #[cfg(target_arch = "aarch64")]
++            if cpu.backend != Backend::Scalar
++                && std::arch::is_aarch64_feature_detected!("dotprod")
++                && self.cols.is_multiple_of(BLOCK)
++                && output.len() == 4
++            {
++                // SAFETY: detected dotprod and four complete validated rows.
+                 let values = unsafe {
+                     super::neon::dot_int4_four_rows(
+                         &self.weights[first * self.blocks * 16..(first + 4) * self.blocks * 16],
+@@ -234,11 +252,11 @@ impl Int4Matrix {
+             || cpu.threads() == 1
+             || self.rows * self.cols <= 128 * 1024
+         {
+-            data.chunks_mut(4).enumerate().for_each(compute);
++            data.chunks_mut(8).enumerate().for_each(compute);
+         } else {
+             cpu.pool.install(|| {
+-                data.par_chunks_mut(4)
+-                    .with_min_len(self.rows.div_ceil(4).div_ceil(cpu.threads()))
++                data.par_chunks_mut(8)
++                    .with_min_len(self.rows.div_ceil(8).div_ceil(cpu.threads()))
+                     .enumerate()
+                     .for_each(compute)
+             });
+diff --git a/src/cpu/neon.rs b/src/cpu/neon.rs
+index bcf7f6a..f7768b0 100644
+--- a/src/cpu/neon.rs
++++ b/src/cpu/neon.rs
+@@ -294,10 +294,109 @@ pub(super) unsafe fn dot_int4_four_rows(
+     result
+ }
+ 
++/// Eight row-major outputs sharing activation loads, with ordered block sums.
++#[cfg(target_arch = "aarch64")]
++#[target_feature(enable = "dotprod")]
++pub(super) unsafe fn dot_int4_eight_rows(
++    weights: &[u8],
++    x: &[i8],
++    ws: &[f32],
++    xs: &[f32],
++) -> [f32; 8] {
++    use std::arch::aarch64::*;
++    assert!(x.len().is_multiple_of(32));
++    assert_eq!(weights.len().checked_div(4), Some(x.len()));
++    assert!(weights.len().is_multiple_of(4));
++    let blocks = x.len() / 32;
++    assert_eq!(xs.len(), blocks);
++    assert_eq!(ws.len(), blocks * 8);
++    let mut totals = [vdupq_n_f32(0.); 2];
++    for b in 0..blocks {
++        // SAFETY: caller proves dotprod support. Length assertions cover eight
++        // complete packed rows, activation blocks, and both scale arrays.
++        // Every signed integer block sum is bounded by 32*8*128 and fits i32.
++        unsafe {
++            let x0 = vld1q_s8(x.as_ptr().add(b * 32));
++            let x1 = vld1q_s8(x.as_ptr().add(b * 32 + 16));
++            let mut sums = [vdupq_n_s32(0); 8];
++            for (row, sum) in sums.iter_mut().enumerate() {
++                let w = vld1q_u8(weights.as_ptr().add(row * (x.len() / 2) + b * 16));
++                let low = vshrq_n_s8::<4>(vreinterpretq_s8_u8(vshlq_n_u8::<4>(w)));
++                let high = vshrq_n_s8::<4>(vreinterpretq_s8_u8(w));
++                *sum = vdotq_s32(vdotq_s32(*sum, low, x0), high, x1);
++            }
++            for (half, total) in totals.iter_mut().enumerate() {
++                let row = half * 4;
++                let sums = vpaddq_s32(
++                    vpaddq_s32(sums[row], sums[row + 1]),
++                    vpaddq_s32(sums[row + 2], sums[row + 3]),
++                );
++                let scales = [
++                    ws[row * blocks + b],
++                    ws[(row + 1) * blocks + b],
++                    ws[(row + 2) * blocks + b],
++                    ws[(row + 3) * blocks + b],
++                ];
++                let scaled = vmulq_n_f32(
++                    vmulq_f32(vcvtq_f32_s32(sums), vld1q_f32(scales.as_ptr())),
++                    xs[b],
++                );
++                *total = vaddq_f32(*total, scaled);
++            }
++        }
++    }
++    let mut result = [0.; 8];
++    // SAFETY: two disjoint complete four-float regions in result.
++    unsafe {
++        vst1q_f32(result.as_mut_ptr(), totals[0]);
++        vst1q_f32(result.as_mut_ptr().add(4), totals[1]);
++    }
++    result
++}
++
+ #[cfg(all(test, target_arch = "aarch64"))]
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn packed_eight_rows_match_two_four_row_calls_bits() {
++        if !std::arch::is_aarch64_feature_detected!("dotprod") {
++            return;
++        }
++        for cols in [32usize, 64, 96, 896, 1280, 1792, 6848] {
++            let blocks = cols / 32;
++            let packed: Vec<u8> = (0..cols * 4)
++                .map(|i| {
++                    let low = ((i * 53 % 15) as i8 - 7) as u8 & 15;
++                    let high = ((i * 37 % 15) as i8 - 7) as u8 & 15;
++                    low | high << 4
++                })
++                .collect();
++            let x: Vec<i8> = (0..cols)
++                .map(|i| ((i * 71 % 256) as i16 - 128) as i8)
++                .collect();
++            let ws: Vec<f32> = (0..blocks * 8)
++                .map(|i| [0., -0., 0.00317, 0.7, 1e-10, 17., 1e10][i % 7])
++                .collect();
++            let xs: Vec<f32> = (0..blocks).map(|i| (i % 17 + 1) as f32 / 123.).collect();
++            // SAFETY: feature detected; complete validated eight-row buffers.
++            let actual = unsafe { dot_int4_eight_rows(&packed, &x, &ws, &xs) };
++            for half in 0..2 {
++                let expected = unsafe {
++                    dot_int4_four_rows(
++                        &packed[half * cols * 2..(half + 1) * cols * 2],
++                        &x,
++                        &ws[half * blocks * 4..(half + 1) * blocks * 4],
++                        &xs,
++                    )
++                };
++                for lane in 0..4 {
++                    assert_eq!(actual[half * 4 + lane].to_bits(), expected[lane].to_bits());
++                }
++            }
++        }
++    }
++
+     #[test]
+     fn packed_four_rows_match_i8_simulation_bits() {
+         if !std::arch::is_aarch64_feature_detected!("dotprod") {
+diff --git a/tests/int4.rs b/tests/int4.rs
+index 87ad5fa..ea14a86 100644
+--- a/tests/int4.rs
++++ b/tests/int4.rs
+@@ -50,8 +50,16 @@ fn literal_nibbles_and_invalid_storage() {
+ 
+ #[test]
+ fn packed_matches_simulation_for_dequantization_and_linear() {
+-    for cols in [1usize, 15, 16, 17, 31, 32, 33, 63, 64, 131, 512, 513, 1280] {
+-        let rows = if cols == 512 || cols == 513 { 257 } else { 7 };
++    for cols in [
++        1usize, 15, 16, 17, 31, 32, 33, 63, 64, 131, 512, 513, 1280, 1281, 1282,
++    ] {
++        let rows = match cols {
++            512 | 513 => 257,
++            1280 => 268,
++            1281 => 269,
++            1282 => 271,
++            _ => 7,
++        };
+         let blocks = cols.div_ceil(32);
+         let codes: Vec<i8> = (0..rows * cols).map(|i| (i % 15) as i8 - 7).collect();
+         let scales: Vec<f32> = (0..rows * blocks)
