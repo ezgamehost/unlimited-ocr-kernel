@@ -8,6 +8,51 @@ use uocr::{
 };
 
 #[test]
+fn vision_descriptor_type_and_shape_are_checked_before_expansion() {
+    use std::io::Write;
+    use uocr::error::OcrError;
+    for (dtype, width, bytes) in [("I8", 1280, 1280), ("F32", 1, 4)] {
+        let mut file = tempfile::NamedTempFile::new().unwrap();
+        let header = serde_json::json!({"model.image_newline": {
+            "dtype":dtype, "shape":[width], "data_offsets":[0,bytes]
+        }})
+        .to_string();
+        file.write_all(&(header.len() as u64).to_le_bytes())
+            .unwrap();
+        file.write_all(header.as_bytes()).unwrap();
+        file.as_file()
+            .set_len(8 + header.len() as u64 + bytes)
+            .unwrap();
+        let checkpoint = Checkpoint::open(file.path()).unwrap();
+        let result = Vision::new(&checkpoint);
+        if dtype == "I8" {
+            assert!(matches!(result, Err(OcrError::Unsupported(_))));
+        } else {
+            assert!(matches!(result, Err(OcrError::Shape(_))));
+        }
+    }
+}
+
+#[test]
+fn incomplete_vision_checkpoint_is_rejected_at_construction() {
+    use std::io::Write;
+    let mut file = tempfile::NamedTempFile::new().unwrap();
+    let bytes = 768 * 3 * 16 * 16 * 2;
+    let header = serde_json::json!({"model.sam_model.patch_embed.proj.weight": {
+        "dtype":"BF16", "shape":[768,3,16,16], "data_offsets":[0,bytes]
+    }})
+    .to_string();
+    file.write_all(&(header.len() as u64).to_le_bytes())
+        .unwrap();
+    file.write_all(header.as_bytes()).unwrap();
+    file.as_file()
+        .set_len(8 + header.len() as u64 + bytes as u64)
+        .unwrap();
+    let checkpoint = Checkpoint::open(file.path()).unwrap();
+    assert!(Vision::new(&checkpoint).is_err());
+}
+
+#[test]
 fn window_shapes_reject_overflow_before_allocation() {
     let one = Tensor::new(vec![1, 1, 1, 1], vec![1.]).unwrap();
     for size in [usize::MAX, 1usize << (usize::BITS / 2)] {

@@ -119,3 +119,25 @@ configurations before checkpoint descriptor access. The full Rust suite, clippy,
 and both original decoder reference tests pass. [Logs](derived-config/) retain
 RED/GREEN and artifact-dependent evidence. Vision descriptor validation and
 allocation-lifetime optimization remain open.
+
+
+## Vision-descriptor follow-up
+
+Item 3 is addressed: `Vision::new` validates all 475 consumed descriptors before
+expanding any weights to FP32. The schema covers SAM local/global relative
+positions, all SAM/CLIP layers, projection and image separators. Floating-point
+dtypes and exact supported shapes are required. Unused checkpoint tensors,
+including CLIP's unused RGB patch embedding, are not expanded.
+
+Constructor regressions reject an incomplete patch-only checkpoint and report
+invalid image-newline dtype/shape at the validation boundary. The full Rust
+suite and clippy pass; all eight release vision tests, including the original
+single-view and multi-crop references, pass. The initial debug doctest phase
+failed to resolve serde/tokenizers despite passing unit/integration tests.
+A dependency rebuild on retry passed, followed by a clean complete suite; the
+precise trigger of that build-artifact issue was not established. Both failed
+and passing logs are retained in [vision-descriptors](vision-descriptors/).
+
+This closes the listed descriptor/config/image/window preflight fixes. The
+aggregate allocation-lifetime work and final independent review remain open;
+the broader benchmark and model-quality acceptance work is also incomplete.

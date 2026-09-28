@@ -1,0 +1,22 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.28s
+     Running tests/vision.rs (target/debug/deps/vision-4da41cd89896de14)
+
+running 1 test
+test vision_descriptor_type_and_shape_are_checked_before_expansion ... FAILED
+
+failures:
+
+---- vision_descriptor_type_and_shape_are_checked_before_expansion stdout ----
+
+thread 'vision_descriptor_type_and_shape_are_checked_before_expansion' (3963842) panicked at tests/vision.rs:25:13:
+assertion failed: matches!(result, Err(OcrError::Unsupported(_)))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    vision_descriptor_type_and_shape_are_checked_before_expansion
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test vision`

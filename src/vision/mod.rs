@@ -1,5 +1,6 @@
 mod clip;
 mod sam;
+mod schema;
 mod spatial;
 use crate::{
     checkpoint::Checkpoint,
@@ -19,22 +20,14 @@ pub struct Vision {
 
 impl Vision {
     pub fn new(checkpoint: &Checkpoint) -> Result<Self> {
+        // Validate every consumed descriptor before materializing any FP32 data.
+        let names = schema::validate(checkpoint)?;
         let mut weights = BTreeMap::new();
-        for name in checkpoint.names().filter(|n| {
-            n.starts_with("model.sam_model.")
-                || n.starts_with("model.vision_model.")
-                || n.starts_with("model.projector.")
-                || *n == "model.image_newline"
-                || *n == "model.view_seperator"
-        }) {
-            let w = checkpoint.tensor(name)?;
-            weights.insert(name.to_owned(), Tensor::new(w.shape.to_vec(), w.to_f32())?);
+        for name in names {
+            let w = checkpoint.tensor(&name)?;
+            weights.insert(name, Tensor::new(w.shape.to_vec(), w.to_f32())?);
         }
-        let model = Self { weights };
-        if model.w("model.sam_model.patch_embed.proj.weight")?.shape != [768, 3, 16, 16] {
-            return Err(OcrError::Unsupported("vision patch encoder shape".into()));
-        }
-        Ok(model)
+        Ok(Self { weights })
     }
     fn w(&self, name: &str) -> Result<&Tensor> {
         self.weights

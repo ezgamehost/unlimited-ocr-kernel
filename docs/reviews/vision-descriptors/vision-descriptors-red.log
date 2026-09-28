@@ -1,0 +1,22 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running tests/vision.rs (target/debug/deps/vision-4da41cd89896de14)
+
+running 1 test
+test incomplete_vision_checkpoint_is_rejected_at_construction ... FAILED
+
+failures:
+
+---- incomplete_vision_checkpoint_is_rejected_at_construction stdout ----
+
+thread 'incomplete_vision_checkpoint_is_rejected_at_construction' (3963056) panicked at tests/vision.rs:22:5:
+assertion failed: Vision::new(&checkpoint).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    incomplete_vision_checkpoint_is_rejected_at_construction
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--test vision`
