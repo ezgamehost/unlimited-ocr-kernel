@@ -1,0 +1,20 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 16.33s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 12 tests
+test cpu::cache_probe::compare_kv_strides ... ignored, isolated attention layout timing probe; macOS Accelerate required
+test decoder::tests::qkv_matches_independent_projections_across_worker_and_memory_budgets ... ignored, requires pinned original model weights
+test model::benchmark::fixed_work_decoder_benchmark ... ignored, requires original weights, INT8 overlay, and English vision reference
+test model::benchmark::table_prompt_quantization_diagnostic ... ignored, requires pinned model, overlays and table page
+test cpu::neon::tests::packed_four_rows_match_i8_simulation_bits ... ok
+test cpu::neon::tests::four_rows_match_single_row_dot_bits ... ok
+test cpu::tests::expert_worker_reuses_pool_but_limits_inner_parallelism_and_memory ... ok
+test model::tests::image_scatter_validates_shape_and_positions_before_mutation ... ok
+test cpu::tests::shared_expert_uses_spare_workers_with_same_memory_partition ... ok
+test cpu::blas_threads::tests::single_thread_guard_restores_nested_and_unwound_policy ... ok
+test vision::sam::tests::relative_bias_rows_preserve_indexed_formula ... ok
+test cpu::neon_gelu::tests::gelu_matches_libm_bits_for_boundaries_mixed_lanes_alignment_and_tails ... ok
+
+test result: ok. 8 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -1,0 +1,16 @@
+{
+  "binaries": {
+    "baseline": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/qkv-precision/baseline",
+      "sha256": "495d2da679900d773017eef6a5a1e96871262481e19d7a38767bee4cf9e032bb",
+      "decoder_source_sha256": "32ca89dccd9deef28c3e944499fb90205cccb24e6787231d5ceffd97bcb25a5b"
+    },
+    "candidate": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/qkv-precision/candidate",
+      "sha256": "7b2821ad84b0991a343790e531252961c7e0c5ce1b6832d5cda8493a90ebbfa9",
+      "decoder_source_sha256": "b4f4ea0f7548f006f76cf38891ceebc8454154acaa6aad23fb83d4325b2ac508"
+    }
+  },
+  "harness_sha256": "8eb59887d085490b6e8b1ef1b6ee2a82f496193716513f43684e472ff0164210",
+  "cli_sha256": "1f1902e4db8a0c9ad5ad79242a439c589ba423ab8462cf52754e8af285c1f193"
+}

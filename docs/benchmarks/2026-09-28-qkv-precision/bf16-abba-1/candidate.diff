@@ -1,0 +1,42 @@
+diff --git a/src/model/benchmark.rs b/src/model/benchmark.rs
+index 4ade58c..0674c6a 100644
+--- a/src/model/benchmark.rs
++++ b/src/model/benchmark.rs
+@@ -9,12 +9,16 @@ fn fixed_work_decoder_benchmark() {
+     let overlay = std::env::var_os("UOCR_BENCH_WEIGHTS")
+         .map(std::path::PathBuf::from)
+         .unwrap_or_else(|| "artifacts/unlimited-ocr-q8-block32.safetensors".into());
+-    let model = Model::load_with_quantization(
+-        Path::new("artifacts/upstream"),
+-        Some(&overlay),
+-        QuantizationMode::DynamicActivations,
+-    )
+-    .unwrap();
++    let precision = std::env::var("UOCR_BENCH_PRECISION").unwrap_or_else(|_| "dynamic".into());
++    let (overlay, mode) = match precision.as_str() {
++        "bf16" => (None, QuantizationMode::WeightsOnly),
++        "weights" => (Some(overlay), QuantizationMode::WeightsOnly),
++        "dynamic" => (Some(overlay), QuantizationMode::DynamicActivations),
++        other => panic!("unsupported UOCR_BENCH_PRECISION: {other}"),
++    };
++    let model =
++        Model::load_with_quantization(Path::new("artifacts/upstream"), overlay.as_deref(), mode)
++            .unwrap();
+     let reference = Checkpoint::open(Path::new(
+         "artifacts/reference-english-gundam-f32/vision.safetensors",
+     ))
+@@ -29,9 +33,11 @@ fn fixed_work_decoder_benchmark() {
+     .unwrap();
+     let tokens: Vec<u32> = serde_json::from_value(recorded["token_ids"].clone()).unwrap();
+     assert_eq!(tokens.len(), 250);
+-    let decoder = Decoder::new(&model.checkpoint, model.config.clone())
+-        .unwrap()
+-        .with_quantization(model.quantized.as_ref().unwrap(), model.quantization_mode);
++    let decoder = Decoder::new(&model.checkpoint, model.config.clone()).unwrap();
++    let decoder = match model.quantized.as_ref() {
++        Some(weights) => decoder.with_quantization(weights, model.quantization_mode),
++        None => decoder,
++    };
+     let mut embeddings = decoder.embedding(&input.ids).unwrap();
+     let width = model.config.hidden_size;
+     for (row, &position) in input.image_positions.iter().enumerate() {

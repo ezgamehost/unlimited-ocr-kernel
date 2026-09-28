@@ -1,0 +1,10 @@
+
+running 1 test
+test model::benchmark::fixed_work_decoder_benchmark ... {"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":4.948182958,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188954338966725754,"logits_sha256":"327528457aba52b54634cad553b03b6429245e97b473b64d4859945d7e874050","overlay":null,"precision":"bf16_weights_fp32","prefill_seconds":2.265594292,"prefix_tokens":1517,"repetition":0,"threads":8,"warmup":true}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":4.73819825,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188954338966725754,"logits_sha256":"327528457aba52b54634cad553b03b6429245e97b473b64d4859945d7e874050","overlay":null,"precision":"bf16_weights_fp32","prefill_seconds":1.5026068750000001,"prefix_tokens":1517,"repetition":1,"threads":8,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":4.774268834,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188954338966725754,"logits_sha256":"327528457aba52b54634cad553b03b6429245e97b473b64d4859945d7e874050","overlay":null,"precision":"bf16_weights_fp32","prefill_seconds":1.521670125,"prefix_tokens":1517,"repetition":2,"threads":8,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":4.6945274999999995,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188954338966725754,"logits_sha256":"327528457aba52b54634cad553b03b6429245e97b473b64d4859945d7e874050","overlay":null,"precision":"bf16_weights_fp32","prefill_seconds":1.492448625,"prefix_tokens":1517,"repetition":3,"threads":8,"warmup":false}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 27.25s
+

@@ -1,0 +1,10 @@
+
+running 1 test
+test model::benchmark::fixed_work_decoder_benchmark ... {"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":5.94603575,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188960396293333958,"logits_sha256":"f811aa65bb9494b41c0a3baba2c63be24f4dc999bfea7c8b1e93d52d5ae4fbbc","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_fp32","prefill_seconds":2.249498709,"prefix_tokens":1517,"repetition":0,"threads":8,"warmup":true}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":4.885341583,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188960396293333958,"logits_sha256":"f811aa65bb9494b41c0a3baba2c63be24f4dc999bfea7c8b1e93d52d5ae4fbbc","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_fp32","prefill_seconds":1.479499917,"prefix_tokens":1517,"repetition":1,"threads":8,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":4.983653125,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188960396293333958,"logits_sha256":"f811aa65bb9494b41c0a3baba2c63be24f4dc999bfea7c8b1e93d52d5ae4fbbc","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_fp32","prefill_seconds":1.469941458,"prefix_tokens":1517,"repetition":2,"threads":8,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":5.090462459,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188960396293333958,"logits_sha256":"f811aa65bb9494b41c0a3baba2c63be24f4dc999bfea7c8b1e93d52d5ae4fbbc","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_fp32","prefill_seconds":1.463609,"prefix_tokens":1517,"repetition":3,"threads":8,"warmup":false}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 33.58s
+
