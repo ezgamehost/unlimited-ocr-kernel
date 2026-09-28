@@ -1,11 +1,13 @@
 """Catch biased aggregation, corrupt fixture acceptance and inaccurate scoring."""
 import json
 import os
+import signal
+import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
-from types import SimpleNamespace
 from pathlib import Path
 
 from tools.benchmark import aggregate, validate_image, run_llama, benchmark_environment, completion_text_without_eos
@@ -13,6 +15,55 @@ from tools.score import character_error_rate, normalize_ocr
 
 
 class BenchmarkTests(unittest.TestCase):
+    def test_timeout_stops_child_and_sigterm_ignoring_grandchild(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            grandchild = root / 'grandchild.py'
+            grandchild.write_text(
+                "import os,signal,sys,time\n"
+                "from pathlib import Path\n"
+                "signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
+                "Path(sys.argv[1]).write_text(str(os.getpid()))\n"
+                "print('grandchild ready', flush=True)\n"
+                "time.sleep(60)\n")
+            child = root / 'child.py'
+            child.write_text(
+                "import os,signal,subprocess,sys,time\n"
+                "from pathlib import Path\n"
+                "signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
+                "Path(sys.argv[1]).write_text(str(os.getpid()))\n"
+                "subprocess.Popen([sys.executable,sys.argv[2],sys.argv[3]])\n"
+                "time.sleep(60)\n")
+            pid_files = [root / 'child.pid', root / 'grandchild.pid']
+            try:
+                result = run_llama(
+                    [sys.executable, str(child), str(pid_files[0]), str(grandchild), str(pid_files[1])],
+                    root / 'result', 10, 1.0)
+                self.assertTrue(result['timed_out'])
+                self.assertEqual(result['status'], 'error')
+                self.assertEqual(result['finish_reason'], 'error')
+                self.assertIn('grandchild ready', result['output'])
+                for path in pid_files:
+                    pid = int(path.read_text())
+                    deadline = time.monotonic() + 2
+                    while True:
+                        status = subprocess.run(
+                            ['ps', '-o', 'stat=', '-p', str(pid)],
+                            capture_output=True, text=True).stdout.strip()
+                        if not status or status.startswith('Z'):
+                            break
+                        if time.monotonic() >= deadline:
+                            self.fail(f'inference descendant {pid} is still running: {status}')
+                        time.sleep(0.02)
+            finally:
+                # Even the intentionally failing pre-fix test must not leak work.
+                for path in pid_files:
+                    if path.exists():
+                        try:
+                            os.kill(int(path.read_text()), signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+
     def test_real_cli_cap_minus_one_log_is_not_eos(self):
         fixture = Path(__file__).resolve().parents[2] / "docs/benchmarks/2026-09-28-max32/llama-q8-256.stderr.txt"
         code = "import pathlib,sys; sys.stderr.write(pathlib.Path(sys.argv[1]).read_text())"
@@ -67,15 +118,13 @@ class BenchmarkTests(unittest.TestCase):
                 benchmark_environment(workers, blas)
 
     def test_all_vision_batches_are_counted(self):
-        def process(command, stdout, stderr, timeout):
-            stderr.write(b"mtmd batch encoding done in 7103 ms\n"
-                         b"mtmd batch encoding done in 2059 ms\n"
-                         b"mtmd batch encoding done in 2174 ms\n"
-                         b"eval time = 1230.21 ms / 250 runs\n")
-            return SimpleNamespace(returncode=0)
-
-        with tempfile.TemporaryDirectory() as directory, patch("tools.benchmark.subprocess.run", side_effect=process):
-            result = run_llama(["fake"], Path(directory) / "page", 2048, 30)
+        log = ("mtmd batch encoding done in 7103 ms\n"
+               "mtmd batch encoding done in 2059 ms\n"
+               "mtmd batch encoding done in 2174 ms\n"
+               "eval time = 1230.21 ms / 250 runs\n")
+        code = f"import sys; sys.stderr.write({log!r})"
+        with tempfile.TemporaryDirectory() as directory:
+            result = run_llama([sys.executable, '-c', code], Path(directory) / "page", 2048, 30)
         self.assertEqual(result["vision_seconds"], 11.336)
         self.assertEqual(result["decode_seconds"], 1.23021)
         self.assertEqual(result["finish_reason"], "eos")

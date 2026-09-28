@@ -61,6 +61,31 @@ fn conv_nhwc_matches_hand_computed_patch_sums() {
 }
 
 #[test]
+fn convolution_preserves_channels_padding_stride_and_bias_at_budget_boundary() {
+    let x = tensor(&[1, 3, 4, 2], &[1., 2.].repeat(12));
+    let w = tensor(
+        &[3, 2, 2, 2],
+        &[
+            1., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 2., 3., 4., -1.,
+            -2., -3., -4.,
+        ],
+    );
+    let expected = [
+        11., 1., -3.5, 12., 3., -6.5, 11., 1., -2.5, 12., 3., -5.5, 14., 7., -9.5, 12., 3., -3.5,
+    ];
+    // Six im2col rows of eight floats plus six output rows of three floats.
+    let budget = (6 * 8 + 6 * 3) * 4;
+    for backend in [Backend::Scalar, Backend::Auto] {
+        let mut cpu = CpuContext::new(backend, 1, budget).unwrap();
+        let output = ops::conv2d(&x, &w, Some(&[10., -1., 0.5]), 2, 1, &mut cpu).unwrap();
+        assert_eq!(output.shape, [1, 2, 3, 3]);
+        assert_eq!(output.data, expected);
+        let mut cpu = CpuContext::new(backend, 1, budget - 1).unwrap();
+        assert!(ops::conv2d(&x, &w, None, 2, 1, &mut cpu).is_err());
+    }
+}
+
+#[test]
 fn rotary_uses_split_halves_and_absolute_positions() {
     let mut values: [f32; 4] = [1., 2., 3., 4.];
     ops::rope(&mut values, 4, 0, 10000.).unwrap();

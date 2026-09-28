@@ -1,0 +1,404 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index 8e3111d..ff01997 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -14,16 +14,34 @@ pub fn linear(
+ ) -> Result<Tensor> {
+     x.validate()?;
+     weight.validate()?;
++    if weight.shape.len() != 2 {
++        return Err(OcrError::Shape(
++            "linear weight must have shape [out,in]".into(),
++        ));
++    }
++    linear_slice(x, &weight.data, weight.shape[0], weight.shape[1], bias, cpu)
++}
++
++/// Borrow an already contiguous output-by-input matrix, including flattened
++/// convolution weights, without allocating a duplicate tensor.
++fn linear_slice(
++    x: &Tensor,
++    weight: &[f32],
++    n: usize,
++    columns: usize,
++    bias: Option<&[f32]>,
++    cpu: &mut CpuContext,
++) -> Result<Tensor> {
++    x.validate()?;
+     let k = *x
+         .shape
+         .last()
+         .ok_or_else(|| OcrError::Shape("linear input must have a dimension".into()))?;
+-    if k == 0 || weight.shape.len() != 2 || weight.shape[1] != k || weight.shape[0] == 0 {
++    if k == 0 || columns != k || n == 0 || weight.len() != element_count(&[n, columns])? {
+         return Err(OcrError::Shape(
+             "linear weight must have shape [out,in]".into(),
+         ));
+     }
+-    let n = weight.shape[0];
+     let m = x.data.len() / k;
+     if bias.is_some_and(|b| b.len() != n) {
+         return Err(OcrError::Shape("linear bias length mismatch".into()));
+@@ -34,13 +52,13 @@ pub fn linear(
+     cpu.check_elements(count)?;
+     let mut data = vec![0.; count];
+     if m != 0 && cfg!(target_os = "macos") && cpu.backend != Backend::Scalar {
+-        accelerate::linear(&x.data, &weight.data, &mut data, m, n, k)?;
++        accelerate::linear(&x.data, weight, &mut data, m, n, k)?;
+     } else {
+         for i in 0..m {
+             for j in 0..n {
+                 data[i * n + j] = x.data[i * k..(i + 1) * k]
+                     .iter()
+-                    .zip(&weight.data[j * k..(j + 1) * k])
++                    .zip(&weight[j * k..(j + 1) * k])
+                     .map(|(a, b)| a * b)
+                     .sum();
+             }
+@@ -558,8 +576,7 @@ pub fn conv2d(
+         }
+     }
+     let patch = Tensor::new(vec![rows, columns], patches)?;
+-    let weight = Tensor::new(vec![outputs, columns], w.data.clone())?;
+-    let mut output = linear(&patch, &weight, bias, cpu)?;
++    let mut output = linear_slice(&patch, &w.data, outputs, columns, bias, cpu)?;
+     output.shape = vec![batch, oh, ow, outputs];
+     Ok(output)
+ }
+diff --git a/src/model/mod.rs b/src/model/mod.rs
+index fe54485..95718cc 100644
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -9,6 +9,7 @@ use crate::{
+     generation::{FinishReason, GenerationOptions, select_token},
+     preprocess::{self, ImageMode},
+     prompt::PromptEncoder,
++    tensor::Tensor,
+     vision::Vision,
+ };
+ use serde::{Deserialize, Serialize};
+@@ -20,6 +21,33 @@ use std::{
+ fn default_prompt() -> String {
+     "<image>document parsing.".into()
+ }
++
++fn scatter_image_features(
++    embeddings: &mut Tensor,
++    features: &Tensor,
++    positions: &[usize],
++) -> Result<()> {
++    embeddings.validate()?;
++    features.validate()?;
++    if embeddings.shape.len() != 2
++        || embeddings.shape[1] == 0
++        || features.shape != [positions.len(), embeddings.shape[1]]
++        || positions
++            .iter()
++            .any(|&position| position >= embeddings.shape[0])
++    {
++        return Err(OcrError::Shape(
++            "image features and prompt embeddings disagree".into(),
++        ));
++    }
++    let width = embeddings.shape[1];
++    for (row, &position) in positions.iter().enumerate() {
++        embeddings.data[position * width..(position + 1) * width]
++            .copy_from_slice(&features.data[row * width..(row + 1) * width]);
++    }
++    Ok(())
++}
++
+ fn default_mode() -> ImageMode {
+     ImageMode::Gundam
+ }
+@@ -87,6 +115,11 @@ impl Model {
+             ));
+         }
+         let config = config::ModelConfig::load(&directory.join("config.json"))?;
++        if config.hidden_size != 1280 {
++            return Err(OcrError::Unsupported(
++                "vision projector requires decoder hidden_size 1280".into(),
++            ));
++        }
+         let checkpoint = Checkpoint::open(&directory.join("model-00001-of-000001.safetensors"))?;
+         Decoder::new(&checkpoint, config.clone())?;
+         let quantized = overlay
+@@ -132,11 +165,7 @@ impl Model {
+             decoder = decoder.with_quantization(quantized, self.quantization_mode);
+         }
+         let mut embeddings = decoder.embedding(&input.ids)?;
+-        for (row, &position) in input.image_positions.iter().enumerate() {
+-            let width = self.config.hidden_size;
+-            embeddings.data[position * width..(position + 1) * width]
+-                .copy_from_slice(&features.data[row * width..(row + 1) * width]);
+-        }
++        scatter_image_features(&mut embeddings, &features, &input.image_positions)?;
+         let (mut state, mut logits) = decoder.prefill(&embeddings, cpu)?;
+         let prefill_seconds = stamp.elapsed().as_secs_f64();
+         let mut history = input.ids;
+@@ -184,3 +213,38 @@ impl Model {
+         })
+     }
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::tensor::Tensor;
++
++    #[test]
++    fn image_scatter_validates_shape_and_positions_before_mutation() {
++        let original = Tensor::new(vec![4, 3], vec![-1.; 12]).unwrap();
++        let features = Tensor::new(vec![2, 3], vec![1., 2., 3., 4., 5., 6.]).unwrap();
++        let mut embeddings = original.clone();
++        scatter_image_features(&mut embeddings, &features, &[1, 3]).unwrap();
++        assert_eq!(
++            embeddings.data,
++            [-1., -1., -1., 1., 2., 3., -1., -1., -1., 4., 5., 6.]
++        );
++        for shape in [vec![3, 2], vec![1, 6], vec![1, 2, 3]] {
++            let mut invalid = features.clone();
++            invalid.shape = shape;
++            let mut embeddings = original.clone();
++            assert!(scatter_image_features(&mut embeddings, &invalid, &[1, 3]).is_err());
++            assert_eq!(embeddings.data, original.data);
++        }
++        for positions in [vec![1], vec![1, 4], vec![1, usize::MAX]] {
++            let mut embeddings = original.clone();
++            assert!(scatter_image_features(&mut embeddings, &features, &positions).is_err());
++            assert_eq!(embeddings.data, original.data);
++        }
++        let mut invalid = features.clone();
++        invalid.data.pop();
++        let mut embeddings = original.clone();
++        assert!(scatter_image_features(&mut embeddings, &invalid, &[1, 3]).is_err());
++        assert_eq!(embeddings.data, original.data);
++    }
++}
+diff --git a/tests/config.rs b/tests/config.rs
+index edf7556..f4e08a1 100644
+--- a/tests/config.rs
++++ b/tests/config.rs
+@@ -8,6 +8,27 @@ fn valid_config_json() -> serde_json::Value {
+         "use_mla":false,"vocab_size":129280})
+ }
+ 
++#[test]
++fn full_model_rejects_incompatible_vision_width_before_checkpoint_access() {
++    use uocr::{error::OcrError, model::Model};
++    for width in [640, 2560] {
++        let directory = tempfile::tempdir().unwrap();
++        let mut json = valid_config_json();
++        json["hidden_size"] = serde_json::json!(width);
++        let encoded = json.to_string();
++        // These remain legitimate decoder-only configurations.
++        ModelConfig::from_json(&encoded).unwrap();
++        std::fs::write(directory.path().join("config.json"), encoded).unwrap();
++        assert!(
++            matches!(
++                Model::load(directory.path()),
++                Err(OcrError::Unsupported(message)) if message.contains("vision")
++            ),
++            "width {width} must fail before opening the absent checkpoint"
++        );
++    }
++}
++
+ #[test]
+ fn rejects_overflowing_derived_decoder_dimensions() {
+     for field in ["n_shared_experts", "vocab_size", "max_position_embeddings"] {
+diff --git a/tests/ops.rs b/tests/ops.rs
+index 758bcae..e51bcf7 100644
+--- a/tests/ops.rs
++++ b/tests/ops.rs
+@@ -60,6 +60,31 @@ fn conv_nhwc_matches_hand_computed_patch_sums() {
+     assert_eq!(y.data, [12., 16., 24., 28.]);
+ }
+ 
++#[test]
++fn convolution_preserves_channels_padding_stride_and_bias_at_budget_boundary() {
++    let x = tensor(&[1, 3, 4, 2], &[1., 2.].repeat(12));
++    let w = tensor(
++        &[3, 2, 2, 2],
++        &[
++            1., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 1., 1., 1., 1., 1., 2., 3., 4., -1.,
++            -2., -3., -4.,
++        ],
++    );
++    let expected = [
++        11., 1., -3.5, 12., 3., -6.5, 11., 1., -2.5, 12., 3., -5.5, 14., 7., -9.5, 12., 3., -3.5,
++    ];
++    // Six im2col rows of eight floats plus six output rows of three floats.
++    let budget = (6 * 8 + 6 * 3) * 4;
++    for backend in [Backend::Scalar, Backend::Auto] {
++        let mut cpu = CpuContext::new(backend, 1, budget).unwrap();
++        let output = ops::conv2d(&x, &w, Some(&[10., -1., 0.5]), 2, 1, &mut cpu).unwrap();
++        assert_eq!(output.shape, [1, 2, 3, 3]);
++        assert_eq!(output.data, expected);
++        let mut cpu = CpuContext::new(backend, 1, budget - 1).unwrap();
++        assert!(ops::conv2d(&x, &w, None, 2, 1, &mut cpu).is_err());
++    }
++}
++
+ #[test]
+ fn rotary_uses_split_halves_and_absolute_positions() {
+     let mut values: [f32; 4] = [1., 2., 3., 4.];
+diff --git a/tests/python/test_benchmark.py b/tests/python/test_benchmark.py
+index 1ad675c..6153c25 100644
+--- a/tests/python/test_benchmark.py
++++ b/tests/python/test_benchmark.py
+@@ -1,11 +1,13 @@
+ """Catch biased aggregation, corrupt fixture acceptance and inaccurate scoring."""
+ import json
+ import os
++import signal
++import subprocess
+ import sys
+ import tempfile
++import time
+ import unittest
+ from unittest.mock import patch
+-from types import SimpleNamespace
+ from pathlib import Path
+ 
+ from tools.benchmark import aggregate, validate_image, run_llama, benchmark_environment, completion_text_without_eos
+@@ -13,6 +15,55 @@ from tools.score import character_error_rate, normalize_ocr
+ 
+ 
+ class BenchmarkTests(unittest.TestCase):
++    def test_timeout_stops_child_and_sigterm_ignoring_grandchild(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            grandchild = root / 'grandchild.py'
++            grandchild.write_text(
++                "import os,signal,sys,time\n"
++                "from pathlib import Path\n"
++                "signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
++                "Path(sys.argv[1]).write_text(str(os.getpid()))\n"
++                "print('grandchild ready', flush=True)\n"
++                "time.sleep(60)\n")
++            child = root / 'child.py'
++            child.write_text(
++                "import os,signal,subprocess,sys,time\n"
++                "from pathlib import Path\n"
++                "signal.signal(signal.SIGTERM, signal.SIG_IGN)\n"
++                "Path(sys.argv[1]).write_text(str(os.getpid()))\n"
++                "subprocess.Popen([sys.executable,sys.argv[2],sys.argv[3]])\n"
++                "time.sleep(60)\n")
++            pid_files = [root / 'child.pid', root / 'grandchild.pid']
++            try:
++                result = run_llama(
++                    [sys.executable, str(child), str(pid_files[0]), str(grandchild), str(pid_files[1])],
++                    root / 'result', 10, 1.0)
++                self.assertTrue(result['timed_out'])
++                self.assertEqual(result['status'], 'error')
++                self.assertEqual(result['finish_reason'], 'error')
++                self.assertIn('grandchild ready', result['output'])
++                for path in pid_files:
++                    pid = int(path.read_text())
++                    deadline = time.monotonic() + 2
++                    while True:
++                        status = subprocess.run(
++                            ['ps', '-o', 'stat=', '-p', str(pid)],
++                            capture_output=True, text=True).stdout.strip()
++                        if not status or status.startswith('Z'):
++                            break
++                        if time.monotonic() >= deadline:
++                            self.fail(f'inference descendant {pid} is still running: {status}')
++                        time.sleep(0.02)
++            finally:
++                # Even the intentionally failing pre-fix test must not leak work.
++                for path in pid_files:
++                    if path.exists():
++                        try:
++                            os.kill(int(path.read_text()), signal.SIGKILL)
++                        except ProcessLookupError:
++                            pass
++
+     def test_real_cli_cap_minus_one_log_is_not_eos(self):
+         fixture = Path(__file__).resolve().parents[2] / "docs/benchmarks/2026-09-28-max32/llama-q8-256.stderr.txt"
+         code = "import pathlib,sys; sys.stderr.write(pathlib.Path(sys.argv[1]).read_text())"
+@@ -67,15 +118,13 @@ class BenchmarkTests(unittest.TestCase):
+                 benchmark_environment(workers, blas)
+ 
+     def test_all_vision_batches_are_counted(self):
+-        def process(command, stdout, stderr, timeout):
+-            stderr.write(b"mtmd batch encoding done in 7103 ms\n"
+-                         b"mtmd batch encoding done in 2059 ms\n"
+-                         b"mtmd batch encoding done in 2174 ms\n"
+-                         b"eval time = 1230.21 ms / 250 runs\n")
+-            return SimpleNamespace(returncode=0)
+-
+-        with tempfile.TemporaryDirectory() as directory, patch("tools.benchmark.subprocess.run", side_effect=process):
+-            result = run_llama(["fake"], Path(directory) / "page", 2048, 30)
++        log = ("mtmd batch encoding done in 7103 ms\n"
++               "mtmd batch encoding done in 2059 ms\n"
++               "mtmd batch encoding done in 2174 ms\n"
++               "eval time = 1230.21 ms / 250 runs\n")
++        code = f"import sys; sys.stderr.write({log!r})"
++        with tempfile.TemporaryDirectory() as directory:
++            result = run_llama([sys.executable, '-c', code], Path(directory) / "page", 2048, 30)
+         self.assertEqual(result["vision_seconds"], 11.336)
+         self.assertEqual(result["decode_seconds"], 1.23021)
+         self.assertEqual(result["finish_reason"], "eos")
+diff --git a/tools/benchmark.py b/tools/benchmark.py
+index 0fbac40..f4398b4 100644
+--- a/tools/benchmark.py
++++ b/tools/benchmark.py
+@@ -6,6 +6,7 @@ import math
+ import os
+ import platform
+ import re
++import signal
+ import statistics
+ import subprocess
+ import time
+@@ -60,6 +61,26 @@ def aggregate(records: list) -> dict:
+     }
+ 
+ 
++def _stop_process_group(process: subprocess.Popen) -> None:
++    """Stop our private session, including descendants surviving the wrapper."""
++    try:
++        os.killpg(process.pid, signal.SIGTERM)
++    except ProcessLookupError:
++        pass
++    try:
++        process.wait(timeout=2)
++    except subprocess.TimeoutExpired:
++        pass
++    finally:
++        # The wrapper may exit before a descendant that ignores SIGTERM.
++        # Escalate the group even if wait() already reaped the wrapper.
++        try:
++            os.killpg(process.pid, signal.SIGKILL)
++        except ProcessLookupError:
++            pass
++        process.wait()
++
++
+ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: float,
+               *, environment: dict | None = None) -> dict:
+     """Measure a fresh process; preserve partial logs on failures/timeouts."""
+@@ -68,13 +89,17 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
+     timed_out = False
+     with output_prefix.with_suffix(".stdout.txt").open("wb") as out, \
+             output_prefix.with_suffix(".stderr.txt").open("wb") as err:
++        process = subprocess.Popen(["/usr/bin/time", "-l"] + command,
++                                   stdout=out, stderr=err, env=environment,
++                                   start_new_session=True)
+         try:
+-            options = {} if environment is None else {"env": environment}
+-            process = subprocess.run(["/usr/bin/time", "-l"] + command,
+-                                     stdout=out, stderr=err, timeout=timeout, **options)
+-            code = process.returncode
++            code = process.wait(timeout=timeout)
+         except subprocess.TimeoutExpired:
++            _stop_process_group(process)
+             code, timed_out = None, True
++        except BaseException:
++            _stop_process_group(process)
++            raise
+     elapsed = time.monotonic() - started
+     log = output_prefix.with_suffix(".stderr.txt").read_text(errors="replace")
+     output = output_prefix.with_suffix(".stdout.txt").read_text(errors="replace").strip()

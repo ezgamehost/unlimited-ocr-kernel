@@ -14,16 +14,34 @@ pub fn linear(
 ) -> Result<Tensor> {
     x.validate()?;
     weight.validate()?;
-    let k = *x
-        .shape
-        .last()
-        .ok_or_else(|| OcrError::Shape("linear input must have a dimension".into()))?;
-    if k == 0 || weight.shape.len() != 2 || weight.shape[1] != k || weight.shape[0] == 0 {
+    if weight.shape.len() != 2 {
         return Err(OcrError::Shape(
             "linear weight must have shape [out,in]".into(),
         ));
     }
-    let n = weight.shape[0];
+    linear_slice(x, &weight.data, weight.shape[0], weight.shape[1], bias, cpu)
+}
+
+/// Borrow an already contiguous output-by-input matrix, including flattened
+/// convolution weights, without allocating a duplicate tensor.
+fn linear_slice(
+    x: &Tensor,
+    weight: &[f32],
+    n: usize,
+    columns: usize,
+    bias: Option<&[f32]>,
+    cpu: &mut CpuContext,
+) -> Result<Tensor> {
+    x.validate()?;
+    let k = *x
+        .shape
+        .last()
+        .ok_or_else(|| OcrError::Shape("linear input must have a dimension".into()))?;
+    if k == 0 || columns != k || n == 0 || weight.len() != element_count(&[n, columns])? {
+        return Err(OcrError::Shape(
+            "linear weight must have shape [out,in]".into(),
+        ));
+    }
     let m = x.data.len() / k;
     if bias.is_some_and(|b| b.len() != n) {
         return Err(OcrError::Shape("linear bias length mismatch".into()));
@@ -34,13 +52,13 @@ pub fn linear(
     cpu.check_elements(count)?;
     let mut data = vec![0.; count];
     if m != 0 && cfg!(target_os = "macos") && cpu.backend != Backend::Scalar {
-        accelerate::linear(&x.data, &weight.data, &mut data, m, n, k)?;
+        accelerate::linear(&x.data, weight, &mut data, m, n, k)?;
     } else {
         for i in 0..m {
             for j in 0..n {
                 data[i * n + j] = x.data[i * k..(i + 1) * k]
                     .iter()
-                    .zip(&weight.data[j * k..(j + 1) * k])
+                    .zip(&weight[j * k..(j + 1) * k])
                     .map(|(a, b)| a * b)
                     .sum();
             }
@@ -558,8 +576,7 @@ pub fn conv2d(
         }
     }
     let patch = Tensor::new(vec![rows, columns], patches)?;
-    let weight = Tensor::new(vec![outputs, columns], w.data.clone())?;
-    let mut output = linear(&patch, &weight, bias, cpu)?;
+    let mut output = linear_slice(&patch, &w.data, outputs, columns, bias, cpu)?;
     output.shape = vec![batch, oh, ow, outputs];
     Ok(output)
 }

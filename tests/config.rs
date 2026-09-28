@@ -9,6 +9,27 @@ fn valid_config_json() -> serde_json::Value {
 }
 
 #[test]
+fn full_model_rejects_incompatible_vision_width_before_checkpoint_access() {
+    use uocr::{error::OcrError, model::Model};
+    for width in [640, 2560] {
+        let directory = tempfile::tempdir().unwrap();
+        let mut json = valid_config_json();
+        json["hidden_size"] = serde_json::json!(width);
+        let encoded = json.to_string();
+        // These remain legitimate decoder-only configurations.
+        ModelConfig::from_json(&encoded).unwrap();
+        std::fs::write(directory.path().join("config.json"), encoded).unwrap();
+        assert!(
+            matches!(
+                Model::load(directory.path()),
+                Err(OcrError::Unsupported(message)) if message.contains("vision")
+            ),
+            "width {width} must fail before opening the absent checkpoint"
+        );
+    }
+}
+
+#[test]
 fn rejects_overflowing_derived_decoder_dimensions() {
     for field in ["n_shared_experts", "vocab_size", "max_position_embeddings"] {
         let mut json = valid_config_json();

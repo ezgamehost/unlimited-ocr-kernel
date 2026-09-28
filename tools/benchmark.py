@@ -6,6 +6,7 @@ import math
 import os
 import platform
 import re
+import signal
 import statistics
 import subprocess
 import time
@@ -60,6 +61,26 @@ def aggregate(records: list) -> dict:
     }
 
 
+def _stop_process_group(process: subprocess.Popen) -> None:
+    """Stop our private session, including descendants surviving the wrapper."""
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        process.wait(timeout=2)
+    except subprocess.TimeoutExpired:
+        pass
+    finally:
+        # The wrapper may exit before a descendant that ignores SIGTERM.
+        # Escalate the group even if wait() already reaped the wrapper.
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+
+
 def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: float,
               *, environment: dict | None = None) -> dict:
     """Measure a fresh process; preserve partial logs on failures/timeouts."""
@@ -68,13 +89,17 @@ def run_llama(command: list, output_prefix: Path, token_limit: int, timeout: flo
     timed_out = False
     with output_prefix.with_suffix(".stdout.txt").open("wb") as out, \
             output_prefix.with_suffix(".stderr.txt").open("wb") as err:
+        process = subprocess.Popen(["/usr/bin/time", "-l"] + command,
+                                   stdout=out, stderr=err, env=environment,
+                                   start_new_session=True)
         try:
-            options = {} if environment is None else {"env": environment}
-            process = subprocess.run(["/usr/bin/time", "-l"] + command,
-                                     stdout=out, stderr=err, timeout=timeout, **options)
-            code = process.returncode
+            code = process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
+            _stop_process_group(process)
             code, timed_out = None, True
+        except BaseException:
+            _stop_process_group(process)
+            raise
     elapsed = time.monotonic() - started
     log = output_prefix.with_suffix(".stderr.txt").read_text(errors="replace")
     output = output_prefix.with_suffix(".stdout.txt").read_text(errors="replace").strip()

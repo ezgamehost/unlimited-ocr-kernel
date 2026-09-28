@@ -9,6 +9,7 @@ use crate::{
     generation::{FinishReason, GenerationOptions, select_token},
     preprocess::{self, ImageMode},
     prompt::PromptEncoder,
+    tensor::Tensor,
     vision::Vision,
 };
 use serde::{Deserialize, Serialize};
@@ -20,6 +21,33 @@ use std::{
 fn default_prompt() -> String {
     "<image>document parsing.".into()
 }
+
+fn scatter_image_features(
+    embeddings: &mut Tensor,
+    features: &Tensor,
+    positions: &[usize],
+) -> Result<()> {
+    embeddings.validate()?;
+    features.validate()?;
+    if embeddings.shape.len() != 2
+        || embeddings.shape[1] == 0
+        || features.shape != [positions.len(), embeddings.shape[1]]
+        || positions
+            .iter()
+            .any(|&position| position >= embeddings.shape[0])
+    {
+        return Err(OcrError::Shape(
+            "image features and prompt embeddings disagree".into(),
+        ));
+    }
+    let width = embeddings.shape[1];
+    for (row, &position) in positions.iter().enumerate() {
+        embeddings.data[position * width..(position + 1) * width]
+            .copy_from_slice(&features.data[row * width..(row + 1) * width]);
+    }
+    Ok(())
+}
+
 fn default_mode() -> ImageMode {
     ImageMode::Gundam
 }
@@ -87,6 +115,11 @@ impl Model {
             ));
         }
         let config = config::ModelConfig::load(&directory.join("config.json"))?;
+        if config.hidden_size != 1280 {
+            return Err(OcrError::Unsupported(
+                "vision projector requires decoder hidden_size 1280".into(),
+            ));
+        }
         let checkpoint = Checkpoint::open(&directory.join("model-00001-of-000001.safetensors"))?;
         Decoder::new(&checkpoint, config.clone())?;
         let quantized = overlay
@@ -132,11 +165,7 @@ impl Model {
             decoder = decoder.with_quantization(quantized, self.quantization_mode);
         }
         let mut embeddings = decoder.embedding(&input.ids)?;
-        for (row, &position) in input.image_positions.iter().enumerate() {
-            let width = self.config.hidden_size;
-            embeddings.data[position * width..(position + 1) * width]
-                .copy_from_slice(&features.data[row * width..(row + 1) * width]);
-        }
+        scatter_image_features(&mut embeddings, &features, &input.image_positions)?;
         let (mut state, mut logits) = decoder.prefill(&embeddings, cpu)?;
         let prefill_seconds = stamp.elapsed().as_secs_f64();
         let mut history = input.ids;
@@ -182,5 +211,40 @@ impl Model {
             timings,
             image_tokens,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tensor::Tensor;
+
+    #[test]
+    fn image_scatter_validates_shape_and_positions_before_mutation() {
+        let original = Tensor::new(vec![4, 3], vec![-1.; 12]).unwrap();
+        let features = Tensor::new(vec![2, 3], vec![1., 2., 3., 4., 5., 6.]).unwrap();
+        let mut embeddings = original.clone();
+        scatter_image_features(&mut embeddings, &features, &[1, 3]).unwrap();
+        assert_eq!(
+            embeddings.data,
+            [-1., -1., -1., 1., 2., 3., -1., -1., -1., 4., 5., 6.]
+        );
+        for shape in [vec![3, 2], vec![1, 6], vec![1, 2, 3]] {
+            let mut invalid = features.clone();
+            invalid.shape = shape;
+            let mut embeddings = original.clone();
+            assert!(scatter_image_features(&mut embeddings, &invalid, &[1, 3]).is_err());
+            assert_eq!(embeddings.data, original.data);
+        }
+        for positions in [vec![1], vec![1, 4], vec![1, usize::MAX]] {
+            let mut embeddings = original.clone();
+            assert!(scatter_image_features(&mut embeddings, &features, &positions).is_err());
+            assert_eq!(embeddings.data, original.data);
+        }
+        let mut invalid = features.clone();
+        invalid.data.pop();
+        let mut embeddings = original.clone();
+        assert!(scatter_image_features(&mut embeddings, &invalid, &[1, 3]).is_err());
+        assert_eq!(embeddings.data, original.data);
     }
 }
