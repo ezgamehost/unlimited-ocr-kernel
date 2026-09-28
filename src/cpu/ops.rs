@@ -457,3 +457,78 @@ pub fn conv2d(
     output.shape = vec![batch, oh, ow, outputs];
     Ok(output)
 }
+
+/// Single-query attention directly over token-major prefix/ring storage.
+/// Physical ring order is immaterial: corresponding K/V entries stay paired.
+pub fn attention_decode(
+    q: &Tensor,
+    keys: &[f32],
+    values: &[f32],
+    heads: usize,
+    cpu: &mut CpuContext,
+) -> Result<Tensor> {
+    q.validate()?;
+    let width = q.data.len();
+    if heads == 0
+        || width == 0
+        || q.shape != [1, width]
+        || !width.is_multiple_of(heads)
+        || keys.is_empty()
+        || !keys.len().is_multiple_of(width)
+        || keys.len() != values.len()
+    {
+        return Err(OcrError::Shape("decode attention layout".into()));
+    }
+    let tokens = keys.len() / width;
+    let dim = width / heads;
+    cpu.check_elements(
+        tokens
+            .checked_add(width)
+            .ok_or_else(|| OcrError::Resource("decode attention scratch overflow".into()))?,
+    )?;
+    let mut scores = vec![0.; tokens];
+    let mut output = vec![0.; width];
+    let scale = (dim as f32).sqrt().recip();
+    let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
+    for head in 0..heads {
+        let offset = head * dim;
+        let query = &q.data[offset..offset + dim];
+        if fast {
+            accelerate::matvec_strided(
+                &keys[offset..],
+                query,
+                &mut scores,
+                tokens,
+                dim,
+                width,
+                false,
+            )?;
+        } else {
+            for (token, score) in scores.iter_mut().enumerate() {
+                *score = query
+                    .iter()
+                    .zip(&keys[token * width + offset..token * width + offset + dim])
+                    .map(|(q, k)| q * k)
+                    .sum();
+            }
+        }
+        for score in &mut scores {
+            *score *= scale;
+        }
+        softmax_backend(&mut scores, cpu.backend)?;
+        let dest = &mut output[offset..offset + dim];
+        if fast {
+            accelerate::matvec_strided(&values[offset..], &scores, dest, tokens, dim, width, true)?;
+        } else {
+            for (token, &score) in scores.iter().enumerate() {
+                for (out, &value) in dest
+                    .iter_mut()
+                    .zip(&values[token * width + offset..token * width + offset + dim])
+                {
+                    *out += score * value;
+                }
+            }
+        }
+    }
+    Tensor::new(q.shape.clone(), output)
+}

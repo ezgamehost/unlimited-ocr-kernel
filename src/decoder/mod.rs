@@ -221,33 +221,41 @@ impl<'a> Decoder<'a> {
         } else {
             cache.push(&k.data, &v.data)?;
         }
-        let split = |data: &[f32], tokens: usize| -> Result<Tensor> {
-            let mut out = vec![0.; data.len()];
+        let joined = if position > 0 {
+            ops::attention_decode(&q, cache.keys(), cache.values(), heads, cpu)?.data
+        } else {
+            let split = |data: &[f32], tokens: usize| -> Result<Tensor> {
+                let mut out = vec![0.; data.len()];
+                for head in 0..heads {
+                    for token in 0..tokens {
+                        out[(head * tokens + token) * dim..(head * tokens + token + 1) * dim]
+                            .copy_from_slice(
+                                &data[token * hidden + head * dim
+                                    ..token * hidden + (head + 1) * dim],
+                            );
+                    }
+                }
+                Tensor::new(vec![heads, tokens, dim], out)
+            };
+            let attention = ops::attention(
+                &split(&q.data, rows)?,
+                &split(cache.keys(), cache.tokens())?,
+                &split(cache.values(), cache.tokens())?,
+                position == 0,
+                cpu,
+            )?;
+            let mut joined = vec![0.; rows * hidden];
             for head in 0..heads {
-                for token in 0..tokens {
-                    out[(head * tokens + token) * dim..(head * tokens + token + 1) * dim]
+                for row in 0..rows {
+                    joined[row * hidden + head * dim..row * hidden + (head + 1) * dim]
                         .copy_from_slice(
-                            &data[token * hidden + head * dim..token * hidden + (head + 1) * dim],
+                            &attention.data
+                                [(head * rows + row) * dim..(head * rows + row + 1) * dim],
                         );
                 }
             }
-            Tensor::new(vec![heads, tokens, dim], out)
+            joined
         };
-        let attention = ops::attention(
-            &split(&q.data, rows)?,
-            &split(cache.keys(), cache.tokens())?,
-            &split(cache.values(), cache.tokens())?,
-            position == 0,
-            cpu,
-        )?;
-        let mut joined = vec![0.; rows * hidden];
-        for head in 0..heads {
-            for row in 0..rows {
-                joined[row * hidden + head * dim..row * hidden + (head + 1) * dim].copy_from_slice(
-                    &attention.data[(head * rows + row) * dim..(head * rows + row + 1) * dim],
-                );
-            }
-        }
         let mut residual = self.projection(
             &Tensor::new(vec![rows, hidden], joined)?,
             &format!("{prefix}.self_attn.o_proj.weight"),
