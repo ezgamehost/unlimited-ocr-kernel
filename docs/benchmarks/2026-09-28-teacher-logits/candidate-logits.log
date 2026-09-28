@@ -1,0 +1,18 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 2.38s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 1 test
+test actual_decoder_teacher_forced_logits_match_upstream ... {"actual_top1":128818,"kind":"teacher_forced_logits","max_abs":0.00013148784637451172,"outside_existing_tolerance":0,"position":276,"reference_top1":128818,"rms":0.000023585817494855205}
+{"actual_top1":201,"kind":"teacher_forced_logits","max_abs":0.00003528594970703125,"outside_existing_tolerance":0,"position":277,"reference_top1":201,"rms":5.881655614941011e-6}
+{"actual_top1":4066,"kind":"teacher_forced_logits","max_abs":0.000035762786865234375,"outside_existing_tolerance":0,"position":278,"reference_top1":4066,"rms":7.2535193931435895e-6}
+{"actual_top1":625,"kind":"teacher_forced_logits","max_abs":0.00002193450927734375,"outside_existing_tolerance":0,"position":404,"reference_top1":625,"rms":3.6496898441186536e-6}
+{"actual_top1":223,"kind":"teacher_forced_logits","max_abs":0.000016689300537109375,"outside_existing_tolerance":0,"position":405,"reference_top1":223,"rms":3.1701280569845475e-6}
+{"actual_top1":10253,"kind":"teacher_forced_logits","max_abs":0.000023365020751953125,"outside_existing_tolerance":0,"position":406,"reference_top1":10253,"rms":4.935517243399762e-6}
+{"actual_top1":270,"kind":"teacher_forced_logits","max_abs":0.000026702880859375,"outside_existing_tolerance":0,"position":532,"reference_top1":270,"rms":7.21572397777057e-6}
+{"actual_top1":428,"kind":"teacher_forced_logits","max_abs":0.000034809112548828125,"outside_existing_tolerance":0,"position":533,"reference_top1":428,"rms":4.485777114284769e-6}
+{"actual_top1":548,"kind":"teacher_forced_logits","max_abs":0.00002288818359375,"outside_existing_tolerance":0,"position":576,"reference_top1":548,"rms":4.528935411798049e-6}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 8.78s
+

@@ -1,0 +1,6 @@
+{
+  "open_gate_exit_code": 101,
+  "known_prefill_violations": 24,
+  "decode_rows_passing": 8,
+  "production_source_matches": "e992dd167740960c94f5efa4c497ecdbb9d020ac"
+}

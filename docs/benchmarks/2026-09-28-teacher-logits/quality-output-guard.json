@@ -1,0 +1,5 @@
+{
+  "exit_code": 2,
+  "existing_identity_unchanged": true,
+  "stderr": "usage: quality.py [-h] [--output-root OUTPUT_ROOT]\nquality.py: error: output already contains a quality gate; use a fresh directory\n"
+}

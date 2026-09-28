@@ -1,0 +1,28 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 2.32s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 1 test
+test actual_decoder_teacher_forced_logits_match_upstream ... {"actual_top1":128818,"kind":"teacher_forced_logits","max_abs":0.00015401840209960938,"outside_existing_tolerance":24,"position":276,"reference_top1":128818,"rms":0.00004002690825723155}
+{"actual_top1":201,"kind":"teacher_forced_logits","max_abs":0.00005245208740234375,"outside_existing_tolerance":0,"position":277,"reference_top1":201,"rms":0.000010483519399449822}
+{"actual_top1":4066,"kind":"teacher_forced_logits","max_abs":0.000049114227294921875,"outside_existing_tolerance":0,"position":278,"reference_top1":4066,"rms":0.000010171322203943237}
+{"actual_top1":625,"kind":"teacher_forced_logits","max_abs":0.0000247955322265625,"outside_existing_tolerance":0,"position":404,"reference_top1":625,"rms":4.924025115940654e-6}
+{"actual_top1":223,"kind":"teacher_forced_logits","max_abs":0.0000209808349609375,"outside_existing_tolerance":0,"position":405,"reference_top1":223,"rms":4.253492434317824e-6}
+{"actual_top1":10253,"kind":"teacher_forced_logits","max_abs":0.000035762786865234375,"outside_existing_tolerance":0,"position":406,"reference_top1":10253,"rms":6.425177269776882e-6}
+{"actual_top1":270,"kind":"teacher_forced_logits","max_abs":0.000028252601623535156,"outside_existing_tolerance":0,"position":532,"reference_top1":270,"rms":6.16506059673012e-6}
+{"actual_top1":428,"kind":"teacher_forced_logits","max_abs":0.00003528594970703125,"outside_existing_tolerance":0,"position":533,"reference_top1":428,"rms":5.1470416466280534e-6}
+{"actual_top1":548,"kind":"teacher_forced_logits","max_abs":0.000026702880859375,"outside_existing_tolerance":0,"position":576,"reference_top1":548,"rms":4.5862551394057115e-6}
+
+thread 'actual_decoder_teacher_forced_logits_match_upstream' (4721305) panicked at tests/decoder.rs:131:5:
+teacher-forced logit discrepancies: [(276, 24, true), (277, 0, true), (278, 0, true), (404, 0, true), (405, 0, true), (406, 0, true), (532, 0, true), (533, 0, true), (576, 0, true)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    actual_decoder_teacher_forced_logits_match_upstream
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 10.77s
+
+error: test failed, to rerun pass `--test decoder`

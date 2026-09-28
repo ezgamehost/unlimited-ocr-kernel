@@ -1,0 +1,22 @@
+    Finished `release` profile [optimized] target(s) in 0.14s
+     Running tests/vision.rs (target/release/deps/vision-efc745dfe720a983)
+
+running 8 tests
+test incomplete_vision_checkpoint_is_rejected_at_construction ... ok
+test original_english_global_stages_match_rust ... vision english sam: max_abs=0.000008970499, rms=0.0000006741234
+vision english clip: max_abs=0.00005376339, rms=0.0000023879147
+vision english projected: max_abs=0.00003194809, rms=0.0000012869796
+ok
+test original_gundam_pixels_and_embeddings_match_rust ... vision gundam merged: max_abs=0.00015157461, rms=0.0000013251022
+ok
+test original_vision_features_match_rust ... vision sam: max_abs=0.000001784414, rms=0.00000020286659
+vision clip: max_abs=0.0000769794, rms=0.0000024892902
+vision projected: max_abs=0.000040590763, rms=0.0000011698328
+ok
+test padded_window_partition_is_reversible ... ok
+test unpartition_rejects_empty_window_storage ... ok
+test vision_descriptor_type_and_shape_are_checked_before_expansion ... ok
+test window_shapes_reject_overflow_before_allocation ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.04s
+

@@ -1,0 +1,107 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 2.40s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 4 tests
+test actual_decoder_layers_match_upstream_prefill_and_decode ... layer 0 position 0: max_abs=0.0000038146973, rms=0.000000051107694
+reference layer=0 head_major=false
+layer 0 position 277: max_abs=0.00000035762787, rms=0.00000008035576
+layer 0 position 278: max_abs=0.00000055134296, rms=0.00000016977481
+layer 0 position 404: max_abs=0.00000023841858, rms=0.000000051192675
+layer 0 position 405: max_abs=0.00000023841858, rms=0.000000046288644
+layer 0 position 406: max_abs=0.00000023841858, rms=0.0000000300126
+layer 0 position 532: max_abs=0.00000017881393, rms=0.00000005013757
+layer 0 position 533: max_abs=0.0000009536743, rms=0.00000013258206
+layer 0 position 576: max_abs=0.0000002682209, rms=0.00000008299252
+layer 0 position 0: max_abs=0.0000038146973, rms=0.000000051107694
+reference layer=0 head_major=true
+layer 0 position 277: max_abs=0.00000035762787, rms=0.00000008035576
+layer 0 position 278: max_abs=0.00000055134296, rms=0.00000016977481
+layer 0 position 404: max_abs=0.00000023841858, rms=0.000000051192675
+layer 0 position 405: max_abs=0.00000023841858, rms=0.000000046288644
+layer 0 position 406: max_abs=0.00000023841858, rms=0.0000000300126
+layer 0 position 532: max_abs=0.00000017881393, rms=0.00000005013757
+layer 0 position 533: max_abs=0.0000009536743, rms=0.00000013258206
+layer 0 position 576: max_abs=0.0000002682209, rms=0.00000008299252
+layer 1 position 0: max_abs=0.000045776367, rms=0.00000012180907
+reference layer=1 head_major=false
+layer 1 position 277: max_abs=0.00000017881393, rms=0.000000036929023
+layer 1 position 278: max_abs=0.00000040978193, rms=0.00000010932329
+layer 1 position 404: max_abs=0.00000023841858, rms=0.000000052556018
+layer 1 position 405: max_abs=0.00000047683716, rms=0.000000093479535
+layer 1 position 406: max_abs=0.00000023841858, rms=0.00000006187738
+layer 1 position 532: max_abs=0.00000037252903, rms=0.00000008950174
+layer 1 position 533: max_abs=0.00000047683716, rms=0.00000006935032
+layer 1 position 576: max_abs=0.0000003874302, rms=0.000000089766694
+layer 1 position 0: max_abs=0.000045776367, rms=0.00000012180907
+reference layer=1 head_major=true
+layer 1 position 277: max_abs=0.00000017881393, rms=0.000000036929023
+layer 1 position 278: max_abs=0.00000040978193, rms=0.00000010932329
+layer 1 position 404: max_abs=0.00000023841858, rms=0.000000052556018
+layer 1 position 405: max_abs=0.00000047683716, rms=0.000000093479535
+layer 1 position 406: max_abs=0.00000023841858, rms=0.00000006187738
+layer 1 position 532: max_abs=0.00000037252903, rms=0.00000008950174
+layer 1 position 533: max_abs=0.00000047683716, rms=0.00000006935032
+layer 1 position 576: max_abs=0.0000003874302, rms=0.000000089766694
+layer 11 position 0: max_abs=0.000030517578, rms=0.000000091856016
+reference layer=11 head_major=false
+layer 11 position 277: max_abs=0.0000019073486, rms=0.00000018882236
+layer 11 position 278: max_abs=0.0000019073486, rms=0.00000014658727
+layer 11 position 404: max_abs=0.000002861023, rms=0.00000025087135
+layer 11 position 405: max_abs=0.0000009536743, rms=0.000000103997685
+layer 11 position 406: max_abs=0.0000038146973, rms=0.00000012779564
+layer 11 position 532: max_abs=0.000005722046, rms=0.00000019875192
+layer 11 position 533: max_abs=0.0000019073486, rms=0.00000022060097
+layer 11 position 576: max_abs=0.000005722046, rms=0.00000025858247
+layer 11 position 0: max_abs=0.000030517578, rms=0.000000091856016
+reference layer=11 head_major=true
+layer 11 position 277: max_abs=0.0000019073486, rms=0.00000018882236
+layer 11 position 278: max_abs=0.0000019073486, rms=0.00000014658727
+layer 11 position 404: max_abs=0.000002861023, rms=0.00000025087135
+layer 11 position 405: max_abs=0.0000009536743, rms=0.000000103997685
+layer 11 position 406: max_abs=0.0000038146973, rms=0.00000012779564
+layer 11 position 532: max_abs=0.000005722046, rms=0.00000019875192
+layer 11 position 533: max_abs=0.0000019073486, rms=0.00000022060097
+layer 11 position 576: max_abs=0.000005722046, rms=0.00000025858247
+ok
+test actual_decoder_teacher_forced_logits_match_upstream ... {"actual_top1":128818,"kind":"teacher_forced_logits","max_abs":0.00013148784637451172,"outside_existing_tolerance":0,"position":276,"reference_top1":128818,"rms":0.000023585817494855205}
+{"actual_top1":201,"kind":"teacher_forced_logits","max_abs":0.00003528594970703125,"outside_existing_tolerance":0,"position":277,"reference_top1":201,"rms":5.881655614941011e-6}
+{"actual_top1":4066,"kind":"teacher_forced_logits","max_abs":0.000035762786865234375,"outside_existing_tolerance":0,"position":278,"reference_top1":4066,"rms":7.2535193931435895e-6}
+{"actual_top1":625,"kind":"teacher_forced_logits","max_abs":0.00002193450927734375,"outside_existing_tolerance":0,"position":404,"reference_top1":625,"rms":3.6496898441186536e-6}
+{"actual_top1":223,"kind":"teacher_forced_logits","max_abs":0.000016689300537109375,"outside_existing_tolerance":0,"position":405,"reference_top1":223,"rms":3.1701280569845475e-6}
+{"actual_top1":10253,"kind":"teacher_forced_logits","max_abs":0.000023365020751953125,"outside_existing_tolerance":0,"position":406,"reference_top1":10253,"rms":4.935517243399762e-6}
+{"actual_top1":270,"kind":"teacher_forced_logits","max_abs":0.000026702880859375,"outside_existing_tolerance":0,"position":532,"reference_top1":270,"rms":7.21572397777057e-6}
+{"actual_top1":428,"kind":"teacher_forced_logits","max_abs":0.000034809112548828125,"outside_existing_tolerance":0,"position":533,"reference_top1":428,"rms":4.485777114284769e-6}
+{"actual_top1":548,"kind":"teacher_forced_logits","max_abs":0.00002288818359375,"outside_existing_tolerance":0,"position":576,"reference_top1":548,"rms":4.528935411798049e-6}
+ok
+test actual_expert_scheduling_preserves_results_with_small_scratch ... ok
+test prefill_logit_component_diagnostic ... {"kind":"cumulative_prefill_last_hidden","layer":0,"max_abs":4.76837158203125e-7,"outside_existing_tolerance":0,"rms":7.511839945994382e-8}
+{"kind":"independent_prefill_last_hidden","layer":0,"max_abs":4.76837158203125e-7,"outside_existing_tolerance":0,"rms":7.511839945994382e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":1,"max_abs":5.364418029785156e-7,"outside_existing_tolerance":0,"rms":1.3756720467579367e-7}
+{"kind":"independent_prefill_last_hidden","layer":1,"max_abs":2.682209014892578e-7,"outside_existing_tolerance":0,"rms":5.1777000644612495e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":2,"max_abs":5.364418029785156e-7,"outside_existing_tolerance":0,"rms":1.3359601199232418e-7}
+{"kind":"independent_prefill_last_hidden","layer":2,"max_abs":2.980232238769531e-7,"outside_existing_tolerance":0,"rms":4.7842412938561407e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":3,"max_abs":5.364418029785156e-7,"outside_existing_tolerance":0,"rms":1.5373136329416026e-7}
+{"kind":"independent_prefill_last_hidden","layer":3,"max_abs":2.384185791015625e-7,"outside_existing_tolerance":0,"rms":4.7090915933666885e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":4,"max_abs":7.152557373046875e-7,"outside_existing_tolerance":0,"rms":2.0240134651776985e-7}
+{"kind":"independent_prefill_last_hidden","layer":4,"max_abs":2.3096799850463867e-7,"outside_existing_tolerance":0,"rms":5.7965987042253355e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":5,"max_abs":1.1175870895385742e-6,"outside_existing_tolerance":0,"rms":3.278355461614049e-7}
+{"kind":"independent_prefill_last_hidden","layer":5,"max_abs":2.421438694000244e-7,"outside_existing_tolerance":0,"rms":7.396311674529084e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":6,"max_abs":1.3113021850585938e-6,"outside_existing_tolerance":0,"rms":3.8939342157680587e-7}
+{"kind":"independent_prefill_last_hidden","layer":6,"max_abs":3.5762786865234375e-7,"outside_existing_tolerance":0,"rms":8.38410719375758e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":7,"max_abs":1.7993152141571045e-6,"outside_existing_tolerance":0,"rms":5.169909835997624e-7}
+{"kind":"independent_prefill_last_hidden","layer":7,"max_abs":1.1920928955078125e-6,"outside_existing_tolerance":0,"rms":1.0182525514229703e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":8,"max_abs":3.4570693969726562e-6,"outside_existing_tolerance":0,"rms":8.37207442144565e-7}
+{"kind":"independent_prefill_last_hidden","layer":8,"max_abs":4.6193599700927734e-7,"outside_existing_tolerance":0,"rms":1.0089949724349157e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":9,"max_abs":3.4570693969726562e-6,"outside_existing_tolerance":0,"rms":1.053695054514864e-6}
+{"kind":"independent_prefill_last_hidden","layer":9,"max_abs":3.8743019104003906e-7,"outside_existing_tolerance":0,"rms":1.0015832739117943e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":10,"max_abs":8.344650268554688e-6,"outside_existing_tolerance":0,"rms":1.5185720795809185e-6}
+{"kind":"independent_prefill_last_hidden","layer":10,"max_abs":4.76837158203125e-7,"outside_existing_tolerance":0,"rms":9.17895622178435e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":11,"max_abs":0.000015735626220703125,"outside_existing_tolerance":0,"rms":2.3703936181900515e-6}
+{"kind":"independent_prefill_last_hidden","layer":11,"max_abs":1.9073486328125e-6,"outside_existing_tolerance":0,"rms":1.482838145350732e-7}
+{"kind":"cumulative_prefill_logits","layer":11,"max_abs":0.00013148784637451172,"outside_existing_tolerance":0,"rms":0.000023585817494855205}
+{"kind":"head_with_reference_hidden","layer":11,"max_abs":0.00002288818359375,"outside_existing_tolerance":0,"rms":2.7204207017502017e-6}
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.79s
+

@@ -1,0 +1,35 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 2.44s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 1 test
+test prefill_logit_component_diagnostic ... {"kind":"cumulative_prefill_last_hidden","layer":0,"max_abs":4.5299530029296875e-6,"outside_existing_tolerance":0,"rms":3.27422178794595e-7}
+{"kind":"independent_prefill_last_hidden","layer":0,"max_abs":4.5299530029296875e-6,"outside_existing_tolerance":0,"rms":3.27422178794595e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":1,"max_abs":3.0994415283203125e-6,"outside_existing_tolerance":0,"rms":3.611977513284024e-7}
+{"kind":"independent_prefill_last_hidden","layer":1,"max_abs":3.5762786865234375e-7,"outside_existing_tolerance":0,"rms":6.60551092928631e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":2,"max_abs":1.7881393432617188e-6,"outside_existing_tolerance":0,"rms":3.1475163408660894e-7}
+{"kind":"independent_prefill_last_hidden","layer":2,"max_abs":3.427267074584961e-7,"outside_existing_tolerance":0,"rms":7.822238628832947e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":3,"max_abs":2.115964889526367e-6,"outside_existing_tolerance":0,"rms":3.301403893395189e-7}
+{"kind":"independent_prefill_last_hidden","layer":3,"max_abs":2.5331974029541016e-7,"outside_existing_tolerance":0,"rms":7.31572719831549e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":4,"max_abs":2.384185791015625e-6,"outside_existing_tolerance":0,"rms":3.899819036322126e-7}
+{"kind":"independent_prefill_last_hidden","layer":4,"max_abs":3.2782554626464844e-7,"outside_existing_tolerance":0,"rms":8.967464050976417e-8}
+{"kind":"cumulative_prefill_last_hidden","layer":5,"max_abs":1.9073486328125e-6,"outside_existing_tolerance":0,"rms":4.924166186694772e-7}
+{"kind":"independent_prefill_last_hidden","layer":5,"max_abs":5.21540641784668e-7,"outside_existing_tolerance":0,"rms":1.338558524623063e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":6,"max_abs":2.86102294921875e-6,"outside_existing_tolerance":0,"rms":6.126128871200777e-7}
+{"kind":"independent_prefill_last_hidden","layer":6,"max_abs":9.5367431640625e-7,"outside_existing_tolerance":0,"rms":1.6581182319656543e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":7,"max_abs":3.5762786865234375e-6,"outside_existing_tolerance":0,"rms":8.689126012541345e-7}
+{"kind":"independent_prefill_last_hidden","layer":7,"max_abs":8.195638656616211e-7,"outside_existing_tolerance":0,"rms":2.035583487813785e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":8,"max_abs":5.125999450683594e-6,"outside_existing_tolerance":0,"rms":1.1992369284645593e-6}
+{"kind":"independent_prefill_last_hidden","layer":8,"max_abs":8.344650268554688e-7,"outside_existing_tolerance":0,"rms":1.079415708259502e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":9,"max_abs":5.27501106262207e-6,"outside_existing_tolerance":0,"rms":1.499120077863828e-6}
+{"kind":"independent_prefill_last_hidden","layer":9,"max_abs":6.556510925292969e-7,"outside_existing_tolerance":0,"rms":1.7223611849174443e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":10,"max_abs":6.258487701416016e-6,"outside_existing_tolerance":0,"rms":2.0761805649305194e-6}
+{"kind":"independent_prefill_last_hidden","layer":10,"max_abs":6.631016731262207e-7,"outside_existing_tolerance":0,"rms":1.8189146773441626e-7}
+{"kind":"cumulative_prefill_last_hidden","layer":11,"max_abs":0.00004482269287109375,"outside_existing_tolerance":0,"rms":3.2093741093699206e-6}
+{"kind":"independent_prefill_last_hidden","layer":11,"max_abs":1.9073486328125e-6,"outside_existing_tolerance":0,"rms":1.6582171225124369e-7}
+{"kind":"cumulative_prefill_logits","layer":11,"max_abs":0.00015401840209960938,"outside_existing_tolerance":24,"rms":0.00004002690825723155}
+{"kind":"head_with_reference_hidden","layer":11,"max_abs":0.000026702880859375,"outside_existing_tolerance":0,"rms":3.3213129099079465e-6}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 3.64s
+

@@ -1,0 +1,122 @@
+[
+  {
+    "case": "corpus-english-original",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 250,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-english-matched",
+    "exact_text": false,
+    "exact_tokens": false,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 250,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-chinese-original",
+    "exact_text": false,
+    "exact_tokens": false,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 289,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-chinese-matched",
+    "exact_text": false,
+    "exact_tokens": false,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 289,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-table-original",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 247,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-table-matched",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 247,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-dense-original",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 1578,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-dense-matched",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 768,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-receipt-original",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 272,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-wide_report-original",
+    "exact_text": true,
+    "exact_tokens": true,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 355,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-bilingual_notice-original",
+    "exact_text": false,
+    "exact_tokens": false,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 384,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-archive_register-original",
+    "exact_text": false,
+    "exact_tokens": false,
+    "eos": true,
+    "image_tokens_equal": true,
+    "precision_equal": true,
+    "tokens": 1790,
+    "cer": 0.0
+  }
+]

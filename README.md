@@ -162,6 +162,13 @@ cargo test --release --test decoder -- --ignored --test-threads=1
 cargo test --release --test vision -- --ignored --test-threads=1
 ```
 
+The full-decoder teacher-forced logit gate currently fails at prefill: 24 of
+129280 values exceed the existing per-layer tolerance, while all eight sampled
+decode rows and all nine top token IDs match their checks. It is explicitly
+marked as an open opt-in gate. A higher-precision normalization candidate
+removed those violations but slightly worsened synthetic layout accuracy and
+was rejected. See the [retained investigation](docs/benchmarks/2026-09-28-teacher-logits/README.md).
+
 The [implementation plan](docs/superpowers/plans/2026-09-27-rust-unlimited-ocr.md)
 and [design](docs/superpowers/specs/2026-09-27-rust-unlimited-ocr-design.md) describe
 the remaining scope. Benchmark reports retain raw output and disclose differing
@@ -174,8 +181,9 @@ On the [frozen-page repeated check](docs/benchmarks/2026-09-28-heldout-repeated/
 the two pages accurate in both engines showed mixed, small timing differences.
 Native transcribed the archive accurately while llama repeated/reordered text.
 The [llama BF16 baseline](docs/benchmarks/2026-09-28-bf16-baseline/README.md)
-is also complete, with host paging documented. Full precision/fresh-process
-acceptance and final review remain unfinished.
+is also complete, with host paging documented. The
+[source-review fixes](docs/benchmarks/2026-09-28-final-review/README.md) are verified;
+full precision/fresh-process acceptance and whole-model parity remain unfinished.
 
 For the pinned llama.cpp comparison, use an explicit newline after `<image>`:
 its image processor inserts that newline automatically. The [matched-prompt

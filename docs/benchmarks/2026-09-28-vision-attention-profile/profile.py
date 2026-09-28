@@ -1,6 +1,7 @@
 """Capture warmed vision or decode stacks after an audited comparison."""
 import argparse
 import json
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -16,13 +17,21 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--quality', type=Path, help='Exact 12-case quality proof for a newer binary')
     parser.add_argument('--stage', choices=['vision', 'decode'], default='vision')
+    parser.add_argument('--power-source', choices=['ac', 'battery'], default='ac',
+                        help='Battery captures are exploratory stack attribution, never performance comparisons')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output exists; preserve previous captures')
     audit = json.loads((args.comparison / 'repeated-comparison.json').read_text())
     assert audit['audited_requests'] == 96 and audit['all_eos']
     power = subprocess.check_output(['pmset', '-g', 'batt'], text=True)
-    assert "Now drawing from 'AC Power'" in power, power
+    expected_source = 'AC Power' if args.power_source == 'ac' else 'Battery Power'
+    assert f"Now drawing from '{expected_source}'" in power, power
+    power_profile = subprocess.check_output(['pmset', '-g', 'custom'], text=True)
+    if args.power_source == 'battery':
+        charge = re.search(r'\t(\d+)%;', power)
+        modes = re.findall(r'^\s*powermode\s+(\d+)\s*$', power_profile, re.MULTILINE)
+        assert charge and int(charge[1]) >= 50 and modes and all(mode == '0' for mode in modes)
     baseline = args.comparison / 'repeated-0-native'
     process = json.loads((baseline / 'process.json').read_text())
     command = process['command']
@@ -48,6 +57,7 @@ def main():
     save(args.output / 'request.json', request)
     metadata = dict(command=command, binary_sha256=expected_binary, quality_process=quality_process,
                     comparison=str(args.comparison.resolve()), power=power,
+                    power_source=args.power_source, power_profile=power_profile,
                     stage=args.stage, sampling_delay_seconds=0.2,
                     sampling_duration_seconds=3 if args.stage == 'decode' else 5,
                     note='Profile overhead included. Inspect stacks for stage attribution; aggregate thread samples are not wall-time percentages.')
@@ -109,9 +119,12 @@ def main():
                 child.stdin.close()
                 metadata['resources'] = wait_child(child, 30, terminate=failure is not None)
             metadata['failure'] = failure
+            metadata['power_after'] = subprocess.check_output(['pmset', '-g', 'batt'], text=True)
+            metadata['power_profile_after'] = subprocess.check_output(['pmset', '-g', 'custom'], text=True)
             save(args.output / 'process.json', metadata)
     assert metadata['resources']['exit_code'] == 0
     assert not metadata['resources']['forced_kill']
+    assert f"Now drawing from '{expected_source}'" in metadata['power_after']
 
 
 if __name__ == '__main__':

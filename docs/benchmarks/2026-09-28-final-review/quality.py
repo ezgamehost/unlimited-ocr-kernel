@@ -1,5 +1,6 @@
 """Exact Q8 and hybrid OCR gates after the final source-review fixes."""
 import json
+import argparse
 from pathlib import Path
 import shutil
 import subprocess
@@ -18,19 +19,29 @@ def save(path, value):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-root', type=Path, default=ROOT)
+    parser.add_argument('--variant', choices=['q8', 'hybrid', 'both'], default='both')
+    args = parser.parse_args()
+    output_root = args.output_root
+    if any((output_root / name).exists() for name in ['candidate-cli.json', 'q8', 'hybrid']):
+        parser.error('output already contains a quality gate; use a fresh directory')
+    output_root.mkdir(parents=True, exist_ok=True)
     cli = Path('target/release/uocr')
     digest = sha256(cli)
     binary = Path('artifacts/kernel-baselines') / ('uocr-' + digest)
     if not binary.exists():
         shutil.copy2(cli, binary)
     assert sha256(binary) == digest
-    save(ROOT / 'candidate-cli.json', dict(binary=str(binary), sha256=digest,
+    save(output_root / 'candidate-cli.json', dict(binary=str(binary), sha256=digest,
          source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
          source_sha256={str(p): sha256(p) for p in sorted(Path('src').rglob('*.rs'))}))
     for name, baseline in [
         ('q8', ROOT.parent / '2026-09-28-current-q8/quality'),
         ('hybrid', ROOT.parent / '2026-09-28-kv-layout-probe/quality'),
     ]:
+        if args.variant != 'both' and args.variant != name:
+            continue
         old_process = json.loads((baseline / 'process.json').read_text())
         assert old_process['binary_sha256'] == BASELINE_SHA
         assert old_process['resources']['exit_code'] == 0
@@ -45,7 +56,7 @@ def main():
         overlay = Path(command[command.index('--quantized-weights') + 1])
         manifest = json.loads(overlay.with_suffix('.json').read_text())
         assert manifest == old_process['overlay_manifest']
-        output = ROOT / name
+        output = output_root / name
         output.mkdir(exist_ok=False)
         save(output / 'requests.json', requests)
         process = dict(command=command, binary_sha256=digest, cases=cases,
