@@ -1,0 +1,55 @@
+ARCHIVE TRANSFER REGISTER
+Batch AT-5603 / Storage room B7
+
+01. File AX-7311: 24 sheets; destination: sealed cabinet.
+    Seal 92017; received at 14:01; condition checked by clerk 2.
+02. File AX-7312: 37 sheets; destination: review desk.
+    Seal 92034; received at 14:02; condition checked by clerk 3.
+03. File AX-7313: 50 sheets; destination: map drawer.
+    Seal 92051; received at 14:03; condition checked by clerk 1.
+04. File AX-7314: 63 sheets; destination: north shelf.
+    Seal 92068; received at 14:04; condition checked by clerk 2.
+05. File AX-7315: 76 sheets; destination: sealed cabinet.
+    Seal 92085; received at 14:05; condition checked by clerk 3.
+06. File AX-7316: 89 sheets; destination: review desk.
+    Seal 92102; received at 14:06; condition checked by clerk 1.
+07. File AX-7317: 23 sheets; destination: map drawer.
+    Seal 92119; received at 14:07; condition checked by clerk 2.
+08. File AX-7318: 36 sheets; destination: north shelf.
+    Seal 92136; received at 14:08; condition checked by clerk 3.
+09. File AX-7319: 49 sheets; destination: sealed cabinet.
+    Seal 92153; received at 14:09; condition checked by clerk 1.
+10. File AX-7320: 62 sheets; destination: review desk.
+    Seal 92170; received at 14:10; condition checked by clerk 2.
+11. File AX-7321: 75 sheets; destination: map drawer.
+    Seal 92187; received at 14:11; condition checked by clerk 3.
+12. File AX-7322: 88 sheets; destination: north shelf.
+    Seal 92204; received at 14:12; condition checked by clerk 1.
+13. File AX-7323: 22 sheets; destination: sealed cabinet.
+    Seal 92221; received at 14:13; condition checked by clerk 2.
+14. File AX-7324: 35 sheets; destination: review desk.
+    Seal 92238; received at 14:14; condition checked by clerk 3.
+15. File AX-7325: 48 sheets; destination: map drawer.
+    Seal 92255; received at 14:15; condition checked by clerk 1.
+16. File AX-7326: 61 sheets; destination: north shelf.
+    Seal 92272; received at 14:16; condition checked by clerk 2.
+17. File AX-7327: 74 sheets; destination: sealed cabinet.
+    Seal 92289; received at 14:17; condition checked by clerk 3.
+18. File AX-7328: 87 sheets; destination: review desk.
+    Seal 92306; received at 14:18; condition checked by clerk 1.
+19. File AX-7329: 21 sheets; destination: map drawer.
+    Seal 92323; received at 14:19; condition checked by clerk 2.
+20. File AX-7330: 34 sheets; destination: north shelf.
+    Seal 92340; received at 14:20; condition checked by clerk 3.
+21. File AX-7331: 47 sheets; destination: sealed cabinet.
+    Seal 92357; received at 14:21; condition checked by clerk 1.
+22. File AX-7332: 60 sheets; destination: review desk.
+    Seal 92374; received at 14:22; condition checked by clerk 2.
+23. File AX-7333: 73 sheets; destination: map drawer.
+    Seal 92391; received at 14:23; condition checked by clerk 3.
+24. File AX-7334: 86 sheets; destination: north shelf.
+    Seal 92408; received at 14:24; condition checked by clerk 1.
+25. File AX-7335: 20 sheets; destination: sealed cabinet.
+    Seal 92425; received at 14:25; condition checked by clerk 2.
+26. File AX-7336: 33 sheets; destination: review desk.
+    Seal 92442; received at 14:26; condition checked by clerk 3.
