@@ -1,0 +1,19 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 2.15s
+     Running tests/decode_attention.rs (target/release/deps/decode_attention-6630e6428e303a63)
+
+running 3 tests
+test decode_heads_preserve_bits_across_threads_and_scratch_fallback ... ok
+test strided_decode_attention_matches_f64_oracle ... ok
+test strided_decode_attention_rejects_invalid_layouts_and_budget ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 2 tests
+test actual_decoder_layers_match_upstream_prefill_and_decode ... ok
+test actual_expert_scheduling_preserves_results_with_small_scratch ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+

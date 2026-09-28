@@ -1,0 +1,9 @@
+  PID  %CPU COMM
+71323  85.9 artifacts/attention-heads-baseline
+71334  84.1 container
+61915  13.3 /System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine
+62041  11.3 /usr/libexec/spotlightknowledged.updater
+ 7676  10.5 /Applications/Ghostty.app/Contents/MacOS/ghostty
+35859   7.7 /usr/local/libexec/container/plugins/container-core-images/bin/container-core-images
+  158   6.8 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer
+28299   5.8 claude

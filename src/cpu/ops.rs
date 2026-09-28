@@ -540,23 +540,14 @@ pub fn attention_decode(
             .checked_add(width)
             .ok_or_else(|| OcrError::Resource("decode attention scratch overflow".into()))?,
     )?;
-    let mut scores = vec![0.; tokens];
     let mut output = vec![0.; width];
     let scale = (dim as f32).sqrt().recip();
     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
-    for head in 0..heads {
+    let compute_head = |head: usize, scores: &mut [f32], dest: &mut [f32]| -> Result<()> {
         let offset = head * dim;
         let query = &q.data[offset..offset + dim];
         if fast {
-            accelerate::matvec_strided(
-                &keys[offset..],
-                query,
-                &mut scores,
-                tokens,
-                dim,
-                width,
-                false,
-            )?;
+            accelerate::matvec_strided(&keys[offset..], query, scores, tokens, dim, width, false)?;
         } else {
             for (token, score) in scores.iter_mut().enumerate() {
                 *score = query
@@ -566,13 +557,12 @@ pub fn attention_decode(
                     .sum();
             }
         }
-        for score in &mut scores {
+        for score in scores.iter_mut() {
             *score *= scale;
         }
-        softmax_backend(&mut scores, cpu.backend)?;
-        let dest = &mut output[offset..offset + dim];
+        softmax_backend(scores, cpu.backend)?;
         if fast {
-            accelerate::matvec_strided(&values[offset..], &scores, dest, tokens, dim, width, true)?;
+            accelerate::matvec_strided(&values[offset..], scores, dest, tokens, dim, width, true)?;
         } else {
             for (token, &score) in scores.iter().enumerate() {
                 for (out, &value) in dest
@@ -582,6 +572,34 @@ pub fn attention_decode(
                     *out += score * value;
                 }
             }
+        }
+        Ok(())
+    };
+    let parallel_scores = tokens.checked_mul(heads);
+    let parallel = cpu.threads() > 1
+        && heads > 1
+        && (!fast || accelerate::parallel_matvec_supported())
+        && cpu.backend != Backend::Scalar
+        && keys.len() >= 65536
+        && parallel_scores
+            .and_then(|n| n.checked_add(width))
+            .is_some_and(|n| cpu.check_elements(n).is_ok());
+    if parallel {
+        // Preallocate exactly the checked aggregate score storage. Heads retain
+        // independent arithmetic; no cross-head floating-point reduction.
+        let mut scores = vec![0.; parallel_scores.expect("checked score count")];
+        cpu.pool.install(|| {
+            output
+                .par_chunks_mut(dim)
+                .zip(scores.par_chunks_mut(tokens))
+                .enumerate()
+                .try_for_each(|(head, (dest, scores))| compute_head(head, scores, dest))
+        })?;
+    } else {
+        // Keep the original scratch requirement for small-budget requests.
+        let mut scores = vec![0.; tokens];
+        for (head, dest) in output.chunks_mut(dim).enumerate() {
+            compute_head(head, &mut scores, dest)?;
         }
     }
     Tensor::new(q.shape.clone(), output)

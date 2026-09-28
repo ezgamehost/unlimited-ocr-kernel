@@ -1,6 +1,8 @@
 use crate::error::{OcrError, Result};
 use std::sync::Arc;
 mod accelerate;
+#[cfg(target_os = "macos")]
+mod blas_threads;
 mod neon;
 pub mod ops;
 pub mod quantized;

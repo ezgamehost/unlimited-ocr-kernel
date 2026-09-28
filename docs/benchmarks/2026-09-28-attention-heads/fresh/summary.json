@@ -1,0 +1,134 @@
+[
+  {
+    "case": "english",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/english.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 17.881986124994,
+    "load_seconds": 5.849078208,
+    "timings": {
+      "preprocess_seconds": 0.124225625,
+      "vision_seconds": 7.620367,
+      "prefill_seconds": 2.008354708,
+      "decode_seconds": 1.821261501000002,
+      "first_token_seconds": 9.753027042,
+      "total_seconds": 11.595429292,
+      "decode_steps": 250
+    },
+    "finish": "eos",
+    "tokens": 250,
+    "same_token_ids": true,
+    "cer": 0.0
+  },
+  {
+    "case": "chinese",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/chinese.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 17.540650167007698,
+    "load_seconds": 5.561714875,
+    "timings": {
+      "preprocess_seconds": 0.122680083,
+      "vision_seconds": 7.596503125,
+      "prefill_seconds": 2.0281725,
+      "decode_seconds": 2.118280663000001,
+      "first_token_seconds": 9.747456167,
+      "total_seconds": 11.891914292,
+      "decode_steps": 289
+    },
+    "finish": "eos",
+    "tokens": 289,
+    "same_token_ids": true,
+    "cer": 0.0
+  },
+  {
+    "case": "table",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/table.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 17.748371875000885,
+    "load_seconds": 5.929970584,
+    "timings": {
+      "preprocess_seconds": 0.120476375,
+      "vision_seconds": 7.768320959,
+      "prefill_seconds": 1.9946090829999998,
+      "decode_seconds": 1.8253220840000006,
+      "first_token_seconds": 9.883493666,
+      "total_seconds": 11.729634,
+      "decode_steps": 248
+    },
+    "finish": "eos",
+    "tokens": 248,
+    "same_token_ids": true,
+    "cer": 0.00398406374501992
+  },
+  {
+    "case": "dense",
+    "command": [
+      "/usr/bin/time",
+      "-l",
+      "target/release/uocr",
+      "--image",
+      "benchmarks/corpus/dense.png",
+      "--threads",
+      "8",
+      "--max-tokens",
+      "2048",
+      "--int8-weights",
+      "artifacts/unlimited-ocr-q8-block32.safetensors",
+      "--int8-activations",
+      "--json"
+    ],
+    "process_wall_seconds": 27.802333290979732,
+    "load_seconds": 5.723016667,
+    "timings": {
+      "preprocess_seconds": 0.121170792,
+      "vision_seconds": 7.562535334,
+      "prefill_seconds": 2.101985917,
+      "decode_seconds": 12.069313465000004,
+      "first_token_seconds": 9.785778417,
+      "total_seconds": 21.993927417,
+      "decode_steps": 1649
+    },
+    "finish": "eos",
+    "tokens": 1649,
+    "same_token_ids": true,
+    "cer": 0.0
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/usr/bin/time",
+    "-l",
+    "target/release/uocr",
+    "--jsonl",
+    "--threads",
+    "8",
+    "--int8-weights",
+    "artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations"
+  ],
+  "mode": "resident independent requests",
+  "load_event": {
+    "backend": "auto",
+    "event": "loaded",
+    "load_seconds": 6.404464083,
+    "precision": "int8_weights_dynamic_activations",
+    "threads": 8
+  },
+  "startup_wall_seconds": 6.7143489580194,
+  "process_wall_seconds": 62.21448875000351,
+  "exit_code": 0
+}

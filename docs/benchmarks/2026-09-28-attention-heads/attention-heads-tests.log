@@ -1,0 +1,10 @@
+    Finished `release` profile [optimized] target(s) in 0.50s
+     Running tests/decode_attention.rs (target/release/deps/decode_attention-6630e6428e303a63)
+
+running 3 tests
+test strided_decode_attention_rejects_invalid_layouts_and_budget ... ok
+test strided_decode_attention_matches_f64_oracle ... ok
+test decode_heads_preserve_bits_across_threads_and_scratch_fallback ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

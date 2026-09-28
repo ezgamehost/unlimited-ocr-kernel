@@ -34,6 +34,11 @@ is `<image>document parsing.`. Use `--max-tokens` to bound generation; a
 `token_limit` finish is incomplete and must not be counted as a completed OCR
 benchmark. `--help` lists the full CLI.
 
+`--threads` sizes the Rust worker pool. On macOS 15+, parallel decode attention
+uses single-threaded BLAS calls to avoid nested workers; older systems use
+serial attention heads. Dense vision/prefill matrix multiplication still uses
+Accelerate's automatic threading, so this option is not a global thread cap.
+
 ## Keep a model resident
 
 ```sh

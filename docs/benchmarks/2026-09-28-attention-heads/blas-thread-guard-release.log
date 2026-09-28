@@ -1,0 +1,13 @@
+    Finished `release` profile [optimized] target(s) in 0.08s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 1 test
+BLAS thread API available; testing restoration
+
+thread 'cpu::blas_threads::tests::single_thread_guard_restores_nested_and_unwound_policy' (3627616) panicked at src/cpu/blas_threads.rs:112:13:
+exercise unwinding
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cpu::blas_threads::tests::single_thread_guard_restores_nested_and_unwound_policy ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+

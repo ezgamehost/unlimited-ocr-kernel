@@ -1,0 +1,94 @@
+[
+  {
+    "case": "english",
+    "request": {
+      "image": "benchmarks/corpus/english.png",
+      "generation": {
+        "max_tokens": 8192
+      }
+    },
+    "request_wall_seconds": 11.63038054201752,
+    "timings": {
+      "decode_seconds": 1.8424466750000006,
+      "decode_steps": 250,
+      "first_token_seconds": 9.7653495,
+      "prefill_seconds": 2.026090708,
+      "preprocess_seconds": 0.122038541,
+      "total_seconds": 11.629211041,
+      "vision_seconds": 7.617130833
+    },
+    "finish": "eos",
+    "tokens": 250,
+    "same_token_ids": true,
+    "cer": 0.0
+  },
+  {
+    "case": "chinese",
+    "request": {
+      "image": "benchmarks/corpus/chinese.png",
+      "generation": {
+        "max_tokens": 8192
+      }
+    },
+    "request_wall_seconds": 10.835961292003049,
+    "timings": {
+      "decode_seconds": 2.117381444,
+      "decode_steps": 289,
+      "first_token_seconds": 8.693857042,
+      "prefill_seconds": 1.4315535,
+      "preprocess_seconds": 0.115709,
+      "total_seconds": 10.835679,
+      "vision_seconds": 7.146514542
+    },
+    "finish": "eos",
+    "tokens": 289,
+    "same_token_ids": true,
+    "cer": 0.0
+  },
+  {
+    "case": "table",
+    "request": {
+      "image": "benchmarks/corpus/table.png",
+      "generation": {
+        "max_tokens": 8192
+      }
+    },
+    "request_wall_seconds": 10.518771707982523,
+    "timings": {
+      "decode_seconds": 1.8086429459999998,
+      "decode_steps": 248,
+      "first_token_seconds": 8.688845667,
+      "prefill_seconds": 1.4383121669999999,
+      "preprocess_seconds": 0.114966709,
+      "total_seconds": 10.518526209000001,
+      "vision_seconds": 7.135483875
+    },
+    "finish": "eos",
+    "tokens": 248,
+    "same_token_ids": true,
+    "cer": 0.00398406374501992
+  },
+  {
+    "case": "dense",
+    "request": {
+      "image": "benchmarks/corpus/dense.png",
+      "generation": {
+        "max_tokens": 8192
+      }
+    },
+    "request_wall_seconds": 21.345701999991434,
+    "timings": {
+      "decode_seconds": 12.464178735000006,
+      "decode_steps": 1649,
+      "first_token_seconds": 8.741022208,
+      "prefill_seconds": 1.424178584,
+      "preprocess_seconds": 0.115970166,
+      "total_seconds": 21.34520875,
+      "vision_seconds": 7.200773542
+    },
+    "finish": "eos",
+    "tokens": 1649,
+    "same_token_ids": true,
+    "cer": 0.0
+  }
+]

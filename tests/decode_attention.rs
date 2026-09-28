@@ -64,3 +64,34 @@ fn strided_decode_attention_rejects_invalid_layouts_and_budget() {
     let mut cpu = CpuContext::new(Backend::Auto, 1, 4).unwrap();
     assert!(ops::attention_decode(&q, &[0.; 6], &[0.; 6], 2, &mut cpu).is_err());
 }
+
+#[test]
+fn decode_heads_preserve_bits_across_threads_and_scratch_fallback() {
+    let (heads, dim) = (10, 128);
+    let width = heads * dim;
+    for tokens in [129, 1641] {
+        let q = Tensor::new(
+            vec![1, width],
+            (0..width).map(|i| (i as f32 * 0.17).sin()).collect(),
+        )
+        .unwrap();
+        let keys: Vec<f32> = (0..tokens * width)
+            .map(|i| (i as f32 * 0.013).cos())
+            .collect();
+        let values: Vec<f32> = (0..tokens * width)
+            .map(|i| (i as f32 * 0.031).sin())
+            .collect();
+        let minimum = (tokens + width) * 4;
+        let parallel = (tokens * heads + width) * 4;
+        let mut results = Vec::new();
+        for (threads, scratch) in [(1, minimum), (8, parallel), (8, minimum)] {
+            let mut cpu = CpuContext::new(Backend::Auto, threads, scratch).unwrap();
+            let output = ops::attention_decode(&q, &keys, &values, heads, &mut cpu).unwrap();
+            results.push(output.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
+        }
+        assert_eq!(results[0], results[1]);
+        assert_eq!(results[0], results[2]);
+        let mut cpu = CpuContext::new(Backend::Auto, 8, minimum - 1).unwrap();
+        assert!(ops::attention_decode(&q, &keys, &values, heads, &mut cpu).is_err());
+    }
+}

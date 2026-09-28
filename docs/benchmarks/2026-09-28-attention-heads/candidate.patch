@@ -1,0 +1,288 @@
+diff --git a/src/cpu/accelerate.rs b/src/cpu/accelerate.rs
+index 9e5f9fd..6a85e7d 100644
+--- a/src/cpu/accelerate.rs
++++ b/src/cpu/accelerate.rs
+@@ -37,6 +37,18 @@ unsafe extern "C" {
+     );
+ }
+ 
++/// Parallel callers need thread-local BLAS control to prevent nested workers.
++pub(super) fn parallel_matvec_supported() -> bool {
++    #[cfg(target_os = "macos")]
++    {
++        super::blas_threads::available()
++    }
++    #[cfg(not(target_os = "macos"))]
++    {
++        false
++    }
++}
++
+ /// Matrix-vector product over a column interval of a token-major KV matrix.
+ pub fn matvec_strided(
+     a: &[f32],
+@@ -69,6 +81,7 @@ pub fn matvec_strided(
+     let (rows, cols, stride) = (convert(rows)?, convert(cols)?, convert(stride)?);
+     #[cfg(target_os = "macos")]
+     {
++        let _thread_policy = super::blas_threads::enter()?;
+         // SAFETY: the checked last row endpoint covers every accessed matrix
+         // element. Vector lengths match the selected transpose; stride and
+         // dimensions fit CBLAS ints. Output is exclusive and cannot alias inputs.
+diff --git a/src/cpu/blas_threads.rs b/src/cpu/blas_threads.rs
+new file mode 100644
+index 0000000..503fd30
+--- /dev/null
++++ b/src/cpu/blas_threads.rs
+@@ -0,0 +1,117 @@
++//! Optional macOS 15+ thread-local BLAS policy, resolved without raising the
++//! deployment target of the portable runtime.
++
++use crate::error::{OcrError, Result};
++use std::{
++    ffi::{c_char, c_void},
++    marker::PhantomData,
++    rc::Rc,
++    sync::OnceLock,
++};
++
++#[derive(Clone, Copy)]
++struct Api {
++    set: unsafe extern "C" fn(u32) -> i32,
++    get: unsafe extern "C" fn() -> u32,
++}
++
++unsafe extern "C" {
++    fn dlsym(handle: *mut c_void, symbol: *const c_char) -> *mut c_void;
++}
++
++fn api() -> Option<Api> {
++    static API: OnceLock<Option<Api>> = OnceLock::new();
++    *API.get_or_init(|| {
++        // SAFETY: Darwin's RTLD_DEFAULT is ((void *) -2); both names are
++        // terminated static C strings. Accelerate is linked for this process.
++        let (set, get) = unsafe {
++            let handle = -2isize as *mut c_void;
++            (
++                dlsym(handle, c"BLASSetThreading".as_ptr()),
++                dlsym(handle, c"BLASGetThreading".as_ptr()),
++            )
++        };
++        if set.is_null() || get.is_null() {
++            return None;
++        }
++        // SAFETY: signatures match Accelerate's thread_api.h: an unsigned-int
++        // BLAS_THREADING enum, int setter result, and enum getter result. Symbols
++        // live in the process-linked framework and cannot be unloaded here.
++        Some(unsafe {
++            Api {
++                set: std::mem::transmute::<*mut c_void, unsafe extern "C" fn(u32) -> i32>(set),
++                get: std::mem::transmute::<*mut c_void, unsafe extern "C" fn() -> u32>(get),
++            }
++        })
++    })
++}
++
++pub(super) fn available() -> bool {
++    api().is_some()
++}
++
++pub(super) struct Guard {
++    api: Api,
++    previous: u32,
++    // Policy is thread-local: the guard must never move to another thread.
++    _not_send: PhantomData<Rc<()>>,
++}
++
++pub(super) fn enter() -> Result<Option<Guard>> {
++    let Some(api) = api() else { return Ok(None) };
++    // SAFETY: exact resolved SDK signatures; 1 is SINGLE_THREADED. The setting
++    // affects only this calling thread, not other requests or worker pools.
++    let previous = unsafe { (api.get)() };
++    if unsafe { (api.set)(1) } != 0 {
++        return Err(OcrError::Unsupported(
++            "single-threaded BLAS policy unavailable".into(),
++        ));
++    }
++    Ok(Some(Guard {
++        api,
++        previous,
++        _not_send: PhantomData,
++    }))
++}
++
++impl Drop for Guard {
++    fn drop(&mut self) {
++        // SAFETY: guard is !Send, so this restores the same thread's previously
++        // accepted policy, including during unwinding or nested calls.
++        unsafe {
++            (self.api.set)(self.previous);
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn single_thread_guard_restores_nested_and_unwound_policy() {
++        let Some(api) = api() else {
++            eprintln!("BLAS thread API unavailable; guard test skipped");
++            return;
++        };
++        eprintln!("BLAS thread API available; testing restoration");
++        // SAFETY: dynamically resolved SDK function with its exact C signature.
++        let original = unsafe { (api.get)() };
++        {
++            let _outer = enter().unwrap();
++            assert_eq!(unsafe { (api.get)() }, 1);
++            {
++                let _inner = enter().unwrap();
++                assert_eq!(unsafe { (api.get)() }, 1);
++            }
++            assert_eq!(unsafe { (api.get)() }, 1);
++        }
++        assert_eq!(unsafe { (api.get)() }, original);
++        let caught = std::panic::catch_unwind(|| {
++            let _guard = enter().unwrap();
++            panic!("exercise unwinding");
++        });
++        assert!(caught.is_err());
++        assert_eq!(unsafe { (api.get)() }, original);
++    }
++}
+diff --git a/src/cpu/mod.rs b/src/cpu/mod.rs
+index a755740..9c362d9 100644
+--- a/src/cpu/mod.rs
++++ b/src/cpu/mod.rs
+@@ -1,6 +1,8 @@
+ use crate::error::{OcrError, Result};
+ use std::sync::Arc;
+ mod accelerate;
++#[cfg(target_os = "macos")]
++mod blas_threads;
+ mod neon;
+ pub mod ops;
+ pub mod quantized;
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index fc33912..df3b447 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -540,23 +540,14 @@ pub fn attention_decode(
+             .checked_add(width)
+             .ok_or_else(|| OcrError::Resource("decode attention scratch overflow".into()))?,
+     )?;
+-    let mut scores = vec![0.; tokens];
+     let mut output = vec![0.; width];
+     let scale = (dim as f32).sqrt().recip();
+     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
+-    for head in 0..heads {
++    let compute_head = |head: usize, scores: &mut [f32], dest: &mut [f32]| -> Result<()> {
+         let offset = head * dim;
+         let query = &q.data[offset..offset + dim];
+         if fast {
+-            accelerate::matvec_strided(
+-                &keys[offset..],
+-                query,
+-                &mut scores,
+-                tokens,
+-                dim,
+-                width,
+-                false,
+-            )?;
++            accelerate::matvec_strided(&keys[offset..], query, scores, tokens, dim, width, false)?;
+         } else {
+             for (token, score) in scores.iter_mut().enumerate() {
+                 *score = query
+@@ -566,13 +557,12 @@ pub fn attention_decode(
+                     .sum();
+             }
+         }
+-        for score in &mut scores {
++        for score in scores.iter_mut() {
+             *score *= scale;
+         }
+-        softmax_backend(&mut scores, cpu.backend)?;
+-        let dest = &mut output[offset..offset + dim];
++        softmax_backend(scores, cpu.backend)?;
+         if fast {
+-            accelerate::matvec_strided(&values[offset..], &scores, dest, tokens, dim, width, true)?;
++            accelerate::matvec_strided(&values[offset..], scores, dest, tokens, dim, width, true)?;
+         } else {
+             for (token, &score) in scores.iter().enumerate() {
+                 for (out, &value) in dest
+@@ -583,6 +573,34 @@ pub fn attention_decode(
+                 }
+             }
+         }
++        Ok(())
++    };
++    let parallel_scores = tokens.checked_mul(heads);
++    let parallel = cpu.threads() > 1
++        && heads > 1
++        && (!fast || accelerate::parallel_matvec_supported())
++        && cpu.backend != Backend::Scalar
++        && keys.len() >= 65536
++        && parallel_scores
++            .and_then(|n| n.checked_add(width))
++            .is_some_and(|n| cpu.check_elements(n).is_ok());
++    if parallel {
++        // Preallocate exactly the checked aggregate score storage. Heads retain
++        // independent arithmetic; no cross-head floating-point reduction.
++        let mut scores = vec![0.; parallel_scores.expect("checked score count")];
++        cpu.pool.install(|| {
++            output
++                .par_chunks_mut(dim)
++                .zip(scores.par_chunks_mut(tokens))
++                .enumerate()
++                .try_for_each(|(head, (dest, scores))| compute_head(head, scores, dest))
++        })?;
++    } else {
++        // Keep the original scratch requirement for small-budget requests.
++        let mut scores = vec![0.; tokens];
++        for (head, dest) in output.chunks_mut(dim).enumerate() {
++            compute_head(head, &mut scores, dest)?;
++        }
+     }
+     Tensor::new(q.shape.clone(), output)
+ }
+diff --git a/tests/decode_attention.rs b/tests/decode_attention.rs
+index 573b364..d83865b 100644
+--- a/tests/decode_attention.rs
++++ b/tests/decode_attention.rs
+@@ -64,3 +64,34 @@ fn strided_decode_attention_rejects_invalid_layouts_and_budget() {
+     let mut cpu = CpuContext::new(Backend::Auto, 1, 4).unwrap();
+     assert!(ops::attention_decode(&q, &[0.; 6], &[0.; 6], 2, &mut cpu).is_err());
+ }
++
++#[test]
++fn decode_heads_preserve_bits_across_threads_and_scratch_fallback() {
++    let (heads, dim) = (10, 128);
++    let width = heads * dim;
++    for tokens in [129, 1641] {
++        let q = Tensor::new(
++            vec![1, width],
++            (0..width).map(|i| (i as f32 * 0.17).sin()).collect(),
++        )
++        .unwrap();
++        let keys: Vec<f32> = (0..tokens * width)
++            .map(|i| (i as f32 * 0.013).cos())
++            .collect();
++        let values: Vec<f32> = (0..tokens * width)
++            .map(|i| (i as f32 * 0.031).sin())
++            .collect();
++        let minimum = (tokens + width) * 4;
++        let parallel = (tokens * heads + width) * 4;
++        let mut results = Vec::new();
++        for (threads, scratch) in [(1, minimum), (8, parallel), (8, minimum)] {
++            let mut cpu = CpuContext::new(Backend::Auto, threads, scratch).unwrap();
++            let output = ops::attention_decode(&q, &keys, &values, heads, &mut cpu).unwrap();
++            results.push(output.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
++        }
++        assert_eq!(results[0], results[1]);
++        assert_eq!(results[0], results[2]);
++        let mut cpu = CpuContext::new(Backend::Auto, 8, minimum - 1).unwrap();
++        assert!(ops::attention_decode(&q, &keys, &values, heads, &mut cpu).is_err());
++    }
++}

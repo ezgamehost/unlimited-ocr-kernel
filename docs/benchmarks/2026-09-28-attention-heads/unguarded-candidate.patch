@@ -1,0 +1,119 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index fc33912..43c2fb9 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -540,23 +540,14 @@ pub fn attention_decode(
+             .checked_add(width)
+             .ok_or_else(|| OcrError::Resource("decode attention scratch overflow".into()))?,
+     )?;
+-    let mut scores = vec![0.; tokens];
+     let mut output = vec![0.; width];
+     let scale = (dim as f32).sqrt().recip();
+     let fast = cfg!(target_os = "macos") && cpu.backend != Backend::Scalar;
+-    for head in 0..heads {
++    let compute_head = |head: usize, scores: &mut [f32], dest: &mut [f32]| -> Result<()> {
+         let offset = head * dim;
+         let query = &q.data[offset..offset + dim];
+         if fast {
+-            accelerate::matvec_strided(
+-                &keys[offset..],
+-                query,
+-                &mut scores,
+-                tokens,
+-                dim,
+-                width,
+-                false,
+-            )?;
++            accelerate::matvec_strided(&keys[offset..], query, scores, tokens, dim, width, false)?;
+         } else {
+             for (token, score) in scores.iter_mut().enumerate() {
+                 *score = query
+@@ -566,13 +557,12 @@ pub fn attention_decode(
+                     .sum();
+             }
+         }
+-        for score in &mut scores {
++        for score in scores.iter_mut() {
+             *score *= scale;
+         }
+-        softmax_backend(&mut scores, cpu.backend)?;
+-        let dest = &mut output[offset..offset + dim];
++        softmax_backend(scores, cpu.backend)?;
+         if fast {
+-            accelerate::matvec_strided(&values[offset..], &scores, dest, tokens, dim, width, true)?;
++            accelerate::matvec_strided(&values[offset..], scores, dest, tokens, dim, width, true)?;
+         } else {
+             for (token, &score) in scores.iter().enumerate() {
+                 for (out, &value) in dest
+@@ -583,6 +573,32 @@ pub fn attention_decode(
+                 }
+             }
+         }
++        Ok(())
++    };
++    let parallel_scores = tokens.checked_mul(heads);
++    let parallel = cpu.threads() > 1
++        && cpu.backend != Backend::Scalar
++        && keys.len() >= 65536
++        && parallel_scores
++            .and_then(|n| n.checked_add(width))
++            .is_some_and(|n| cpu.check_elements(n).is_ok());
++    if parallel {
++        // Preallocate exactly the checked aggregate score storage. Heads retain
++        // independent arithmetic; no cross-head floating-point reduction.
++        let mut scores = vec![0.; parallel_scores.expect("checked score count")];
++        cpu.pool.install(|| {
++            output
++                .par_chunks_mut(dim)
++                .zip(scores.par_chunks_mut(tokens))
++                .enumerate()
++                .try_for_each(|(head, (dest, scores))| compute_head(head, scores, dest))
++        })?;
++    } else {
++        // Keep the original scratch requirement for small-budget requests.
++        let mut scores = vec![0.; tokens];
++        for (head, dest) in output.chunks_mut(dim).enumerate() {
++            compute_head(head, &mut scores, dest)?;
++        }
+     }
+     Tensor::new(q.shape.clone(), output)
+ }
+diff --git a/tests/decode_attention.rs b/tests/decode_attention.rs
+index 573b364..d83865b 100644
+--- a/tests/decode_attention.rs
++++ b/tests/decode_attention.rs
+@@ -64,3 +64,34 @@ fn strided_decode_attention_rejects_invalid_layouts_and_budget() {
+     let mut cpu = CpuContext::new(Backend::Auto, 1, 4).unwrap();
+     assert!(ops::attention_decode(&q, &[0.; 6], &[0.; 6], 2, &mut cpu).is_err());
+ }
++
++#[test]
++fn decode_heads_preserve_bits_across_threads_and_scratch_fallback() {
++    let (heads, dim) = (10, 128);
++    let width = heads * dim;
++    for tokens in [129, 1641] {
++        let q = Tensor::new(
++            vec![1, width],
++            (0..width).map(|i| (i as f32 * 0.17).sin()).collect(),
++        )
++        .unwrap();
++        let keys: Vec<f32> = (0..tokens * width)
++            .map(|i| (i as f32 * 0.013).cos())
++            .collect();
++        let values: Vec<f32> = (0..tokens * width)
++            .map(|i| (i as f32 * 0.031).sin())
++            .collect();
++        let minimum = (tokens + width) * 4;
++        let parallel = (tokens * heads + width) * 4;
++        let mut results = Vec::new();
++        for (threads, scratch) in [(1, minimum), (8, parallel), (8, minimum)] {
++            let mut cpu = CpuContext::new(Backend::Auto, threads, scratch).unwrap();
++            let output = ops::attention_decode(&q, &keys, &values, heads, &mut cpu).unwrap();
++            results.push(output.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
++        }
++        assert_eq!(results[0], results[1]);
++        assert_eq!(results[0], results[2]);
++        let mut cpu = CpuContext::new(Backend::Auto, 8, minimum - 1).unwrap();
++        assert!(ops::attention_decode(&q, &keys, &values, heads, &mut cpu).is_err());
++    }
++}

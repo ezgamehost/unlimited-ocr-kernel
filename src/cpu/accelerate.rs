@@ -37,6 +37,18 @@ unsafe extern "C" {
     );
 }
 
+/// Parallel callers need thread-local BLAS control to prevent nested workers.
+pub(super) fn parallel_matvec_supported() -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        super::blas_threads::available()
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        false
+    }
+}
+
 /// Matrix-vector product over a column interval of a token-major KV matrix.
 pub fn matvec_strided(
     a: &[f32],
@@ -69,6 +81,7 @@ pub fn matvec_strided(
     let (rows, cols, stride) = (convert(rows)?, convert(cols)?, convert(stride)?);
     #[cfg(target_os = "macos")]
     {
+        let _thread_policy = super::blas_threads::enter()?;
         // SAFETY: the checked last row endpoint covers every accessed matrix
         // element. Vector lengths match the selected transpose; stride and
         // dimensions fit CBLAS ints. Output is exclusive and cannot alias inputs.
