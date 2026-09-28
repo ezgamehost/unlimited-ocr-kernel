@@ -55,3 +55,24 @@ exactly, and all sixteen fixed-work logit hashes agree. `run_repeated.py` checks
 those gates, verifies executable/model/projector/overlay identities, then runs
 native-hybrid, llama-Q8, llama-Q8, native-hybrid. The original ABBA sampling and
 matching rules above remain unchanged. All-Q4 failed pilot evidence stays intact.
+
+## Host conditions during the live repeated run
+
+Llama phase1 latency rose from roughly13–17s to33–41s while outputs remained
+complete. Read-only host snapshots show about10GB of swap in use. Across the
+recorded85.36s UTC interval, host-wide counters increased by6717 pageins,1966
+pageouts,308 swapins,501613 compressions and529792 decompressions (16KiB pages).
+These observations are not attributable to the benchmark child alone and do
+not prove a single cause. Preserve all samples and per-phase results; do not
+interpret the aggregate as isolated kernel performance. The same live runner
+continues; no restart or background inference/build was introduced.
+
+## Actual stop condition
+
+ABBA interrupted in phase2 because the available Mac reached2% battery and then
+1%, discharging. `power-interruption.json` records SIGTERM to verified owned
+llama PID89694/processgroup89694/parent89095. Driver exec33128 is TERMINALexit1;
+phase2 reports incomplete4/24 collected (three completed warmups and interrupted
+fourth), no forced kill; phase3 neverstarted. Preserve this series as incomplete.
+Heavy work requires AC power. Start any future full series in a distinct folder
+and capture initial power state; do not relabel this as all96 requests complete.

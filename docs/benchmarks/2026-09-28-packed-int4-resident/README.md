@@ -57,3 +57,28 @@ Validation after adding the diagnostic: Rust suite 56 passed, 9 ignored;
 clippy `--all-targets -- -D warnings` clean. The new ignored diagnostic was run
 explicitly twice, once per packed/simulation overlay, and both runs passed.
 No production inference code changed during this investigation.
+
+## Repeated comparison interrupted by critical battery
+
+The ABBA series did not finish. Phase0 native and phase1 llama each completed
+24 requests and exited0 without forced kills. Phase2 llama was deliberately
+stopped after the Mac reported2% battery, discharging, with an approximately
+four-minute estimate. A follow-up reported1%. Only the verified benchmark child
+process group was sent SIGTERM; the driver then ended with its recorded stream
+error. Phase3 native never started. The completed phases and partial phase2 are
+preserved; they must not be presented as a complete96-request ABBA result.
+
+Phase0 native: every output CER0, peak5,104,910,336 bytes. Phase1 llama: CER0
+except the same one-character table error, peak9,107,537,920 bytes. Llama wall
+times increased markedly within the phase. Host snapshots show active paging
+and about10GB swap in use. Later power snapshot shows battery discharge; no
+thermal/performance warning was recorded. There is no initial power snapshot,
+so neither battery status nor paging alone proves the cause of the slowdown.
+See `host-memory-deltas.json`, `host-power-thermal.json`, `power-interruption.json`
+and the per-phase raw output. No full-series speed ratio is claimed.
+
+The final audit helper requires all four completed phases and therefore is not
+run against this incomplete series. Heavy profiling, builds and inference are
+deferred until AC power is available. A future powered series needs a distinct
+output namespace; do not overwrite these files or silently stitch samples
+across the power interruption into a completed ABBA run.

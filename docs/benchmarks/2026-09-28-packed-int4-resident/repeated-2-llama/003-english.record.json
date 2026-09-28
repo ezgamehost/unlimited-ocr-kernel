@@ -1,0 +1,12 @@
+{
+  "image_id": "english",
+  "iteration": -1,
+  "warmup": true,
+  "index": 3,
+  "image_sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+  "status": "error",
+  "finish_reason": "error",
+  "first_token_seconds": 30.028849750000518,
+  "error": "ValueError: stream ended without a terminal event",
+  "wall_seconds": 60.21953775000293
+}

@@ -1,0 +1,17 @@
+{
+  "utc": "2026-09-28T14:57:11.112593+00:00",
+  "reason": "Mac reports 2% battery, discharging, approximately four minutes remaining; stop owned benchmark load to preserve results.",
+  "signal": "SIGTERM",
+  "pid": 89694,
+  "parent_pid": 89095,
+  "process_group": 89694,
+  "completed_phases": [
+    0,
+    1
+  ],
+  "interrupted_phase": 2,
+  "unstarted_phases": [
+    3
+  ],
+  "full_abba_complete": false
+}

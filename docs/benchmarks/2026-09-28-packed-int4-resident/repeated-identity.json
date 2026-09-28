@@ -1,0 +1,22 @@
+{
+  "hashes": {
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr": "7990f781a918f3f0cfe68fa5d6294f504d56fb6f45524589ef584d6ed948de58",
+    "/private/tmp/unlimited-ocr-baseline/bin/llama-b11223/llama-server": "6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6",
+    "/private/tmp/unlimited-ocr-baseline/models/model.gguf": "149574e63ec2681bbfb3d0f83ca1064e041fd6f3a97a62382d3168ad64289848",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf": "75dcbeafd883b3f27bee1a3d95c3ef57a6305c16758912af7cf62e6cf4c009a6",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/unlimited-ocr-q4-q8head-block32.safetensors": "6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae"
+  },
+  "overlay_manifest": {
+    "schema_version": 1,
+    "format": "uocr-q4-q8head-block32-v1",
+    "block_size": 32,
+    "source_sha256": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+    "output_sha256": "6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae",
+    "matrix_count": 2197,
+    "bytes": 1813492888,
+    "body_bits": 4,
+    "head_bits": 8
+  },
+  "source_commit": "183d23a50f909dc77ef1043f2c5974286db4ece9",
+  "note": "Identity verification precedes all inference timing; resident independent requests, no cold-cache claim."
+}

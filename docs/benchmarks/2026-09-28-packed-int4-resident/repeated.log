@@ -1,0 +1,69 @@
+{"event": "phase_start", "phase": 0, "engine": "native", "output": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/repeated-0-native"}
+{"event": "ready", "engine": "native", "startup_seconds": 4.919944125023903}
+{"image_id": "table", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 11.214139082992915, "cer": 0.0}
+{"image_id": "chinese", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.779951416014228, "cer": 0.0}
+{"image_id": "dense", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.93032008301816, "cer": 0.0}
+{"image_id": "english", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.48175241597346, "cer": 0.0}
+{"image_id": "dense", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.850183500006096, "cer": 0.0}
+{"image_id": "table", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.402356333011994, "cer": 0.0}
+{"image_id": "english", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.459981583000626, "cer": 0.0}
+{"image_id": "chinese", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.688722708990099, "cer": 0.0}
+{"image_id": "chinese", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.679798124998342, "cer": 0.0}
+{"image_id": "dense", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.844940874987515, "cer": 0.0}
+{"image_id": "table", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.395641459006583, "cer": 0.0}
+{"image_id": "english", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.438361375010572, "cer": 0.0}
+{"image_id": "chinese", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.682514042011462, "cer": 0.0}
+{"image_id": "table", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.446550625027157, "cer": 0.0}
+{"image_id": "english", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.425897915993119, "cer": 0.0}
+{"image_id": "dense", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.865365750010824, "cer": 0.0}
+{"image_id": "chinese", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.669209416984813, "cer": 0.0}
+{"image_id": "table", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.39056695799809, "cer": 0.0}
+{"image_id": "dense", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 14.025351249991218, "cer": 0.0}
+{"image_id": "english", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.428887291025603, "cer": 0.0}
+{"image_id": "chinese", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.659968791005667, "cer": 0.0}
+{"image_id": "dense", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.827511292009149, "cer": 0.0}
+{"image_id": "table", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.394791917002294, "cer": 0.0}
+{"image_id": "english", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 10.437350457999855, "cer": 0.0}
+{"event": "phase_complete", "phase": 0, "engine": "native"}
+{"event": "phase_start", "phase": 1, "engine": "llama", "output": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/repeated-1-llama"}
+{"event": "ready", "engine": "llama", "startup_seconds": 5.029295000014827}
+{"image_id": "table", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.744616958021652, "cer": 0.00398406374501992}
+{"image_id": "chinese", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.724618583975825, "cer": 0.0}
+{"image_id": "dense", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 16.66870879099588, "cer": 0.0}
+{"image_id": "english", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.351209542015567, "cer": 0.0}
+{"image_id": "dense", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 16.24145666701952, "cer": 0.0}
+{"image_id": "table", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.01157166599296, "cer": 0.00398406374501992}
+{"image_id": "english", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 12.878163332992699, "cer": 0.0}
+{"image_id": "chinese", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.87980579098803, "cer": 0.0}
+{"image_id": "chinese", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 13.297479542001383, "cer": 0.0}
+{"image_id": "dense", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 28.61018341698218, "cer": 0.0}
+{"image_id": "table", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 35.87224629201228, "cer": 0.00398406374501992}
+{"image_id": "english", "iteration": 1, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 35.048515458009206, "cer": 0.0}
+{"image_id": "chinese", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 35.82369116699556, "cer": 0.0}
+{"image_id": "table", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 36.070080458011944, "cer": 0.00398406374501992}
+{"image_id": "english", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 32.967824791994644, "cer": 0.0}
+{"image_id": "dense", "iteration": 2, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 41.39112008397933, "cer": 0.0}
+{"image_id": "chinese", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 34.808391917002155, "cer": 0.0}
+{"image_id": "table", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 33.87312145900796, "cer": 0.00398406374501992}
+{"image_id": "dense", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 41.84754245801014, "cer": 0.0}
+{"image_id": "english", "iteration": 3, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 32.54505375001463, "cer": 0.0}
+{"image_id": "chinese", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 33.79413150000619, "cer": 0.0}
+{"image_id": "dense", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 41.24312833300792, "cer": 0.0}
+{"image_id": "table", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 32.792271042009816, "cer": 0.00398406374501992}
+{"image_id": "english", "iteration": 4, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 33.06302304100245, "cer": 0.0}
+{"event": "phase_complete", "phase": 1, "engine": "llama"}
+{"event": "phase_start", "phase": 2, "engine": "llama", "output": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/repeated-2-llama"}
+{"event": "ready", "engine": "llama", "startup_seconds": 4.197602291998919}
+{"image_id": "table", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 31.598607084015384, "cer": 0.00398406374501992}
+{"image_id": "chinese", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 33.69724112501717, "cer": 0.0}
+{"image_id": "dense", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 41.98912829201436, "cer": 0.0}
+{"image_id": "english", "iteration": -1, "warmup": true, "status": "error", "finish_reason": "error", "wall_seconds": 60.21953775000293, "cer": null}
+Traceback (most recent call last):
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py", line 52, in <module>
+    main()
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-packed-int4-resident/run_repeated.py", line 46, in main
+    summary = run(args)
+              ^^^^^^^^^
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/tools/benchmark_resident.py", line 371, in run
+    raise RuntimeError(failure)
+RuntimeError: ValueError: stream ended without a terminal event

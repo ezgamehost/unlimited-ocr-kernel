@@ -1,0 +1,14 @@
+{
+  "page_size": 16384,
+  "deltas": {
+    "Pageins": 6717,
+    "Pageouts": 1966,
+    "Swapins": 308,
+    "Swapouts": 0,
+    "Compressions": 501613,
+    "Decompressions": 529792
+  },
+  "note": "Host-wide observations during llama phase1; not child-attributed or causal proof.",
+  "wall_utc_interval_seconds": 85.363767,
+  "clock_note": "Cross-process monotonic offsets were not comparable (both near process start). Interval uses recorded UTC timestamps; no rate or per-child attribution is inferred."
+}

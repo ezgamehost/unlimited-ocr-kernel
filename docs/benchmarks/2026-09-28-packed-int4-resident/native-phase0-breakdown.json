@@ -1,0 +1,37 @@
+{
+  "note": "First native phase only; stage clocks, not final ABBA comparison.",
+  "images": {
+    "english": {
+      "preprocess_seconds": 0.114910875,
+      "vision_seconds": 7.138873792,
+      "prefill_seconds": 1.56812375,
+      "decode_seconds": 1.590318838,
+      "total_seconds": 10.435327167,
+      "vision_fraction_of_median_internal_total": 0.6841063703853493
+    },
+    "chinese": {
+      "preprocess_seconds": 0.115570958,
+      "vision_seconds": 7.12182375,
+      "prefill_seconds": 1.569228958,
+      "decode_seconds": 1.8406075089999998,
+      "total_seconds": 10.677503250000001,
+      "vision_fraction_of_median_internal_total": 0.6669933582085306
+    },
+    "table": {
+      "preprocess_seconds": 0.114383041,
+      "vision_seconds": 7.111535666,
+      "prefill_seconds": 1.569106959,
+      "decode_seconds": 1.576694126,
+      "total_seconds": 10.393824458,
+      "vision_fraction_of_median_internal_total": 0.6842077903794438
+    },
+    "dense": {
+      "preprocess_seconds": 0.115977125,
+      "vision_seconds": 7.170897583,
+      "prefill_seconds": 1.576735083,
+      "decode_seconds": 4.91769834500001,
+      "total_seconds": 13.847239167,
+      "vision_fraction_of_median_internal_total": 0.5178575668779738
+    }
+  }
+}

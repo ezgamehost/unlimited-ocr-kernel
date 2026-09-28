@@ -1,0 +1,8 @@
+{
+  "utc": "2026-09-28T14:50:07.612017+00:00",
+  "monotonic": 0.051498083,
+  "note": "Host-wide counters; cannot attribute deltas to a specific process.",
+  "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4281.\nPages active:                                 443087.\nPages inactive:                               441334.\nPages speculative:                               413.\nPages throttled:                                   0.\nPages wired down:                             167487.\nPages purgeable:                                 147.\n\"Translation faults\":                     1455316068.\nPages copy-on-write:                        32910511.\nPages zero filled:                         802922353.\nPages reactivated:                         220392149.\nPages purged:                               13643352.\nFile-backed pages:                            229412.\nAnonymous pages:                              655422.\nPages stored in compressor:                  2050419.\nPages occupied by compressor:                 471173.\nDecompressions:                            201983428.\nCompressions:                              272549134.\nPageins:                                   127087302.\nPageouts:                                    2998752.\nSwapins:                                     1650391.\nSwapouts:                                    2785837.\n",
+  "swap_usage": "vm.swapusage: total = 11264.00M  used = 10062.94M  free = 1201.06M  (encrypted)\n",
+  "load": "vm.loadavg: { 11.13 9.11 7.11 }\n"
+}

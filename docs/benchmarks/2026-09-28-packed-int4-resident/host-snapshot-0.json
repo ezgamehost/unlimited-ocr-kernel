@@ -1,0 +1,8 @@
+{
+  "utc": "2026-09-28T14:48:42.248250+00:00",
+  "monotonic": 0.076094041,
+  "note": "Read-only host snapshot after llama phase1 latency outliers; counters are host-wide, not attributed to child.",
+  "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                     4327.\nPages active:                                 423011.\nPages inactive:                               421173.\nPages speculative:                               862.\nPages throttled:                                   0.\nPages wired down:                             167513.\nPages purgeable:                                4031.\n\"Translation faults\":                     1454347881.\nPages copy-on-write:                        32906570.\nPages zero filled:                         802754790.\nPages reactivated:                         219673009.\nPages purged:                               13632187.\nFile-backed pages:                            228050.\nAnonymous pages:                              616996.\nPages stored in compressor:                  2089560.\nPages occupied by compressor:                 511374.\nDecompressions:                            201453636.\nCompressions:                              272047521.\nPageins:                                   127080585.\nPageouts:                                    2996786.\nSwapins:                                     1650083.\nSwapouts:                                    2785837.\n",
+  "swap_usage": "vm.swapusage: total = 11264.00M  used = 10070.94M  free = 1193.06M  (encrypted)\n",
+  "load": "vm.loadavg: { 10.80 8.50 6.71 }\n"
+}
