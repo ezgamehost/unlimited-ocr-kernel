@@ -1,0 +1,26 @@
+{
+  "baseline": {
+    "decode_with_checksum_seconds": {
+      "median": 3.7358459585,
+      "min": 3.695154,
+      "max": 3.744067125
+    },
+    "prefill_seconds": {
+      "median": 1.4501072295,
+      "min": 1.436410333,
+      "max": 1.478506042
+    }
+  },
+  "candidate": {
+    "decode_with_checksum_seconds": {
+      "median": 3.7101540625,
+      "min": 3.6925698750000002,
+      "max": 3.743550708
+    },
+    "prefill_seconds": {
+      "median": 1.458594979,
+      "min": 1.448492,
+      "max": 1.469457042
+    }
+  }
+}
