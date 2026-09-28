@@ -36,3 +36,8 @@ labeled battery ABBA completed with 4.08% lower median decode and exact logits;
 candidate retained for AC confirmation. See the benchmark README for raw evidence.
 Ruling: run correctness and separate battery exploration while AC is unavailable;
 these do not substitute for the AC/full-page validation requirements.
+
+AC confirmation completed: all16logit hashes exact; median512decode4.48%lower,
+prefill+20.1ms. Layout accepted with measured conversion cost. CurrentBF16/Q8
+max32outputs also match older outputs exactly; hybrid max32fails identically
+with both layouts. Full-page update remains pending.

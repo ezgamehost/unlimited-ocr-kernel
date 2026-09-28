@@ -1,0 +1,37 @@
+{
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/kv-layout/uocr-c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
+    "--model",
+    "artifacts/upstream",
+    "--image",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-max32/portrait32.png",
+    "--prompt",
+    "<image>document parsing.",
+    "--threads",
+    "8",
+    "--max-tokens",
+    "8192",
+    "--quantized-weights",
+    "artifacts/unlimited-ocr-q4-q8head-sim.safetensors",
+    "--int8-activations",
+    "--json"
+  ],
+  "binary_sha256": "c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
+  "input_sha256": "4fe946abc026998f6e1a06f878fd7a309aae1d8785fea5d51cc6a25d4a63d01e",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t54%; charging; 3:40 remaining present: true\n",
+  "purpose": "Same hybrid codes/scales in physical INT8 storage; packing diagnostic, not performance comparison.",
+  "overlay_sha256": "741b40e3adf06ad2abb05c593e13a184303fd7d820142de15c8be6d268175f6b",
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 7057604608,
+    "user_cpu_seconds": 179.396829,
+    "system_cpu_seconds": 39.679197,
+    "major_faults": 315,
+    "minor_faults": 993009
+  },
+  "finish_reason": "eos",
+  "tokens": 3349,
+  "image_tokens": 3793,
+  "cer": 1.3664289632473945
+}

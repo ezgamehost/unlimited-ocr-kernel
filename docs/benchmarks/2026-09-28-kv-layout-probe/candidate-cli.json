@@ -1,10 +1,11 @@
 {
   "binary_sha256": "c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
   "preserved_binary": "artifacts/kv-layout/uocr-c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57",
-  "status": "exact quality gates passed; positive battery ABBA; AC and full-page confirmation pending",
+  "status": "accepted after exact quality gates and AC fixed-work comparison; full-page update pending",
   "source_sha256": {
     "src/cpu/ops.rs": "ba406c7fe21c96b213a2b6bb0978cc4c5a9292a55c0f8ea3cd441fb77d090313",
     "src/decoder/mod.rs": "46224bf874a2bf57f205e795667af3d9facb6bd0432fa7d5adc90c481098d727",
     "src/decoder/cache.rs": "c50da6a2c4eaaa3cc9e49c0ad1473860b2b6726c750ae870d234953b08628969"
-  }
+  },
+  "accepted_binary": "artifacts/kernel-baselines/uocr-c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57"
 }

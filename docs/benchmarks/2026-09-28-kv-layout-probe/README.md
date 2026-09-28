@@ -1,8 +1,8 @@
 # Head-major KV cache candidate
 
-Status: candidate retained for AC confirmation after exact quality gates and
-a positive exploratory battery comparison. The earlier accepted NEON GELU
-baseline remains separately preserved. No updated llama.cpp claim is made.
+Status: accepted after exact quality gates and AC fixed-work confirmation.
+The earlier NEON GELU baseline remains separately preserved. No updated
+llama.cpp claim is made.
 
 ## Isolated stride probe
 
@@ -94,3 +94,21 @@ not a full-page or AC result. AC confirmation and a new full-page comparison
 remain pending. The candidate CLI is preserved at the path in
 `candidate-cli.json` with SHA
 `c191d8963f450c57e9e71b17c1ad0612ad77a63ef1f3952a9f850f9747e19b57`.
+
+## Completed AC confirmation
+
+`powered-abba-1/` is a separate, complete ABBA series: all four processes exit
+normally, all sixteen full-logit hashes match, and AC checks pass before and
+after each phase. Each variant has six measured repetitions after warmups.
+
+| Metric | Token-major | Head-major |
+|---|---:|---:|
+| Median 512-step decode including checksum | 3.419120s | 3.265862s |
+| Observed decode range | 3.400347–3.457732s | 3.250377–3.298195s |
+| Median prefill including conversion | 1.614920s | 1.635055s |
+
+Decode median is 4.48% lower with nonoverlapping measured ranges. Conversion
+costs about 20.1 ms more prefill time in this series (1.25%). The layout is
+accepted with that tradeoff; a complete-page comparison must still measure its
+net effect at actual output lengths. The quality-verified CLI is also preserved
+in `artifacts/kernel-baselines/` under its SHA-based filename.

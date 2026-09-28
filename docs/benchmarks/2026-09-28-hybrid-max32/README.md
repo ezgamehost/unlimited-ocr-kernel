@@ -12,6 +12,8 @@ BF16 and dynamic Q8. CER can exceed one because insertions count as errors.
 | Hybrid, head-major cache | 3349 | EOS | 1.366429 |
 | Current BF16 weights / FP32 compute | 930 | EOS | 0.069117 |
 | Current Q8 weights / dynamic INT8 activations | 930 | EOS | 0.069117 |
+| Hybrid weights / FP32 activations | 8192 | Token limit | 2.224904 |
+| Hybrid codes in physical INT8 storage / dynamic INT8 activations | 3349 | EOS | 1.366429 |
 
 The hybrid outputs match exactly across cache layouts, including text, token
 IDs, EOS and 3,793 image tokens. This extends cache-layout validation to a
@@ -21,8 +23,14 @@ smaller prompt/page cases. It is a failed quality case, not a speed benchmark.
 Both current BF16 and Q8 outputs also match their earlier original-prompt
 controls exactly, including token IDs. Thus the recent vision/cache changes do
 not explain this observed regression. The hybrid precision path is implicated;
-additional controls isolate activation precision and packed storage. Until those
-finish, do not attribute the failure more narrowly to either component.
+the FP32-activation control also fails and reaches the token limit, so removing
+dynamic activation quantization does not fix this input. Its CER describes an
+incomplete capped output, not successful OCR. The physical-INT8 simulation of
+the same hybrid codes and scales also reproduces the packed output exactly.
+The observed regression therefore follows the low-bit weight configuration;
+packed storage and the new cache layout are not its cause. Activation rounding
+can still interact with weight errors, but removing it does not recover this
+case. No prompt change or output filtering is used to hide the failure.
 
 The BF16/Q8 result is itself imperfect: it omits sections 01–02 and repeats
 section 26. Original-upstream attribution of those remaining errors is still
