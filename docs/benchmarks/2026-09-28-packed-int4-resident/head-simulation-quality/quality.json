@@ -1,0 +1,74 @@
+[
+  {
+    "case": "corpus-english-original",
+    "finish_reason": "eos",
+    "tokens": 250,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-english-matched",
+    "finish_reason": "eos",
+    "tokens": 250,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-chinese-original",
+    "finish_reason": "eos",
+    "tokens": 289,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-chinese-matched",
+    "finish_reason": "eos",
+    "tokens": 289,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-table-original",
+    "finish_reason": "eos",
+    "tokens": 247,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-table-matched",
+    "finish_reason": "eos",
+    "tokens": 247,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-dense-original",
+    "finish_reason": "eos",
+    "tokens": 1578,
+    "cer": 0.0
+  },
+  {
+    "case": "corpus-dense-matched",
+    "finish_reason": "eos",
+    "tokens": 768,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-receipt-original",
+    "finish_reason": "eos",
+    "tokens": 272,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-wide_report-original",
+    "finish_reason": "eos",
+    "tokens": 355,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-bilingual_notice-original",
+    "finish_reason": "eos",
+    "tokens": 384,
+    "cer": 0.0
+  },
+  {
+    "case": "heldout-archive_register-original",
+    "finish_reason": "eos",
+    "tokens": 1790,
+    "cer": 0.0
+  }
+]

@@ -100,7 +100,9 @@ target/release/uocr --image benchmarks/corpus/english.png --threads 8 --json \
 The signed block32 format keeps FP32 scales and uses ARM SDOT with runtime
 feature detection, plus a portable fallback. The original checkpoint is still
 required for unquantized tensors. All eight synthetic selection pages match the
-unpacked INT4 simulation's text and tokens exactly. Broader quality validation
+unpacked INT4 simulation's text and tokens exactly with the original prompt.
+The matched-newline comparison prompt exposes an empty-table regression in
+all-Q4; a Q8 output-head remedy is under evaluation. Broader quality validation
 and repeated full-page performance acceptance remain pending; see the
 [packed INT4 evidence](docs/benchmarks/2026-09-28-packed-int4/README.md).
 

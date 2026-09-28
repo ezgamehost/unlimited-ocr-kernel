@@ -1,0 +1,36 @@
+{
+  "complete": true,
+  "protocol_complete": true,
+  "expected_requests": 4,
+  "collected_requests": 4,
+  "per_image": {
+    "english": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 10.33818579101353,
+      "p95_seconds": 10.33818579101353
+    },
+    "chinese": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 10.639777083008084,
+      "p95_seconds": 10.639777083008084
+    },
+    "table": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 11.189601917023538,
+      "p95_seconds": 11.189601917023538
+    },
+    "dense": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 13.571698707994074,
+      "p95_seconds": 13.571698707994074
+    }
+  }
+}

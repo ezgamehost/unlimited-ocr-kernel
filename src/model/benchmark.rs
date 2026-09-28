@@ -76,3 +76,97 @@ fn fixed_work_decoder_benchmark() {
         );
     }
 }
+
+/// Diagnostic only: vary the output head while keeping decoder hidden states fixed.
+#[test]
+#[ignore = "requires pinned model, overlays and table page"]
+fn table_prompt_quantization_diagnostic() {
+    use crate::{
+        cpu::{ops, quantized::Int8Matrix},
+        decoder::cache::LayerCache,
+        tensor::Tensor,
+    };
+    let overlay = std::env::var_os("UOCR_BENCH_WEIGHTS")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| "artifacts/unlimited-ocr-q4-block32.safetensors".into());
+    let model = Model::load_with_quantization(
+        Path::new("artifacts/upstream"),
+        Some(&overlay),
+        QuantizationMode::DynamicActivations,
+    )
+    .unwrap();
+    let q8 = Checkpoint::open(Path::new("artifacts/unlimited-ocr-q8-block32.safetensors")).unwrap();
+    assert_eq!(
+        q8.sha256().unwrap(),
+        "b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441"
+    );
+    let w = q8.tensor("lm_head.weight").unwrap();
+    let q8_head = Int8Matrix::from_parts(
+        w.shape[0],
+        w.shape[1],
+        w.bytes.iter().map(|&v| v as i8).collect(),
+        q8.tensor("lm_head.weight.q8_scales").unwrap().to_f32(),
+    )
+    .unwrap();
+    let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
+    let image =
+        preprocess::prepare(Path::new("benchmarks/corpus/table.png"), ImageMode::Gundam).unwrap();
+    let image_tokens = image.image_tokens().unwrap();
+    let features = model.vision.encode(&image, &mut cpu).unwrap();
+    let decoder = Decoder::new(&model.checkpoint, model.config.clone())
+        .unwrap()
+        .with_quantization(model.quantized.as_ref().unwrap(), model.quantization_mode);
+    for prompt in ["<image>document parsing.", "<image>\ndocument parsing."] {
+        let input = model.tokenizer.encode(prompt, image_tokens).unwrap();
+        let mut hidden = decoder.embedding(&input.ids).unwrap();
+        let width = model.config.hidden_size;
+        for (row, &position) in input.image_positions.iter().enumerate() {
+            hidden.data[position * width..(position + 1) * width]
+                .copy_from_slice(&features.data[row * width..(row + 1) * width]);
+        }
+        for layer in 0..model.config.num_hidden_layers {
+            let mut cache = LayerCache::new(
+                model.config.num_attention_heads,
+                width / model.config.num_attention_heads,
+                model.config.sliding_window,
+            )
+            .unwrap();
+            hidden = decoder.layer(layer, &hidden, &mut cache, &mut cpu).unwrap();
+        }
+        let last = Tensor::new(
+            vec![1, width],
+            hidden.data[hidden.data.len() - width..].to_vec(),
+        )
+        .unwrap();
+        let norm = model
+            .checkpoint
+            .tensor("model.norm.weight")
+            .unwrap()
+            .to_f32();
+        let normalized = ops::rms_norm(&last, &norm, model.config.rms_norm_eps).unwrap();
+        let baseline = decoder.logits(&hidden, &mut cpu).unwrap();
+        let q8_logits = q8_head.linear_dynamic_int8(&normalized, &mut cpu).unwrap();
+        let bf16_logits = ops::linear_weight(
+            &normalized,
+            model.checkpoint.tensor("lm_head.weight").unwrap(),
+            None,
+            &mut cpu,
+        )
+        .unwrap();
+        for (head, logits) in [
+            ("overlay", baseline),
+            ("q8_dynamic", q8_logits),
+            ("bf16_fp32", bf16_logits),
+        ] {
+            assert!(logits.data.iter().all(|v| v.is_finite()));
+            let mut ranked: Vec<_> = logits.data.iter().copied().enumerate().collect();
+            ranked.sort_unstable_by(|a, b| b.1.total_cmp(&a.1));
+            println!(
+                "{}",
+                serde_json::json!({"diagnostic":"table_prompt_head", "overlay":overlay,
+                "prompt":prompt,"prefix_tokens":input.ids.len(),"head":head,"top5":&ranked[..5],
+                "eos_logit":logits.data[1],"det_logit":logits.data[128818]})
+            );
+        }
+    }
+}

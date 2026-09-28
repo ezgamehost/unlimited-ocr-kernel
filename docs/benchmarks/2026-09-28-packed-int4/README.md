@@ -113,3 +113,12 @@ regression while retaining the decode gain and exact arithmetic. The median
 combined prefill plus 512-step decode is 4.791718 s versus 5.307588 s for the
 unpacked simulation (10.77% higher throughput for this fixed workload).
 This does not close the full-page comparison or final-review gates.
+
+
+A subsequent [matched-prompt pilot](../2026-09-28-packed-int4-resident/PLAN.md)
+finds a zero-token table response (CER1) when the comparison newline is added.
+Original-prompt results above remain valid, but all-Q4 has not passed the
+matched-prompt full-page acceptance gate. Packed and unpacked Q4 first-token
+logits match exactly there; keeping the head at Q8 changes the first selection
+from EOS to det on the same hidden state. Full hybrid quality is being checked
+before any hybrid packing or performance claim.

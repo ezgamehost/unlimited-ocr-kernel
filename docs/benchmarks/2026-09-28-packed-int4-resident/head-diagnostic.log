@@ -1,0 +1,15 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 14.53s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 1 test
+test model::benchmark::table_prompt_quantization_diagnostic ... {"det_logit":37.09181594848633,"diagnostic":"table_prompt_head","eos_logit":12.194462776184082,"head":"overlay","overlay":"artifacts/unlimited-ocr-q4-block32.safetensors","prefix_tokens":1517,"prompt":"<image>document parsing.","top5":[[128818,37.09181594848633],[128819,16.49582862854004],[7490,14.992915153503418],[100855,13.830272674560547],[104645,12.915257453918457]]}
+{"det_logit":37.14970397949219,"diagnostic":"table_prompt_head","eos_logit":12.20409870147705,"head":"q8_dynamic","overlay":"artifacts/unlimited-ocr-q4-block32.safetensors","prefix_tokens":1517,"prompt":"<image>document parsing.","top5":[[128818,37.14970397949219],[128819,16.878358840942383],[7490,14.720138549804688],[100855,13.429059982299805],[50,12.940165519714355]]}
+{"det_logit":37.20143508911133,"diagnostic":"table_prompt_head","eos_logit":12.205123901367188,"head":"bf16_fp32","overlay":"artifacts/unlimited-ocr-q4-block32.safetensors","prefix_tokens":1517,"prompt":"<image>document parsing.","top5":[[128818,37.20143508911133],[128819,16.87369728088379],[7490,14.718307495117188],[100855,13.454126358032227],[50,12.88815689086914]]}
+{"det_logit":18.223175048828125,"diagnostic":"table_prompt_head","eos_logit":18.831995010375977,"head":"overlay","overlay":"artifacts/unlimited-ocr-q4-block32.safetensors","prefix_tokens":1518,"prompt":"<image>\ndocument parsing.","top5":[[1,18.831995010375977],[128818,18.223175048828125],[128819,17.012147903442383],[764,13.38310432434082],[13134,13.025566101074219]]}
+{"det_logit":18.106924057006836,"diagnostic":"table_prompt_head","eos_logit":17.983083724975586,"head":"q8_dynamic","overlay":"artifacts/unlimited-ocr-q4-block32.safetensors","prefix_tokens":1518,"prompt":"<image>\ndocument parsing.","top5":[[128818,18.106924057006836],[1,17.983083724975586],[128819,17.054285049438477],[764,14.065558433532715],[13134,13.094449996948242]]}
+{"det_logit":18.051664352416992,"diagnostic":"table_prompt_head","eos_logit":18.04720115661621,"head":"bf16_fp32","overlay":"artifacts/unlimited-ocr-q4-block32.safetensors","prefix_tokens":1518,"prompt":"<image>\ndocument parsing.","top5":[[128818,18.051664352416992],[1,18.04720115661621],[128819,17.042694091796875],[764,14.10110092163086],[13134,13.130687713623047]]}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 17.56s
+

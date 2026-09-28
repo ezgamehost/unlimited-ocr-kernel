@@ -1,0 +1,1 @@
+{"result":{"finish_reason":"eos","image_tokens":1513,"precision":"int4_weights_dynamic_int8_activations","text":"","timings":{"decode_seconds":0.0,"decode_steps":0,"first_token_seconds":11.188518208,"prefill_seconds":2.067047125,"preprocess_seconds":0.123595333,"total_seconds":11.188518417,"vision_seconds":8.997790083},"token_ids":[]},"status":"ok"}
