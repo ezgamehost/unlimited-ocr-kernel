@@ -74,7 +74,7 @@ impl Vision {
             x = residual(x, attention)?;
             let norm = self.norm(&x, &format!("{prefix}.layer_norm2"), 1e-5)?;
             let mut up = self.linear(&norm, &format!("{prefix}.mlp.fc1"), cpu)?;
-            ops::quick_gelu(&mut up.data);
+            ops::quick_gelu_parallel(&mut up.data, cpu);
             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.fc2"), cpu)?)?;
         }
         Ok(x)

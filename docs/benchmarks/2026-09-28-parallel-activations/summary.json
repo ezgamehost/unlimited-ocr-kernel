@@ -1,0 +1,102 @@
+[
+  {
+    "case": "english",
+    "tokens": 250,
+    "finish": "eos",
+    "same_token_ids": true,
+    "cer": 0.0,
+    "timings": {
+      "decode_seconds": 2.424468842999999,
+      "decode_steps": 250,
+      "first_token_seconds": 12.779028875,
+      "prefill_seconds": 3.343524375,
+      "preprocess_seconds": 0.122291042,
+      "total_seconds": 15.225708417,
+      "vision_seconds": 9.31311775
+    },
+    "previous_timings": {
+      "decode_seconds": 2.417083755,
+      "decode_steps": 250,
+      "first_token_seconds": 15.167116459,
+      "prefill_seconds": 3.399329708,
+      "preprocess_seconds": 0.122645709,
+      "total_seconds": 17.606122417,
+      "vision_seconds": 11.645057375
+    }
+  },
+  {
+    "case": "chinese",
+    "tokens": 289,
+    "finish": "eos",
+    "same_token_ids": true,
+    "cer": 0.0,
+    "timings": {
+      "decode_seconds": 2.7833941290000013,
+      "decode_steps": 289,
+      "first_token_seconds": 11.90326025,
+      "prefill_seconds": 2.790816667,
+      "preprocess_seconds": 0.115371792,
+      "total_seconds": 14.7121335,
+      "vision_seconds": 8.996983208
+    },
+    "previous_timings": {
+      "decode_seconds": 2.769686379000002,
+      "decode_steps": 289,
+      "first_token_seconds": 14.253801375,
+      "prefill_seconds": 2.8212087500000003,
+      "preprocess_seconds": 0.119545875,
+      "total_seconds": 17.048774792,
+      "vision_seconds": 11.312958333
+    }
+  },
+  {
+    "case": "table",
+    "tokens": 248,
+    "finish": "eos",
+    "same_token_ids": true,
+    "cer": 0.00398406374501992,
+    "timings": {
+      "decode_seconds": 2.3895752069999983,
+      "decode_steps": 248,
+      "first_token_seconds": 12.009429917,
+      "prefill_seconds": 2.787166542,
+      "preprocess_seconds": 0.11447825,
+      "total_seconds": 14.421104209,
+      "vision_seconds": 9.107699167
+    },
+    "previous_timings": {
+      "decode_seconds": 2.3796087560000005,
+      "decode_steps": 248,
+      "first_token_seconds": 14.105902,
+      "prefill_seconds": 2.829721333,
+      "preprocess_seconds": 0.115004666,
+      "total_seconds": 16.507206916,
+      "vision_seconds": 11.161035458
+    }
+  },
+  {
+    "case": "dense",
+    "tokens": 1649,
+    "finish": "eos",
+    "same_token_ids": true,
+    "cer": 0.0,
+    "timings": {
+      "decode_seconds": 15.910571428000004,
+      "decode_steps": 1649,
+      "first_token_seconds": 12.448786417,
+      "prefill_seconds": 2.89560125,
+      "preprocess_seconds": 0.117147709,
+      "total_seconds": 28.504237375,
+      "vision_seconds": 9.435953917
+    },
+    "previous_timings": {
+      "decode_seconds": 15.887297785000005,
+      "decode_steps": 1649,
+      "first_token_seconds": 14.622243125,
+      "prefill_seconds": 2.824771375,
+      "preprocess_seconds": 0.116467167,
+      "total_seconds": 30.651455375,
+      "vision_seconds": 11.680924208
+    }
+  }
+]

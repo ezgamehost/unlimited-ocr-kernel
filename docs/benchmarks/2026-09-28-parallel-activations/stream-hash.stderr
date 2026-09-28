@@ -1,0 +1,20 @@
+stream_hash_seconds=3.140021 path=artifacts/upstream/model-00001-of-000001.safetensors sha256=2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6
+stream_hash_seconds=1.487468 path=artifacts/unlimited-ocr-q8-block32.safetensors sha256=b6afd272e6f19de970f97245c83b09e110a20acc8033f2853d0e6739e5fde441
+        4.84 real         3.71 user         0.87 sys
+             7061504  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                 648  page reclaims
+                   2  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  14  voluntary context switches
+                3106  involuntary context switches
+         20292322196  instructions retired
+         18380349158  cycles elapsed
+             2638184  peak memory footprint

@@ -204,6 +204,25 @@ pub fn quick_gelu(values: &mut [f32]) {
     }
 }
 
+fn parallel_activation(values: &mut [f32], cpu: &CpuContext, operation: fn(&mut [f32])) {
+    if cpu.backend == Backend::Scalar || cpu.threads() == 1 || values.len() < 16384 {
+        operation(values);
+    } else {
+        let chunk = values.len().div_ceil(cpu.threads());
+        cpu.pool
+            .install(|| values.par_chunks_mut(chunk).for_each(operation));
+    }
+}
+
+/// Preserve scalar erf arithmetic while distributing independent elements.
+pub fn gelu_parallel(values: &mut [f32], cpu: &CpuContext) {
+    parallel_activation(values, cpu, gelu);
+}
+
+pub fn quick_gelu_parallel(values: &mut [f32], cpu: &CpuContext) {
+    parallel_activation(values, cpu, quick_gelu);
+}
+
 /// Attention in [heads,tokens,head_dim] layout, using bounded query blocks.
 pub fn attention(
     q: &Tensor,

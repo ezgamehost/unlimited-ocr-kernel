@@ -42,7 +42,7 @@ impl Vision {
             x = residual(x, attended)?;
             let norm = self.norm(&x, &format!("{prefix}.norm2"), 1e-6)?;
             let mut up = self.linear(&norm, &format!("{prefix}.mlp.lin1"), cpu)?;
-            ops::gelu(&mut up.data);
+            ops::gelu_parallel(&mut up.data, cpu);
             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.lin2"), cpu)?)?;
         }
         x = self.conv(&x, "model.sam_model.neck.0", 1, 0, cpu)?;

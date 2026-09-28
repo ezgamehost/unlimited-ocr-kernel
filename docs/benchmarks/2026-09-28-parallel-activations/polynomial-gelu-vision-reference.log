@@ -1,0 +1,57 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 6.38s
+     Running tests/vision.rs (target/release/deps/vision-efc745dfe720a983)
+
+running 3 tests
+test original_english_global_stages_match_rust ... FAILED
+test original_gundam_pixels_and_embeddings_match_rust ... FAILED
+test original_vision_features_match_rust ... ok
+
+failures:
+
+---- original_english_global_stages_match_rust stdout ----
+vision english sam: max_abs=0.000007376075, rms=0.0000006517698
+vision english clip: max_abs=0.0003376007, rms=0.000006321306
+mismatch english clip index=207880 actual=-0.12507533 expected=-0.1252969
+mismatch english clip index=207882 actual=-0.24974611 expected=-0.24954242
+mismatch english clip index=207886 actual=-0.015802898 expected=-0.015689265
+mismatch english clip index=207890 actual=0.16687548 expected=0.16672847
+mismatch english clip index=207893 actual=-0.1782873 expected=-0.17843273
+mismatch english clip index=207894 actual=0.048383087 expected=0.04855819
+mismatch english clip index=207896 actual=0.008150574 expected=0.008263489
+mismatch english clip index=207901 actual=-0.18759736 expected=-0.1877426
+mismatch english clip index=207907 actual=-0.07572198 expected=-0.07587343
+mismatch english clip index=207913 actual=-0.09298125 expected=-0.09311089
+mismatch english clip index=207925 actual=-0.018977366 expected=-0.01910603
+mismatch english clip index=207927 actual=0.2878404 expected=0.2879884
+
+thread 'original_english_global_stages_match_rust' (3360063) panicked at tests/vision.rs:93:5:
+english clip: max=0.0003376007
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- original_gundam_pixels_and_embeddings_match_rust stdout ----
+vision gundam merged: max_abs=0.00026082993, rms=0.0000018124556
+mismatch gundam merged index=591058 actual=-0.71864754 expected=-0.7188561
+mismatch gundam merged index=1861143 actual=0.056019656 expected=0.056138735
+mismatch gundam merged index=1861256 actual=-0.09955536 expected=-0.099440716
+mismatch gundam merged index=1861273 actual=-0.09406842 expected=-0.09394024
+mismatch gundam merged index=1861324 actual=-0.07347602 expected=-0.07335299
+mismatch gundam merged index=1861326 actual=0.04563948 expected=0.04551358
+mismatch gundam merged index=1861365 actual=0.009926766 expected=0.010028301
+mismatch gundam merged index=1861366 actual=0.03190068 expected=0.03178244
+mismatch gundam merged index=1861469 actual=0.18106836 expected=0.18093596
+mismatch gundam merged index=1861495 actual=0.008075787 expected=0.007973327
+mismatch gundam merged index=1861667 actual=-0.022413334 expected=-0.022522502
+mismatch gundam merged index=1861752 actual=0.1304766 expected=0.13063338
+
+thread 'original_gundam_pixels_and_embeddings_match_rust' (3360185) panicked at tests/vision.rs:93:5:
+gundam merged: max=0.00026082993
+
+
+failures:
+    original_english_global_stages_match_rust
+    original_gundam_pixels_and_embeddings_match_rust
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 1 filtered out; finished in 16.85s
+
+error: test failed, to rerun pass `--test vision`

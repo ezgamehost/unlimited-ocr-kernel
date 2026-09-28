@@ -1,0 +1,96 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index 66d8580..b1e18e2 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -198,12 +198,65 @@ pub fn gelu(values: &mut [f32]) {
+     }
+ }
+ 
++/// Erf GELU using A&S 7.1.26 and bounded vector exponential scratch.
++/// The mathematical erf approximation has absolute error <= 1.5e-7;
++/// FP32 rounding adds error, covered separately by numerical/reference tests.
++/// Source: https://personal.math.ubc.ca/~cbm/aands/page_299.htm
++pub fn gelu_backend(values: &mut [f32], backend: Backend) {
++    #[cfg(target_os = "macos")]
++    if backend != Backend::Scalar {
++        let mut scratch = [0f32; 1024];
++        for chunk in values.chunks_mut(scratch.len()) {
++            let exp = &mut scratch[..chunk.len()];
++            for (dest, &x) in exp.iter_mut().zip(chunk.iter()) {
++                let u = x * std::f32::consts::FRAC_1_SQRT_2;
++                *dest = -u * u;
++            }
++            accelerate::exp_in_place(exp);
++            for (x, &exp) in chunk.iter_mut().zip(exp.iter()) {
++                let u = *x * std::f32::consts::FRAC_1_SQRT_2;
++                let t = 1. / (1. + 0.3275911 * u.abs());
++                let polynomial = (((((1.0614054 * t - 1.4531521) * t) + 1.4214138) * t
++                    - 0.28449672) * t + 0.2548296) * t;
++                let erf = (1. - polynomial * exp).copysign(u);
++                *x *= 0.5 * (1. + erf);
++            }
++        }
++        return;
++    }
++    #[cfg(not(target_os = "macos"))]
++    let _ = backend;
++    gelu(values);
++}
++
+ pub fn quick_gelu(values: &mut [f32]) {
+     for value in values {
+         *value /= 1. + (-1.702 * *value).exp();
+     }
+ }
+ 
++/// Same QuickGELU formula with bounded vector exponential scratch on macOS.
++pub fn quick_gelu_backend(values: &mut [f32], backend: Backend) {
++    #[cfg(target_os = "macos")]
++    if backend != Backend::Scalar {
++        let mut scratch = [0f32; 1024];
++        for chunk in values.chunks_mut(scratch.len()) {
++            let exp = &mut scratch[..chunk.len()];
++            for (dest, &x) in exp.iter_mut().zip(chunk.iter()) {
++                *dest = -1.702 * x;
++            }
++            accelerate::exp_in_place(exp);
++            for (x, &exp) in chunk.iter_mut().zip(exp.iter()) {
++                *x /= 1. + exp;
++            }
++        }
++        return;
++    }
++    #[cfg(not(target_os = "macos"))]
++    let _ = backend;
++    quick_gelu(values);
++}
++
+ /// Attention in [heads,tokens,head_dim] layout, using bounded query blocks.
+ pub fn attention(
+     q: &Tensor,
+diff --git a/src/vision/clip.rs b/src/vision/clip.rs
+index 6ea367d..b2fb6e2 100644
+--- a/src/vision/clip.rs
++++ b/src/vision/clip.rs
+@@ -74,7 +74,7 @@ impl Vision {
+             x = residual(x, attention)?;
+             let norm = self.norm(&x, &format!("{prefix}.layer_norm2"), 1e-5)?;
+             let mut up = self.linear(&norm, &format!("{prefix}.mlp.fc1"), cpu)?;
+-            ops::quick_gelu(&mut up.data);
++            ops::quick_gelu_backend(&mut up.data, cpu.backend);
+             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.fc2"), cpu)?)?;
+         }
+         Ok(x)
+diff --git a/src/vision/sam.rs b/src/vision/sam.rs
+index 622ace0..14e634a 100644
+--- a/src/vision/sam.rs
++++ b/src/vision/sam.rs
+@@ -42,7 +42,7 @@ impl Vision {
+             x = residual(x, attended)?;
+             let norm = self.norm(&x, &format!("{prefix}.norm2"), 1e-6)?;
+             let mut up = self.linear(&norm, &format!("{prefix}.mlp.lin1"), cpu)?;
+-            ops::gelu(&mut up.data);
++            ops::gelu_backend(&mut up.data, cpu.backend);
+             x = residual(x, self.linear(&up, &format!("{prefix}.mlp.lin2"), cpu)?)?;
+         }
+         x = self.conv(&x, "model.sam_model.neck.0", 1, 0, cpu)?;

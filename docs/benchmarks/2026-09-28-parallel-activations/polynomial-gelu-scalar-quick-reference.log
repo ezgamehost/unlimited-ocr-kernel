@@ -1,0 +1,36 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 14.06s
+     Running tests/vision.rs (target/release/deps/vision-efc745dfe720a983)
+
+running 1 test
+test original_english_global_stages_match_rust ... FAILED
+
+failures:
+
+---- original_english_global_stages_match_rust stdout ----
+vision english sam: max_abs=0.000007376075, rms=0.0000006517698
+vision english clip: max_abs=0.00034594536, rms=0.0000064792425
+mismatch english clip index=207880 actual=-0.1250707 expected=-0.1252969
+mismatch english clip index=207882 actual=-0.24975148 expected=-0.24954242
+mismatch english clip index=207886 actual=-0.015805714 expected=-0.015689265
+mismatch english clip index=207890 actual=0.16687873 expected=0.16672847
+mismatch english clip index=207893 actual=-0.17828368 expected=-0.17843273
+mismatch english clip index=207894 actual=0.048378542 expected=0.04855819
+mismatch english clip index=207896 actual=0.008148167 expected=0.008263489
+mismatch english clip index=207901 actual=-0.18759345 expected=-0.1877426
+mismatch english clip index=207907 actual=-0.07571927 expected=-0.07587343
+mismatch english clip index=207913 actual=-0.09297859 expected=-0.09311089
+mismatch english clip index=207925 actual=-0.01897426 expected=-0.01910603
+mismatch english clip index=207927 actual=0.28783685 expected=0.2879884
+
+thread 'original_english_global_stages_match_rust' (3361181) panicked at tests/vision.rs:93:5:
+english clip: max=0.00034594536
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_english_global_stages_match_rust
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 2.77s
+
+error: test failed, to rerun pass `--test vision`

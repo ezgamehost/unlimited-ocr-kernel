@@ -1,0 +1,19 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 9.24s
+     Running `target/release/examples/bench_activations`
+gelu backend=Scalar seconds=0.133978
+gelu backend=Auto seconds=0.021426
+gelu backend=Scalar seconds=0.133750
+gelu backend=Auto seconds=0.020562
+gelu backend=Scalar seconds=0.132127
+gelu backend=Auto seconds=0.019384
+gelu backend=Scalar seconds=0.132460
+gelu backend=Auto seconds=0.020713
+quick_gelu backend=Scalar seconds=0.018670
+quick_gelu backend=Auto seconds=0.005050
+quick_gelu backend=Scalar seconds=0.018638
+quick_gelu backend=Auto seconds=0.004742
+quick_gelu backend=Scalar seconds=0.018856
+quick_gelu backend=Auto seconds=0.004452
+quick_gelu backend=Scalar seconds=0.018662
+quick_gelu backend=Auto seconds=0.004694
