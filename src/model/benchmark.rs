@@ -1,13 +1,17 @@
 //! Resident, fixed-work native decoder measurement; not an OCR quality test.
 use super::*;
 use crate::cpu::{Backend, quantized::QuantizationMode};
+use sha2::{Digest, Sha256};
 
 #[test]
 #[ignore = "requires original weights, INT8 overlay, and English vision reference"]
 fn fixed_work_decoder_benchmark() {
+    let overlay = std::env::var_os("UOCR_BENCH_WEIGHTS")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| "artifacts/unlimited-ocr-q8-block32.safetensors".into());
     let model = Model::load_with_quantization(
         Path::new("artifacts/upstream"),
-        Some(Path::new("artifacts/unlimited-ocr-q8-block32.safetensors")),
+        Some(&overlay),
         QuantizationMode::DynamicActivations,
     )
     .unwrap();
@@ -48,11 +52,13 @@ fn fixed_work_decoder_benchmark() {
         let prefill_seconds = start.elapsed().as_secs_f64();
         let start = Instant::now();
         let mut checksum = 0u64;
+        let mut digest = Sha256::new();
         for token in tokens.iter().cycle().take(512) {
             let logits = decoder.step(*token, &mut state, &mut cpu).unwrap();
             // Consume every output; the reported duration includes this checksum.
             for value in &logits.data {
                 checksum = checksum.wrapping_add(u64::from(value.to_bits()));
+                digest.update(value.to_bits().to_le_bytes());
             }
             std::hint::black_box(&logits);
         }
@@ -63,7 +69,8 @@ fn fixed_work_decoder_benchmark() {
                 "repetition": repetition, "threads": threads, "prefix_tokens": input.ids.len(),
                 "decode_steps": 512, "prefill_seconds": prefill_seconds,
                 "decode_with_checksum_seconds": start.elapsed().as_secs_f64(),
-                "logits_checksum": checksum, "precision": model.precision(),
+                "logits_checksum": checksum, "logits_sha256": format!("{:x}", digest.finalize()),
+                "overlay": overlay, "precision": model.precision(),
                 "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS"
             })
         );

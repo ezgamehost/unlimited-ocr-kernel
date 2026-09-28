@@ -16,8 +16,8 @@ use uocr::{
 struct Args {
     #[arg(long, default_value = "artifacts/upstream")]
     model: PathBuf,
-    /// Validated INT8 decoder overlay plus its .json checksum manifest.
-    #[arg(long)]
+    /// Validated Q8 or packed Q4 decoder overlay and .json checksum manifest.
+    #[arg(long, visible_alias = "quantized-weights")]
     int8_weights: Option<PathBuf>,
     /// Also quantize single-row projection inputs (experimental extra rounding).
     #[arg(long, requires = "int8_weights")]
@@ -115,5 +115,26 @@ fn main() {
     if let Err(error) = run() {
         eprintln!("uocr: {error}");
         std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn quantized_weights_alias_preserves_activation_dependency() {
+        for flag in ["--int8-weights", "--quantized-weights"] {
+            let args = Args::try_parse_from([
+                "uocr",
+                "--jsonl",
+                flag,
+                "packed.safetensors",
+                "--int8-activations",
+            ])
+            .unwrap();
+            assert_eq!(args.int8_weights, Some(PathBuf::from("packed.safetensors")));
+            assert!(args.int8_activations);
+        }
+        assert!(Args::try_parse_from(["uocr", "--jsonl", "--int8-activations"]).is_err());
     }
 }

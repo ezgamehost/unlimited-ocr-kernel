@@ -63,13 +63,9 @@ pub struct Model {
 
 impl Model {
     pub fn precision(&self) -> &'static str {
-        match (&self.quantized, self.quantization_mode) {
-            (None, _) => "bf16_weights_fp32",
-            (Some(_), crate::cpu::quantized::QuantizationMode::WeightsOnly) => "int8_weights_fp32",
-            (Some(_), crate::cpu::quantized::QuantizationMode::DynamicActivations) => {
-                "int8_weights_dynamic_activations"
-            }
-        }
+        self.quantized
+            .as_ref()
+            .map_or("bf16_weights_fp32", |q| q.precision(self.quantization_mode))
     }
     pub fn load(directory: &Path) -> Result<Self> {
         Self::load_with_quantization(

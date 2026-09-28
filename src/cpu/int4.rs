@@ -170,7 +170,7 @@ impl Int4Matrix {
         } else {
             initial
         };
-        self.output(x, cpu, |row| {
+        let dot = |row| {
             codes
                 .chunks(BLOCK)
                 .enumerate()
@@ -185,6 +185,48 @@ impl Int4Matrix {
                     sum as f32 * self.scales[row * self.blocks + block] * scales[block]
                 })
                 .fold(initial, |total, value| total + value)
-        })
+        };
+        let mut data = vec![0.; self.rows];
+        let compute = |(group, output): (usize, &mut [f32])| {
+            let first = group * 4;
+            #[cfg(target_arch = "aarch64")]
+            if cpu.backend != Backend::Scalar
+                && std::arch::is_aarch64_feature_detected!("dotprod")
+                && self.cols.is_multiple_of(BLOCK)
+                && output.len() == 4
+            {
+                // SAFETY: dotprod detected; validated four rows of complete
+                // block32 packed weights and matching activation/scales.
+                let values = unsafe {
+                    super::neon::dot_int4_four_rows(
+                        &self.weights[first * self.blocks * 16..(first + 4) * self.blocks * 16],
+                        codes,
+                        &self.scales[first * self.blocks..(first + 4) * self.blocks],
+                        scales,
+                    )
+                };
+                output.copy_from_slice(&values);
+                return;
+            }
+            for (offset, value) in output.iter_mut().enumerate() {
+                *value = dot(first + offset);
+            }
+        };
+        if cpu.backend == Backend::Scalar
+            || cpu.threads() == 1
+            || self.rows * self.cols <= 128 * 1024
+        {
+            data.chunks_mut(4).enumerate().for_each(compute);
+        } else {
+            cpu.pool.install(|| {
+                data.par_chunks_mut(4)
+                    .with_min_len(self.rows.div_ceil(4).div_ceil(cpu.threads()))
+                    .enumerate()
+                    .for_each(compute)
+            });
+        }
+        let mut shape = x.shape.clone();
+        *shape.last_mut().unwrap() = self.rows;
+        Tensor::new(shape, data)
     }
 }

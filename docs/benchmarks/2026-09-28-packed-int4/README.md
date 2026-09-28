@@ -35,8 +35,8 @@ PYTHONPATH=. .venv/bin/python docs/benchmarks/2026-09-28-packed-int4/audit.py
 ```
 
 `--int4` and `--simulate-int4` are mutually exclusive. Normal Q8 export retains
-its existing format and metadata. The current model overlay loader still
-rejects the packed version until its planned integration is implemented.
+its existing format and metadata. The model overlay loader now accepts the packed version after the integration
+checks below.
 
 Portable matrix implementation is now available in `src/cpu/int4.rs`:
 validated nibble storage, weight-only linear, prefill dequantization and W4A8
@@ -47,5 +47,38 @@ match the I8 simulation bit-for-bit on Scalar and Auto. Weight-only outputs
 match within floating-point tolerance. A signed-zero regression exposed the
 existing scalar/SDOT accumulation identity difference; the packed path preserves
 the selected backend's identity. Full suite: 53 passed, 8 ignored; clippy clean.
-See `portable-tests.log` and `portable-clippy.log`. SIMD and model loader
-integration remain pending; no packed full-model performance result yet.
+See `portable-tests.log` and `portable-clippy.log`. The integration below adds SIMD and model loader dispatch.
+
+
+The four-row ARM SDOT path unpacks signed low/high halves in registers, shares
+activation loads and preserves separate scale products and block accumulation.
+Runtime dotprod detection guards entry; row and column tails retain the portable
+path. Q4 loading checks format-specific metadata, original dimensions, U8 packed
+shape, FP32 scales, code range, padding, source hash and overlay hash. Q8 loading
+and original BF16 default remain supported. `--quantized-weights` aliases the
+existing `--int8-weights` option; use `--int8-activations` for W4A8 execution.
+Precision reports identify packed Q4 and dynamic INT8 activations explicitly.
+
+Integration checks: 56 Rust tests passed, 8 artifact-dependent tests ignored by
+the default suite; clippy clean. Separately, all ten decoder/vision tests ran
+with ignored original-reference cases enabled and passed. See the integration
+and original-reference logs. This is separate from the final whole-branch review.
+
+`equivalence.py` ran all eight selection pages with the original prompt. Every
+text string and token ID matches the earlier unpacked Q4 simulation exactly;
+all eight reached EOS. Raw requests, responses, executable hash and normal-exit
+resources are retained under `packed-equivalence/`. The process used a measured
+peak RSS of 5,117,886,464 bytes, but this single accuracy run is not a repeated
+latency or memory comparison. These synthetic pages informed precision selection
+and are not unseen Q4 validation.
+
+Initial fixed-work ABBA comparison (`fixed-work/`): six measured samples per
+variant, plus four warmups total. All sixteen full-logit SHA256 values match
+`abf6835c8398b0f760f50a31f053e4633656b6fa9675d5b6305317ecc384ed3f`.
+Median 512-step decode including checksum improves from 3.845986 to 3.205082 s
+(1.200x throughput), while prefill regresses from 1.468385 to 2.735561 s.
+Packed process peaks are 3,491,840,000 and 3,491,823,616 bytes; raw simulation
+peaks and all per-process resources are retained. This initial candidate is
+not accepted as an overall speed improvement: its prefill regression needs
+correction. These compare the same Q4 numerical model in two storage formats,
+not Q8 quality or llama.cpp.

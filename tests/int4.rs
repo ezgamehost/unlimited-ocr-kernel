@@ -50,8 +50,8 @@ fn literal_nibbles_and_invalid_storage() {
 
 #[test]
 fn packed_matches_simulation_for_dequantization_and_linear() {
-    for cols in [1usize, 15, 16, 17, 31, 32, 33, 63, 64, 131, 513, 1280] {
-        let rows = if cols == 513 { 257 } else { 7 };
+    for cols in [1usize, 15, 16, 17, 31, 32, 33, 63, 64, 131, 512, 513, 1280] {
+        let rows = if cols == 512 || cols == 513 { 257 } else { 7 };
         let blocks = cols.div_ceil(32);
         let codes: Vec<i8> = (0..rows * cols).map(|i| (i % 15) as i8 - 7).collect();
         let scales: Vec<f32> = (0..rows * blocks)

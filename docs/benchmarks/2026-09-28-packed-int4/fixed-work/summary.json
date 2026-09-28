@@ -1,0 +1,19 @@
+{
+  "logits_sha256": "abf6835c8398b0f760f50a31f053e4633656b6fa9675d5b6305317ecc384ed3f",
+  "measured_samples_per_variant": 6,
+  "medians": {
+    "simulation": {
+      "prefill_seconds": 1.4683845,
+      "decode_with_checksum_seconds": 3.8459860005
+    },
+    "packed": {
+      "prefill_seconds": 2.735560813,
+      "decode_with_checksum_seconds": 3.2050822500000002
+    }
+  },
+  "ratios_simulation_over_packed": {
+    "prefill_seconds": 0.5367764054163616,
+    "decode_with_checksum_seconds": 1.1999648372518363
+  },
+  "note": "512 identical teacher-forced steps, including additive checksum and SHA256; original 1517-token prompt prefix; no vision timing; no llama comparison."
+}

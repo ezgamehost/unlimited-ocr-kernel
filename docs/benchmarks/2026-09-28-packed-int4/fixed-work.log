@@ -1,0 +1,4 @@
+{"index": 0, "variant": "simulation", "wall": 28.766223124985117, "peak": 4377231360}
+{"index": 1, "variant": "packed", "wall": 28.88834604099975, "peak": 3491840000}
+{"index": 2, "variant": "packed", "wall": 29.10097216698341, "peak": 3491823616}
+{"index": 3, "variant": "simulation", "wall": 27.85713891600608, "peak": 4068868096}

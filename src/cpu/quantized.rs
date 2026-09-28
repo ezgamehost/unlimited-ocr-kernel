@@ -240,7 +240,7 @@ impl Int8Matrix {
 }
 
 const FORMAT: &str = "uocr-q8-block32-v1";
-const SCALE_SUFFIX: &str = ".q8_scales";
+const Q4_FORMAT: &str = "uocr-q4-block32-v1";
 
 #[derive(Clone, Copy, Debug, serde::Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -258,12 +258,33 @@ struct Manifest {
     output_sha256: String,
     matrix_count: usize,
     bytes: usize,
+    weight_bits: Option<usize>,
+    storage_bits: Option<usize>,
 }
 
 /// Validated, immutable owned matrices. Load-time copying also touches pages
 /// before timed inference; its cost belongs in model load time.
+pub enum QuantizedMatrix {
+    Int8(Int8Matrix),
+    Int4(super::int4::Int4Matrix),
+}
+impl QuantizedMatrix {
+    pub fn linear(&self, x: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
+        match self {
+            Self::Int8(m) => m.linear(x, cpu),
+            Self::Int4(m) => m.linear(x, cpu),
+        }
+    }
+    pub fn linear_dynamic_int8(&self, x: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
+        match self {
+            Self::Int8(m) => m.linear_dynamic_int8(x, cpu),
+            Self::Int4(m) => m.linear_dynamic_int8(x, cpu),
+        }
+    }
+}
 pub struct QuantizedWeights {
-    matrices: std::collections::BTreeMap<String, Int8Matrix>,
+    matrices: std::collections::BTreeMap<String, QuantizedMatrix>,
+    packed_int4: bool,
 }
 
 fn eligible(name: &str) -> bool {
@@ -312,16 +333,22 @@ impl QuantizedWeights {
             serde_json::from_slice(&std::fs::read(path.with_extension("json"))?)?;
         let checkpoint = Checkpoint::open(path)?;
         let metadata = checkpoint.metadata();
+        let packed_int4 = manifest.format == Q4_FORMAT;
         if manifest.schema_version != 1
-            || manifest.format != FORMAT
+            || (!packed_int4 && manifest.format != FORMAT)
             || manifest.block_size != BLOCK
-            || metadata.get("format").map(String::as_str) != Some(FORMAT)
+            || metadata.get("format") != Some(&manifest.format)
             || metadata.get("block_size").map(String::as_str) != Some("32")
             || metadata.get("source_sha256") != Some(&manifest.source_sha256)
             || checkpoint.file_bytes() != manifest.bytes
+            || (packed_int4
+                && (manifest.weight_bits != Some(4)
+                    || manifest.storage_bits != Some(4)
+                    || metadata.get("weight_bits").map(String::as_str) != Some("4")
+                    || metadata.get("storage_bits").map(String::as_str) != Some("4")))
         {
             return Err(OcrError::Format(
-                "INT8 overlay version or metadata mismatch".into(),
+                "quantized overlay version or metadata mismatch".into(),
             ));
         }
         // Validate the large source first so the overlay is the most recently
@@ -330,7 +357,7 @@ impl QuantizedWeights {
             || checkpoint.sha256()? != manifest.output_sha256
         {
             return Err(OcrError::Format(
-                "INT8 checksum or source model mismatch".into(),
+                "quantized checksum or source model mismatch".into(),
             ));
         }
         let expected: Vec<_> = source.names().filter(|name| eligible(name)).collect();
@@ -338,36 +365,67 @@ impl QuantizedWeights {
             || expected.len() != manifest.matrix_count
             || checkpoint.names().count() != expected.len() * 2
         {
-            return Err(OcrError::Format("INT8 matrix set mismatch".into()));
+            return Err(OcrError::Format("quantized matrix set mismatch".into()));
         }
         let mut matrices = std::collections::BTreeMap::new();
         for name in expected {
             let original = source.tensor(name)?;
             let weight = checkpoint.tensor(name)?;
-            let scales = checkpoint.tensor(&format!("{name}{SCALE_SUFFIX}"))?;
-            if weight.dtype != DType::I8
-                || weight.shape.len() != 2
-                || weight.shape != original.shape
+            let suffix = if packed_int4 {
+                ".q4_scales"
+            } else {
+                ".q8_scales"
+            };
+            let scales = checkpoint.tensor(&format!("{name}{suffix}"))?;
+            if original.shape.len() != 2
+                || original.shape.contains(&0)
                 || !matches!(original.dtype, DType::BF16 | DType::F16 | DType::F32)
                 || scales.dtype != DType::F32
-                || scales.shape != [weight.shape[0], weight.shape[1].div_ceil(BLOCK)]
-                || weight.bytes.contains(&128)
+                || scales.shape != [original.shape[0], original.shape[1].div_ceil(BLOCK)]
             {
-                return Err(OcrError::Format(format!("invalid INT8 matrix {name}")));
+                return Err(OcrError::Format(format!("invalid quantized matrix {name}")));
             }
-            matrices.insert(
-                name.to_owned(),
-                Int8Matrix::from_parts(
-                    weight.shape[0],
-                    weight.shape[1],
+            let (rows, cols) = (original.shape[0], original.shape[1]);
+            let matrix = if packed_int4 {
+                if weight.dtype != DType::U8 || weight.shape != [rows, cols.div_ceil(BLOCK), 16] {
+                    return Err(OcrError::Format(format!("invalid INT4 matrix {name}")));
+                }
+                QuantizedMatrix::Int4(super::int4::Int4Matrix::from_parts(
+                    rows,
+                    cols,
+                    weight.bytes.to_vec(),
+                    scales.to_f32(),
+                )?)
+            } else {
+                if weight.dtype != DType::I8
+                    || weight.shape != original.shape
+                    || weight.bytes.contains(&128)
+                {
+                    return Err(OcrError::Format(format!("invalid INT8 matrix {name}")));
+                }
+                QuantizedMatrix::Int8(Int8Matrix::from_parts(
+                    rows,
+                    cols,
                     weight.bytes.iter().map(|&v| v as i8).collect(),
                     scales.to_f32(),
-                )?,
-            );
+                )?)
+            };
+            matrices.insert(name.to_owned(), matrix);
         }
-        Ok(Self { matrices })
+        Ok(Self {
+            matrices,
+            packed_int4,
+        })
     }
-    pub fn get(&self, name: &str) -> Option<&Int8Matrix> {
+    pub fn precision(&self, mode: QuantizationMode) -> &'static str {
+        match (self.packed_int4, mode) {
+            (false, QuantizationMode::WeightsOnly) => "int8_weights_fp32",
+            (false, QuantizationMode::DynamicActivations) => "int8_weights_dynamic_activations",
+            (true, QuantizationMode::WeightsOnly) => "int4_weights_fp32",
+            (true, QuantizationMode::DynamicActivations) => "int4_weights_dynamic_int8_activations",
+        }
+    }
+    pub fn get(&self, name: &str) -> Option<&QuantizedMatrix> {
         self.matrices.get(name)
     }
 }

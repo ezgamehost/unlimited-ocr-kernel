@@ -102,3 +102,82 @@ fn authenticated_but_invalid_overlay_is_rejected() {
         );
     }
 }
+
+#[test]
+fn packed_overlay_dispatch_and_authenticated_validation() {
+    for invalid in [
+        "valid",
+        "version",
+        "weight_bits",
+        "storage_bits",
+        "header_bits",
+        "padding",
+        "code",
+        "dtype",
+        "shape",
+        "scale",
+        "source",
+        "checksum",
+        "missing",
+    ] {
+        let dir = tempfile::tempdir().unwrap();
+        let (source, path) = fixture(dir.path());
+        let hash = source.sha256().unwrap();
+        let mut header = serde_json::json!({"__metadata__":{"format":"uocr-q4-block32-v1","block_size":"32","source_sha256":hash,"weight_bits":"4","storage_bits":"4"},"lm_head.weight":{"dtype":"U8","shape":[1,1,16],"data_offsets":[0,16]},"lm_head.weight.q4_scales":{"dtype":"F32","shape":[1,1],"data_offsets":[16,20]}});
+        let mut data = vec![0u8; 16];
+        data[0] = 1;
+        data[1] = 14;
+        data.extend(1f32.to_le_bytes());
+        match invalid {
+            "version" => header["__metadata__"]["format"] = "future".into(),
+            "header_bits" => header["__metadata__"]["storage_bits"] = "8".into(),
+            "padding" => data[0] |= 16,
+            "code" => data[0] = 8,
+            "dtype" => header["lm_head.weight"]["dtype"] = "I8".into(),
+            "shape" => header["lm_head.weight"]["shape"] = serde_json::json!([1, 16]),
+            "scale" => data[16..].copy_from_slice(&f32::NAN.to_le_bytes()),
+            "missing" => {
+                header
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("lm_head.weight.q4_scales");
+            }
+            _ => {}
+        }
+        write(&path, header, &data);
+        let bytes = fs::read(&path).unwrap();
+        let mut manifest = serde_json::json!({"schema_version":1,"format":"uocr-q4-block32-v1","block_size":32,"source_sha256":hash,"output_sha256":format!("{:x}",Sha256::digest(&bytes)),"matrix_count":1,"bytes":bytes.len(),"weight_bits":4,"storage_bits":4});
+        match invalid {
+            "weight_bits" | "storage_bits" => {
+                manifest.as_object_mut().unwrap().remove(invalid);
+            }
+            "source" => manifest["source_sha256"] = "wrong".into(),
+            "checksum" => manifest["output_sha256"] = "wrong".into(),
+            _ => {}
+        }
+        fs::write(
+            path.with_extension("json"),
+            serde_json::to_vec(&manifest).unwrap(),
+        )
+        .unwrap();
+        let result = QuantizedWeights::load(&path, &source);
+        if invalid == "valid" {
+            let overlay = result.unwrap();
+            assert_eq!(
+                overlay.precision(uocr::cpu::quantized::QuantizationMode::WeightsOnly),
+                "int4_weights_fp32"
+            );
+            assert_eq!(
+                overlay.precision(uocr::cpu::quantized::QuantizationMode::DynamicActivations),
+                "int4_weights_dynamic_int8_activations"
+            );
+            let mut cpu = CpuContext::new(Backend::Auto, 1, 1024).unwrap();
+            let matrix = overlay.get("lm_head.weight").unwrap();
+            let x = Tensor::new(vec![1, 2], vec![3., 4.]).unwrap();
+            assert_eq!(matrix.linear(&x, &mut cpu).unwrap().data, [-5.]);
+            assert!((matrix.linear_dynamic_int8(&x, &mut cpu).unwrap().data[0] + 5.).abs() < 0.02);
+        } else {
+            assert!(result.is_err(), "accepted {invalid}");
+        }
+    }
+}
