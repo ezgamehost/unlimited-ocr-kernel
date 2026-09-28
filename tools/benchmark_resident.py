@@ -1,9 +1,11 @@
 """Matched resident CPU OCR measurements with raw streams and per-child resources."""
 import argparse
 import base64
+from collections import Counter
 import datetime
 import hashlib
 import json
+import math
 import os
 import platform
 import random
@@ -24,6 +26,23 @@ from tools.score import character_error_rate, normalize_ocr
 
 def save(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
+
+
+def gguf_storage(path):
+    """Inspect stored tensor types, not compute precision or filename hints."""
+    import gguf
+    reader = gguf.GGUFReader(path, 'r')
+    counts, elements = Counter(), Counter()
+    for tensor in reader.tensors:
+        name = tensor.tensor_type.name
+        counts[name] += 1
+        elements[name] += math.prod(int(n) for n in tensor.shape)
+    if not counts:
+        raise ValueError('GGUF contains no tensors')
+    field = reader.get_field('general.file_type')
+    return dict(label='+'.join(sorted(counts)), tensor_types=dict(counts),
+                elements_by_type=dict(elements),
+                declared_file_type=field.contents() if field else None)
 
 
 def schedule(images, warmups, repetitions, seed):
@@ -175,6 +194,10 @@ def run(args):
                     native_prompt='<image>\ndocument parsing.',
                     attention_note='native preserved prefix plus 128 generated; llama full attention',
                     first_token_note='native internal clock; llama first streamed content/token arrival')
+    if args.engine == 'llama':
+        decoder, projector = gguf_storage(args.model), gguf_storage(args.mmproj)
+        metadata['gguf_storage'] = dict(decoder=decoder, projector=projector)
+        metadata['precision'] = f"{decoder['label']} decoder, {projector['label']} projector (storage)"
     save(args.output / 'process.json', metadata)
     records, failure, child = [], None, None
     started = time.monotonic()
@@ -289,7 +312,7 @@ def run(args):
                                       decode_seconds=timing['predicted_ms'] / 1000,
                                       decode_steps=max(0, timing['predicted_n'] - 1),
                                       prompt_with_vision_seconds=timing['prompt_ms'] / 1000,
-                                      cache_tokens=timing['cache_n'], precision='Q8_0 decoder, F16 projector')
+                                      cache_tokens=timing['cache_n'], precision=metadata['precision'])
                     save(prefix.with_suffix('.decoded.json'), dict(text=text, token_ids=tokens))
                     record.update(status='ok', wall_seconds=wall, emitted_tokens=len(tokens), timings=timing,
                                   cer=character_error_rate(normalize_ocr(item['text']), normalize_ocr(text)))

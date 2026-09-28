@@ -13,6 +13,28 @@ from tools.benchmark_resident import LineReader, StreamAccumulator, schedule, wa
 
 
 class ResidentBenchmarkTests(unittest.TestCase):
+    def test_precision_reads_tensor_storage_despite_misleading_filename_and_file_type(self):
+        import gguf
+        import numpy as np
+        import tools.benchmark_resident as resident
+        with tempfile.TemporaryDirectory() as directory:
+            for kind in (gguf.GGMLQuantizationType.BF16, gguf.GGMLQuantizationType.Q8_0):
+                path = Path(directory) / 'model-Q8.gguf'
+                writer = gguf.GGUFWriter(path, arch='test')
+                writer.add_uint32('general.file_type', 7)
+                data = gguf.quants.quantize(np.ones((2, 32), dtype=np.float32), kind)
+                writer.add_tensor('matrix', data, raw_dtype=kind)
+                writer.add_tensor('norm', np.ones(32, dtype=np.float32))
+                writer.write_header_to_file()
+                writer.write_kv_data_to_file()
+                writer.write_tensors_to_file()
+                writer.close()
+                self.assertTrue(hasattr(resident, 'gguf_storage'), 'GGUF precision inspection missing')
+                actual = resident.gguf_storage(path)
+                self.assertEqual(actual['tensor_types'], {kind.name: 1, 'F32': 1})
+                self.assertEqual(actual['elements_by_type'], {kind.name: 64, 'F32': 32})
+                self.assertIn(kind.name, actual['label'])
+
     def test_native_driver_records_resources_and_repeated_independent_requests(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
