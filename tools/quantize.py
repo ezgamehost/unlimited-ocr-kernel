@@ -16,7 +16,10 @@ SUFFIX='.q8_scales'
 MATRIX=re.compile(r'^(?:lm_head|model\.layers\.\d+\.(?:self_attn\.[qkvo]_proj|mlp\.(?:(?:experts\.\d+|shared_experts)\.)?(?:gate|up|down)_proj))\.weight$')
 
 
-def quantize_blocks(values):
+def quantize_blocks(values, bits=8):
+    if type(bits) is not int or bits not in (4,8):
+        raise ValueError('weight quantization bits must be 4 or 8')
+    bound=(1<<(bits-1))-1
     x=np.asarray(values,dtype=np.float32)
     if x.ndim!=2 or 0 in x.shape or not np.isfinite(x).all():
         raise ValueError('quantization needs a finite nonempty matrix')
@@ -26,15 +29,17 @@ def quantize_blocks(values):
     padded[:,:cols]=x
     grouped=padded.reshape(rows,blocks,BLOCK)
     maximum=np.abs(grouped).max(axis=2)
-    scales=maximum/np.float32(127)
+    scales=maximum/np.float32(bound)
     if np.any((maximum>0)&(scales==0)):
         raise ValueError('INT8 scale underflow')
     safe=np.where(scales==0,np.float32(1),scales)
-    quantized=np.clip(np.rint(grouped/safe[:,:,None]),-127,127).astype(np.int8)
+    quantized=np.clip(np.rint(grouped/safe[:,:,None]),-bound,bound).astype(np.int8)
     return quantized.reshape(rows,blocks*BLOCK)[:,:cols].copy(),scales.astype('<f4',copy=False)
 
 
-def quantize_file(source:Path,output:Path,chunk_rows=1024):
+def quantize_file(source:Path,output:Path,chunk_rows=1024,*,bits=8):
+    if type(bits) is not int or bits not in (4,8):
+        raise ValueError('weight quantization bits must be 4 or 8')
     source,output=Path(source).resolve(),Path(output).resolve()
     if source==output or chunk_rows<=0:
         raise ValueError('use a distinct output and positive chunk size')
@@ -48,6 +53,8 @@ def quantize_file(source:Path,output:Path,chunk_rows=1024):
             names=sorted(name for name in reader.keys() if MATRIX.fullmatch(name))
             if not names:raise ValueError('no supported decoder matrices')
             header={'__metadata__':{'format':FORMAT,'block_size':str(BLOCK),'source_sha256':source_hash}}
+            if bits==4:
+                header['__metadata__'].update(simulated_weight_bits='4',storage_bits='8')
             offset=0
             for name in names:
                 tensor=reader.get_slice(name)
@@ -70,7 +77,7 @@ def quantize_file(source:Path,output:Path,chunk_rows=1024):
                     tensor=reader.get_slice(name)
                     for row in range(0,rows,chunk_rows):
                         values=tensor[row:min(row+chunk_rows,rows),:].float().numpy()
-                        q,s=quantize_blocks(values)
+                        q,s=quantize_blocks(values,bits)
                         stream.seek(start+header[name]['data_offsets'][0]+row*cols)
                         stream.write(q.tobytes())
                         stream.seek(start+header[name+SUFFIX]['data_offsets'][0]+row*blocks*4)
@@ -82,6 +89,9 @@ def quantize_file(source:Path,output:Path,chunk_rows=1024):
         if sha256(source)!=source_hash:raise ValueError('source changed during export')
         result={'schema_version':1,'format':FORMAT,'block_size':BLOCK,'source_sha256':source_hash,
                 'output_sha256':sha256(Path(temporary)),'matrix_count':len(names),'bytes':Path(temporary).stat().st_size}
+        if bits==4:
+            result.update(simulated_weight_bits=4,storage_bits=8,
+                          purpose='INT4 accuracy simulation in INT8 storage; no packing or speedup claim')
         os.link(temporary,output)
         return result
     finally:
@@ -92,8 +102,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source',type=Path,default=Path('artifacts/upstream/model-00001-of-000001.safetensors'))
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--simulate-int4',action='store_true',
+                        help='Use signed 4-bit weight levels in unchanged INT8 storage; accuracy experiment only')
     args=parser.parse_args()
-    result=quantize_file(args.source,args.output)
+    result=quantize_file(args.source,args.output,bits=4 if args.simulate_int4 else 8)
     args.output.with_suffix('.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result),flush=True)
 
