@@ -1,0 +1,143 @@
+{
+  "scope": "Native engine complete; cross-engine comparison pending llama completion.",
+  "requests": 48,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 6430392320,
+    "user_cpu_seconds": 1504.889341,
+    "system_cpu_seconds": 410.579309,
+    "major_faults": 50075,
+    "minor_faults": 8269749
+  },
+  "images": {
+    "english": {
+      "measured_requests": 10,
+      "cer_values": [
+        0.0
+      ],
+      "emitted_tokens": [
+        250
+      ],
+      "decoded_outputs_identical": true,
+      "timings": {
+        "wall_seconds": {
+          "median": 11.289557270996738,
+          "p95_nearest_rank": 16.749193541007116
+        },
+        "first_token_seconds": {
+          "median": 9.3258393755,
+          "p95_nearest_rank": 14.780782167
+        },
+        "decode_seconds": {
+          "median": 1.8850809595,
+          "p95_nearest_rank": 2.1469050819999995
+        },
+        "vision_seconds": {
+          "median": 7.6517485205,
+          "p95_nearest_rank": 11.810171459
+        },
+        "prefill_seconds": {
+          "median": 1.573102646,
+          "p95_nearest_rank": 3.043880208
+        }
+      }
+    },
+    "chinese": {
+      "measured_requests": 10,
+      "cer_values": [
+        0.0
+      ],
+      "emitted_tokens": [
+        289
+      ],
+      "decoded_outputs_identical": true,
+      "timings": {
+        "wall_seconds": {
+          "median": 11.51079162498354,
+          "p95_nearest_rank": 12.36271529100486
+        },
+        "first_token_seconds": {
+          "median": 9.220772437499999,
+          "p95_nearest_rank": 10.0807695
+        },
+        "decode_seconds": {
+          "median": 2.1395511655000004,
+          "p95_nearest_rank": 2.690021929000002
+        },
+        "vision_seconds": {
+          "median": 7.486179521,
+          "p95_nearest_rank": 8.029564292
+        },
+        "prefill_seconds": {
+          "median": 1.60481775,
+          "p95_nearest_rank": 2.071107375
+        }
+      }
+    },
+    "table": {
+      "measured_requests": 10,
+      "cer_values": [
+        0.00398406374501992
+      ],
+      "emitted_tokens": [
+        248
+      ],
+      "decoded_outputs_identical": true,
+      "timings": {
+        "wall_seconds": {
+          "median": 11.103069333010353,
+          "p95_nearest_rank": 14.259730332996696
+        },
+        "first_token_seconds": {
+          "median": 9.1615722085,
+          "p95_nearest_rank": 10.656651542
+        },
+        "decode_seconds": {
+          "median": 1.882721934,
+          "p95_nearest_rank": 4.062518141
+        },
+        "vision_seconds": {
+          "median": 7.4859924375,
+          "p95_nearest_rank": 8.32974675
+        },
+        "prefill_seconds": {
+          "median": 1.6599248545,
+          "p95_nearest_rank": 2.387414125
+        }
+      }
+    },
+    "dense": {
+      "measured_requests": 10,
+      "cer_values": [
+        0.0
+      ],
+      "emitted_tokens": [
+        768
+      ],
+      "decoded_outputs_identical": true,
+      "timings": {
+        "wall_seconds": {
+          "median": 15.667220354021993,
+          "p95_nearest_rank": 20.89100683401921
+        },
+        "first_token_seconds": {
+          "median": 9.532121562499999,
+          "p95_nearest_rank": 12.3816715
+        },
+        "decode_seconds": {
+          "median": 5.870221253499997,
+          "p95_nearest_rank": 8.504100289999995
+        },
+        "vision_seconds": {
+          "median": 7.5286775625,
+          "p95_nearest_rank": 10.511173416
+        },
+        "prefill_seconds": {
+          "median": 1.827428646,
+          "p95_nearest_rank": 2.380199375
+        }
+      }
+    }
+  }
+}

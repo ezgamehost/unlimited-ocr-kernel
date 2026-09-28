@@ -1,0 +1,29 @@
+{
+  "image_id": "table",
+  "iteration": 2,
+  "warmup": false,
+  "index": 17,
+  "image_sha256": "8b7670c3fe05f5531efba8ba079b0b7a31925be81ec9acc08eec57972c57160b",
+  "status": "ok",
+  "finish_reason": "eos",
+  "first_token_seconds": 14.16640779201407,
+  "decode_seconds": 2.062614,
+  "decode_steps": 248,
+  "prompt_with_vision_seconds": 14.112943999999999,
+  "cache_tokens": 0,
+  "precision": "Q8_0 decoder, F16 projector",
+  "wall_seconds": 16.229470709018642,
+  "emitted_tokens": 248,
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 1518,
+    "prompt_ms": 14112.944,
+    "prompt_per_token_ms": 9.297064558629776,
+    "prompt_per_second": 107.5608320985331,
+    "predicted_n": 249,
+    "predicted_ms": 2062.614,
+    "predicted_per_token_ms": 8.316991935483872,
+    "predicted_per_second": 120.23577848303172
+  },
+  "cer": 0.00398406374501992
+}

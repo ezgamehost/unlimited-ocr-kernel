@@ -107,7 +107,11 @@ The [implementation plan](docs/superpowers/plans/2026-09-27-rust-unlimited-ocr.m
 and [design](docs/superpowers/specs/2026-09-27-rust-unlimited-ocr-design.md) describe
 the remaining scope. Benchmark reports retain raw output and disclose differing
 precision, attention policies, generation lengths and process lifetimes. The
-final repeated benchmark and resource/API hardening remain unfinished.
+[repeated resident INT8 comparison](docs/benchmarks/2026-09-28-resident-repeated/README.md)
+completed 40 measured requests per engine: Rust's median page speed was
+1.08–1.28× llama.cpp's, with matching text CER and 26% lower peak child RSS.
+Rust still had slower decode throughput and slightly worse dense-page p95.
+Fresh-process/BF16 comparisons and resource/API hardening remain unfinished.
 
 For the pinned llama.cpp comparison, use an explicit newline after `<image>`:
 its image processor inserts that newline automatically. The [matched-prompt
