@@ -2,6 +2,7 @@
 use crate::error::{OcrError, Result};
 use memmap2::{Mmap, MmapOptions};
 use serde::Deserialize;
+use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs::File, path::Path};
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
@@ -10,6 +11,7 @@ pub enum DType {
     F16,
     F32,
     I64,
+    I8,
 }
 
 impl DType {
@@ -18,6 +20,7 @@ impl DType {
             Self::BF16 | Self::F16 => 2,
             Self::F32 => 4,
             Self::I64 => 8,
+            Self::I8 => 1,
         }
     }
 }
@@ -33,6 +36,7 @@ pub struct Checkpoint {
     mapping: Mmap,
     data_start: usize,
     tensors: BTreeMap<String, Descriptor>,
+    metadata: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Copy)]
@@ -64,6 +68,7 @@ impl WeightView<'_> {
 
     pub fn to_f32(&self) -> Vec<f32> {
         match self.dtype {
+            DType::I8 => self.bytes.iter().map(|&v| (v as i8) as f32).collect(),
             DType::BF16 => self
                 .bytes
                 .as_chunks::<2>()
@@ -120,7 +125,11 @@ impl Checkpoint {
             .ok_or_else(|| OcrError::Format("truncated header".into()))?;
         let mut header: BTreeMap<String, serde_json::Value> =
             serde_json::from_slice(&mapping[8..data_start])?;
-        header.remove("__metadata__");
+        let metadata = header
+            .remove("__metadata__")
+            .map(serde_json::from_value)
+            .transpose()?
+            .unwrap_or_default();
         let mut tensors = BTreeMap::new();
         for (name, value) in header {
             let descriptor: Descriptor = serde_json::from_value(value)?;
@@ -154,7 +163,18 @@ impl Checkpoint {
             mapping,
             data_start,
             tensors,
+            metadata,
         })
+    }
+
+    pub fn metadata(&self) -> &BTreeMap<String, String> {
+        &self.metadata
+    }
+    pub fn sha256(&self) -> String {
+        format!("{:x}", Sha256::digest(&self.mapping[..]))
+    }
+    pub fn file_bytes(&self) -> usize {
+        self.mapping.len()
     }
 
     pub fn tensor(&self, name: &str) -> Result<WeightView<'_>> {

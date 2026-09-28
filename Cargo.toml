@@ -6,6 +6,7 @@ license = "MIT"
 description = "CPU inference kernels and runtime for Unlimited-OCR"
 
 [dependencies]
+sha2 = { version = "0.10", features = ["asm"] }
 half = "2.6"
 libm = "0.2"
 memmap2 = "0.9"

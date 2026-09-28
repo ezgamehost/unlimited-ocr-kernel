@@ -205,3 +205,134 @@ impl Int8Matrix {
         Tensor::new(shape, data)
     }
 }
+
+const FORMAT: &str = "uocr-q8-block32-v1";
+const SCALE_SUFFIX: &str = ".q8_scales";
+
+#[derive(Clone, Copy, Debug, serde::Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum QuantizationMode {
+    WeightsOnly,
+    DynamicActivations,
+}
+
+#[derive(serde::Deserialize)]
+struct Manifest {
+    schema_version: u32,
+    format: String,
+    block_size: usize,
+    source_sha256: String,
+    output_sha256: String,
+    matrix_count: usize,
+    bytes: usize,
+}
+
+/// Validated, immutable owned matrices. Load-time copying also touches pages
+/// before timed inference; its cost belongs in model load time.
+pub struct QuantizedWeights {
+    matrices: std::collections::BTreeMap<String, Int8Matrix>,
+}
+
+fn eligible(name: &str) -> bool {
+    if name == "lm_head.weight" {
+        return true;
+    }
+    let Some(rest) = name.strip_prefix("model.layers.") else {
+        return false;
+    };
+    let Some((layer, rest)) = rest.split_once('.') else {
+        return false;
+    };
+    if layer.parse::<usize>().is_err() {
+        return false;
+    }
+    if let Some(part) = rest.strip_prefix("self_attn.") {
+        return [
+            "q_proj.weight",
+            "k_proj.weight",
+            "v_proj.weight",
+            "o_proj.weight",
+        ]
+        .contains(&part);
+    }
+    let Some(mut part) = rest.strip_prefix("mlp.") else {
+        return false;
+    };
+    if let Some(rest) = part.strip_prefix("shared_experts.") {
+        part = rest;
+    } else if let Some(rest) = part.strip_prefix("experts.") {
+        let Some((expert, rest)) = rest.split_once('.') else {
+            return false;
+        };
+        if expert.parse::<usize>().is_err() {
+            return false;
+        }
+        part = rest;
+    }
+    ["gate_proj.weight", "up_proj.weight", "down_proj.weight"].contains(&part)
+}
+
+impl QuantizedWeights {
+    pub fn load(path: &std::path::Path, source: &crate::checkpoint::Checkpoint) -> Result<Self> {
+        use crate::checkpoint::{Checkpoint, DType};
+        let manifest: Manifest =
+            serde_json::from_slice(&std::fs::read(path.with_extension("json"))?)?;
+        let checkpoint = Checkpoint::open(path)?;
+        let metadata = checkpoint.metadata();
+        if manifest.schema_version != 1
+            || manifest.format != FORMAT
+            || manifest.block_size != BLOCK
+            || metadata.get("format").map(String::as_str) != Some(FORMAT)
+            || metadata.get("block_size").map(String::as_str) != Some("32")
+            || metadata.get("source_sha256") != Some(&manifest.source_sha256)
+            || checkpoint.file_bytes() != manifest.bytes
+        {
+            return Err(OcrError::Format(
+                "INT8 overlay version or metadata mismatch".into(),
+            ));
+        }
+        if checkpoint.sha256() != manifest.output_sha256
+            || source.sha256() != manifest.source_sha256
+        {
+            return Err(OcrError::Format(
+                "INT8 checksum or source model mismatch".into(),
+            ));
+        }
+        let expected: Vec<_> = source.names().filter(|name| eligible(name)).collect();
+        if expected.is_empty()
+            || expected.len() != manifest.matrix_count
+            || checkpoint.names().count() != expected.len() * 2
+        {
+            return Err(OcrError::Format("INT8 matrix set mismatch".into()));
+        }
+        let mut matrices = std::collections::BTreeMap::new();
+        for name in expected {
+            let original = source.tensor(name)?;
+            let weight = checkpoint.tensor(name)?;
+            let scales = checkpoint.tensor(&format!("{name}{SCALE_SUFFIX}"))?;
+            if weight.dtype != DType::I8
+                || weight.shape.len() != 2
+                || weight.shape != original.shape
+                || !matches!(original.dtype, DType::BF16 | DType::F16 | DType::F32)
+                || scales.dtype != DType::F32
+                || scales.shape != [weight.shape[0], weight.shape[1].div_ceil(BLOCK)]
+                || weight.bytes.contains(&128)
+            {
+                return Err(OcrError::Format(format!("invalid INT8 matrix {name}")));
+            }
+            matrices.insert(
+                name.to_owned(),
+                Int8Matrix::from_parts(
+                    weight.shape[0],
+                    weight.shape[1],
+                    weight.bytes.iter().map(|&v| v as i8).collect(),
+                    scales.to_f32(),
+                )?,
+            );
+        }
+        Ok(Self { matrices })
+    }
+    pub fn get(&self, name: &str) -> Option<&Int8Matrix> {
+        self.matrices.get(name)
+    }
+}

@@ -78,7 +78,7 @@ pub fn linear_weight(
     if bias.is_some_and(|b| b.len() != n) {
         return Err(OcrError::Shape("linear bias length".into()));
     }
-    if weight.dtype == DType::I64 {
+    if matches!(weight.dtype, DType::I64 | DType::I8) {
         return Err(OcrError::Unsupported("integer linear weight".into()));
     }
     if x.data.len() == k && weight.dtype == DType::BF16 {

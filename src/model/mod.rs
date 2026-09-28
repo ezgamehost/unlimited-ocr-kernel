@@ -43,6 +43,7 @@ pub struct Timings {
 }
 #[derive(Debug, Serialize)]
 pub struct OcrResult {
+    pub precision: &'static str,
     pub text: String,
     pub token_ids: Vec<u32>,
     pub finish_reason: FinishReason,
@@ -50,6 +51,8 @@ pub struct OcrResult {
     pub image_tokens: usize,
 }
 pub struct Model {
+    quantized: Option<crate::cpu::quantized::QuantizedWeights>,
+    quantization_mode: crate::cpu::quantized::QuantizationMode,
     checkpoint: Checkpoint,
     config: config::ModelConfig,
     vision: Vision,
@@ -57,13 +60,45 @@ pub struct Model {
 }
 
 impl Model {
+    pub fn precision(&self) -> &'static str {
+        match (&self.quantized, self.quantization_mode) {
+            (None, _) => "bf16_weights_fp32",
+            (Some(_), crate::cpu::quantized::QuantizationMode::WeightsOnly) => "int8_weights_fp32",
+            (Some(_), crate::cpu::quantized::QuantizationMode::DynamicActivations) => {
+                "int8_weights_dynamic_activations"
+            }
+        }
+    }
     pub fn load(directory: &Path) -> Result<Self> {
+        Self::load_with_quantization(
+            directory,
+            None,
+            crate::cpu::quantized::QuantizationMode::WeightsOnly,
+        )
+    }
+
+    pub fn load_with_quantization(
+        directory: &Path,
+        overlay: Option<&Path>,
+        mode: crate::cpu::quantized::QuantizationMode,
+    ) -> Result<Self> {
+        if overlay.is_none() && mode == crate::cpu::quantized::QuantizationMode::DynamicActivations
+        {
+            return Err(OcrError::Format(
+                "dynamic INT8 requires a quantized weight overlay".into(),
+            ));
+        }
         let config = config::ModelConfig::load(&directory.join("config.json"))?;
         let checkpoint = Checkpoint::open(&directory.join("model-00001-of-000001.safetensors"))?;
         Decoder::new(&checkpoint, config.clone())?;
+        let quantized = overlay
+            .map(|path| crate::cpu::quantized::QuantizedWeights::load(path, &checkpoint))
+            .transpose()?;
         let vision = Vision::new(&checkpoint)?;
         let tokenizer = PromptEncoder::load(&directory.join("tokenizer.json"))?;
         Ok(Self {
+            quantized,
+            quantization_mode: mode,
             checkpoint,
             config,
             vision,
@@ -94,7 +129,10 @@ impl Model {
         let features = self.vision.encode(&image, cpu)?;
         let vision_seconds = stamp.elapsed().as_secs_f64();
         let stamp = Instant::now();
-        let decoder = Decoder::new(&self.checkpoint, self.config.clone())?;
+        let mut decoder = Decoder::new(&self.checkpoint, self.config.clone())?;
+        if let Some(quantized) = &self.quantized {
+            decoder = decoder.with_quantization(quantized, self.quantization_mode);
+        }
         let mut embeddings = decoder.embedding(&input.ids)?;
         for (row, &position) in input.image_positions.iter().enumerate() {
             let width = self.config.hidden_size;
@@ -139,6 +177,7 @@ impl Model {
             decode_steps,
         };
         Ok(OcrResult {
+            precision: self.precision(),
             text,
             token_ids: output,
             finish_reason: reason,

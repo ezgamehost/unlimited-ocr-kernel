@@ -16,6 +16,12 @@ use uocr::{
 struct Args {
     #[arg(long, default_value = "artifacts/upstream")]
     model: PathBuf,
+    /// Validated INT8 decoder overlay plus its .json checksum manifest.
+    #[arg(long)]
+    int8_weights: Option<PathBuf>,
+    /// Also quantize single-row projection inputs (experimental extra rounding).
+    #[arg(long, requires = "int8_weights")]
+    int8_activations: bool,
     #[arg(long, required_unless_present = "jsonl")]
     image: Option<PathBuf>,
     #[arg(long,default_value="gundam",value_parser=["base","gundam"])]
@@ -55,11 +61,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or("scratch limit overflow")?;
     let mut cpu = CpuContext::new(backend, args.threads, scratch)?;
     let stamp = Instant::now();
-    let model = Model::load(&args.model)?;
+    let mode = if args.int8_activations {
+        uocr::cpu::quantized::QuantizationMode::DynamicActivations
+    } else {
+        uocr::cpu::quantized::QuantizationMode::WeightsOnly
+    };
+    let model = Model::load_with_quantization(&args.model, args.int8_weights.as_deref(), mode)?;
     let load = stamp.elapsed().as_secs_f64();
     eprintln!(
         "{}",
-        serde_json::json!({"event":"loaded","load_seconds":load,"backend":args.backend,"threads":args.threads})
+        serde_json::json!({"event":"loaded","load_seconds":load,"backend":args.backend,"threads":args.threads,"precision":model.precision()})
     );
     if args.jsonl {
         for line in io::stdin().lock().lines() {

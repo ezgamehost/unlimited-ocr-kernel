@@ -11,6 +11,10 @@ use cache::LayerCache;
 
 pub struct Decoder<'a> {
     weights: &'a Checkpoint,
+    quantized: Option<(
+        &'a crate::cpu::quantized::QuantizedWeights,
+        crate::cpu::quantized::QuantizationMode,
+    )>,
     pub config: ModelConfig,
 }
 pub struct DecodeState {
@@ -75,10 +79,34 @@ impl<'a> Decoder<'a> {
                 }
             }
         }
-        Ok(Self { weights, config })
+        Ok(Self {
+            weights,
+            config,
+            quantized: None,
+        })
+    }
+
+    pub(crate) fn with_quantization(
+        mut self,
+        weights: &'a crate::cpu::quantized::QuantizedWeights,
+        mode: crate::cpu::quantized::QuantizationMode,
+    ) -> Self {
+        self.quantized = Some((weights, mode));
+        self
     }
 
     fn projection(&self, x: &Tensor, name: &str, cpu: &mut CpuContext) -> Result<Tensor> {
+        if let Some((weights, mode)) = self.quantized
+            && let Some(matrix) = weights.get(name)
+        {
+            return if mode == crate::cpu::quantized::QuantizationMode::DynamicActivations
+                && x.shape.first() == Some(&1)
+            {
+                matrix.linear_dynamic_int8(x, cpu)
+            } else {
+                matrix.linear(x, cpu)
+            };
+        }
         ops::linear_weight(x, self.weights.tensor(name)?, None, cpu)
     }
 

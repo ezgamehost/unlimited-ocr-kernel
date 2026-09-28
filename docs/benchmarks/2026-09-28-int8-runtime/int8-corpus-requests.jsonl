@@ -1,0 +1,4 @@
+{"image": "benchmarks/corpus/english.png", "generation": {"max_tokens": 2048}}
+{"image": "benchmarks/corpus/chinese.png", "generation": {"max_tokens": 2048}}
+{"image": "benchmarks/corpus/table.png", "generation": {"max_tokens": 2048}}
+{"image": "benchmarks/corpus/dense.png", "generation": {"max_tokens": 2048}}

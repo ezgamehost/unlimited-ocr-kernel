@@ -1,7 +1,9 @@
 # Experimental INT8 kernels and preparation
 
-These kernels are not yet connected to `Model` or the OCR CLI. No quantized
-OCR accuracy or whole-page speed claim is established.
+These kernels are connected to `Model` and the OCR CLI through an explicitly
+selected decoder overlay. BF16 remains the default. See the runtime pilot
+results in `../2026-09-28-int8-runtime`; the operator samples below do not
+establish a whole-page speedup.
 
 The weight-only path retains FP32 activations. The separately named
 `linear_dynamic_int8` experiment also rounds single-token activation blocks
@@ -51,3 +53,17 @@ Tests cover zero ranges, tails, error bounds, scalar and NEON dots against FP64
 oracles, invalid scales/storage, parallel row partitions, source preservation,
 integer-source rejection, and exclusion of router/normalization tensors. These
 are implementation checks, not evidence of model-level quantization quality.
+
+Runtime usage:
+
+```sh
+target/release/uocr --image benchmarks/corpus/english.png --threads 8 \
+  --int8-weights artifacts/unlimited-ocr-q8-block32.safetensors --json
+```
+
+Add `--int8-activations` to select the separately labeled experimental mode.
+It rounds every single-row projection input, including single-row expert
+groups during prefill; multirow projections retain FP32 activations. Both modes
+retain original routing, normalization, embedding and vision weights. Runtime
+loading validates both complete file hashes, the exact matrix set, version,
+dimensions, dtypes, integer range and finite nonnegative scales before use.

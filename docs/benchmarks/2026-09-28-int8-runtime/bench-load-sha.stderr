@@ -1,0 +1,22 @@
+source_open_seconds=0.002469
+source_hash_seconds=9.483251 sha256=2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6
+overlay_load_seconds=18.868707
+vision_load_seconds=0.356756
+       29.16 real         6.65 user         4.19 sys
+          8805040128  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              371096  page reclaims
+              932353  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   4  voluntary context switches
+              370111  involuntary context switches
+         78220520875  instructions retired
+         44737320060  cycles elapsed
+          4759167688  peak memory footprint
