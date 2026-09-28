@@ -1,0 +1,82 @@
+{
+  "engine": "native",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/target/release/uocr",
+    "--model",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/upstream",
+    "--jsonl",
+    "--threads",
+    "8",
+    "--int8-weights",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/unlimited-ocr-q8-block32.safetensors",
+    "--int8-activations"
+  ],
+  "process_mode": "resident-independent-requests",
+  "started_utc": "2026-09-28T10:38:49.674488+00:00",
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "schedule": [
+    {
+      "image_id": "english",
+      "iteration": 0,
+      "warmup": false
+    }
+  ],
+  "max_tokens": 8192,
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "binary_sha256": "4451dc2620e28a3df912b8a2bf5dc158b03249a48b11e796dd7165ec1c71324c",
+  "runner_sha256": "99ad14dea3d69b67663d7249ff353cd42b83bbdb0bffd24e7d576e8a9f34bd9f",
+  "warmups_per_image": 0,
+  "measured_per_image": 1,
+  "seed": 42,
+  "manifest": {
+    "schema_version": 1,
+    "pillow_version": "12.1.1",
+    "description": "Synthetic correctness/latency corpus; not a representative production dataset.",
+    "images": [
+      {
+        "id": "english",
+        "path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png",
+        "text": "MEETING NOTES\n\nDate: September 27, 2026\n\nThe research team reviewed the new document recognition system.\nEvery result must include the original input and a clear transcript.\nWe measure complete page latency, memory use, and character errors.\nFaster processing is useful only when the output remains accurate.\n\nActions for next week:\n1. Check English and Chinese documents.\n2. Test tables, small print, and unusual page dimensions.\n3. Save failures and incomplete outputs with the successful results.\n4. Compare identical inputs on the same computer.\n\nApproved by: Research Operations",
+        "sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          796,
+          444
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 18,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png"
+      }
+    ]
+  },
+  "prefix_tokens": 1518,
+  "native_prompt": "<image>\ndocument parsing.",
+  "attention_note": "native preserved prefix plus 128 generated; llama full attention",
+  "first_token_note": "native internal clock; llama first streamed content/token arrival",
+  "load_event": {
+    "backend": "auto",
+    "event": "loaded",
+    "load_seconds": 7.5150011249999995,
+    "precision": "int8_weights_dynamic_activations",
+    "threads": 8
+  },
+  "startup_wall_seconds": 7.610887417016784,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 6359744512,
+    "user_cpu_seconds": 30.484924,
+    "system_cpu_seconds": 9.522801,
+    "major_faults": 49410,
+    "minor_faults": 894863
+  },
+  "process_wall_seconds": 19.287524292012677,
+  "failure": null
+}

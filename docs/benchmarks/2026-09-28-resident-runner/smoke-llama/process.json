@@ -1,0 +1,109 @@
+{
+  "engine": "llama",
+  "command": [
+    "/private/tmp/unlimited-ocr-baseline/bin/llama-b11223/llama-server",
+    "-m",
+    "/private/tmp/unlimited-ocr-baseline/models/model.gguf",
+    "--mmproj",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/mmproj-unlimited-ocr-F16-tiles32.gguf",
+    "-ngl",
+    "0",
+    "--device",
+    "none",
+    "--no-mmproj-offload",
+    "--no-op-offload",
+    "--no-kv-offload",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-c",
+    "32768",
+    "-n",
+    "8192",
+    "--temp",
+    "0",
+    "--seed",
+    "42",
+    "--repeat-penalty",
+    "1",
+    "--no-warmup",
+    "--special",
+    "--jinja",
+    "-lv",
+    "4",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "54883",
+    "--parallel",
+    "1",
+    "--no-cache-prompt",
+    "--cache-ram",
+    "0",
+    "--no-cache-idle-slots",
+    "--no-context-shift",
+    "--offline"
+  ],
+  "process_mode": "resident-independent-requests",
+  "started_utc": "2026-09-28T10:39:09.026655+00:00",
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "schedule": [
+    {
+      "image_id": "english",
+      "iteration": 0,
+      "warmup": false
+    }
+  ],
+  "max_tokens": 8192,
+  "thread_environment": {
+    "VECLIB_MAXIMUM_THREADS": "8",
+    "OMP_NUM_THREADS": "8"
+  },
+  "binary_sha256": "6a072f8bf308ea28144476441d25760ee01b84ed102f86be4662d21ace8d72a6",
+  "runner_sha256": "99ad14dea3d69b67663d7249ff353cd42b83bbdb0bffd24e7d576e8a9f34bd9f",
+  "warmups_per_image": 0,
+  "measured_per_image": 1,
+  "seed": 42,
+  "manifest": {
+    "schema_version": 1,
+    "pillow_version": "12.1.1",
+    "description": "Synthetic correctness/latency corpus; not a representative production dataset.",
+    "images": [
+      {
+        "id": "english",
+        "path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png",
+        "text": "MEETING NOTES\n\nDate: September 27, 2026\n\nThe research team reviewed the new document recognition system.\nEvery result must include the original input and a clear transcript.\nWe measure complete page latency, memory use, and character errors.\nFaster processing is useful only when the output remains accurate.\n\nActions for next week:\n1. Check English and Chinese documents.\n2. Test tables, small print, and unusual page dimensions.\n3. Save failures and incomplete outputs with the successful results.\n4. Compare identical inputs on the same computer.\n\nApproved by: Research Operations",
+        "sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+        "width": 1024,
+        "height": 1400,
+        "text_bounds": [
+          48,
+          48,
+          796,
+          444
+        ],
+        "font": "/System/Library/Fonts/Menlo.ttc",
+        "font_sha256": "dc256e0b39c2a6fec947129d421fef41b8b429f58f9b6e5d1b148c87f775c1f6",
+        "font_size": 18,
+        "resolved_path": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/benchmarks/corpus/english.png"
+      }
+    ]
+  },
+  "prefix_tokens": 1518,
+  "native_prompt": "<image>\ndocument parsing.",
+  "attention_note": "native preserved prefix plus 128 generated; llama full attention",
+  "first_token_note": "native internal clock; llama first streamed content/token arrival",
+  "startup_wall_seconds": 5.100243624998257,
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 7236763648,
+    "user_cpu_seconds": 109.633862,
+    "system_cpu_seconds": 7.736025,
+    "major_faults": 193080,
+    "minor_faults": 1001036
+  },
+  "process_wall_seconds": 19.74661158301751,
+  "failure": null
+}

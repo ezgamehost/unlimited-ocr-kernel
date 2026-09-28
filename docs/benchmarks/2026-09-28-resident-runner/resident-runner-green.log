@@ -1,0 +1,8 @@
+.{"event": "ready", "engine": "native", "startup_seconds": 0.2118458750192076}
+{"image_id": "sample", "iteration": -1, "warmup": true, "status": "ok", "finish_reason": "eos", "wall_seconds": 0.00011266599176451564, "cer": 0.0}
+{"image_id": "sample", "iteration": 0, "warmup": false, "status": "ok", "finish_reason": "eos", "wall_seconds": 6.60410150885582e-05, "cer": 0.0}
+....
+----------------------------------------------------------------------
+Ran 5 tests in 0.336s
+
+OK

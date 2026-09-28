@@ -1,0 +1,16 @@
+.E...
+======================================================================
+ERROR: test_native_driver_records_resources_and_repeated_independent_requests (tests.python.test_benchmark_resident.ResidentBenchmarkTests.test_native_driver_records_resources_and_repeated_independent_requests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/tests/python/test_benchmark_resident.py", line 41, in test_native_driver_records_resources_and_repeated_independent_requests
+    summary = run(args)
+              ^^^^^^^^^
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/tools/benchmark_resident.py", line 316, in run
+    raise RuntimeError(failure)
+RuntimeError: TimeoutError: inference process startup deadline
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.652s
+
+FAILED (errors=1)

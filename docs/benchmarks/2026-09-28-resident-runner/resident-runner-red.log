@@ -1,0 +1,18 @@
+E
+======================================================================
+ERROR: test_benchmark_resident (unittest.loader._FailedTest.test_benchmark_resident)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_benchmark_resident
+Traceback (most recent call last):
+  File "/Users/matthewzhao/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/tests/python/test_benchmark_resident.py", line 9, in <module>
+    from tools.benchmark_resident import LineReader, StreamAccumulator, schedule, wait_child
+ModuleNotFoundError: No module named 'tools.benchmark_resident'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
