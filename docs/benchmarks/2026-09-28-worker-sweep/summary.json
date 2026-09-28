@@ -1,0 +1,27 @@
+{
+  "1": {
+    "measured_samples": 3,
+    "decode_median_seconds": 7.00703575,
+    "prefill_median_seconds": 1.652633417
+  },
+  "4": {
+    "measured_samples": 3,
+    "decode_median_seconds": 3.875407875,
+    "prefill_median_seconds": 1.439713417
+  },
+  "8": {
+    "measured_samples": 6,
+    "decode_median_seconds": 3.763751771,
+    "prefill_median_seconds": 1.4568213955
+  },
+  "10": {
+    "measured_samples": 3,
+    "decode_median_seconds": 4.128471167,
+    "prefill_median_seconds": 1.476684292
+  },
+  "14": {
+    "measured_samples": 3,
+    "decode_median_seconds": 4.650716792,
+    "prefill_median_seconds": 1.5243573339999998
+  }
+}

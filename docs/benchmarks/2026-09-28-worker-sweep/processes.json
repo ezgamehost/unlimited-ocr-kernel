@@ -1,0 +1,86 @@
+[
+  {
+    "index": 0,
+    "threads": 8,
+    "blas_cap": 8,
+    "command": [
+      "target/release/deps/uocr-17f9463a030211d5",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "76c41ede4ac422ea2e7251ccbb8de9a202f1a6b78106397ce7a773555620e646",
+    "exit_code": 0
+  },
+  {
+    "index": 1,
+    "threads": 4,
+    "blas_cap": 8,
+    "command": [
+      "target/release/deps/uocr-17f9463a030211d5",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "76c41ede4ac422ea2e7251ccbb8de9a202f1a6b78106397ce7a773555620e646",
+    "exit_code": 0
+  },
+  {
+    "index": 2,
+    "threads": 10,
+    "blas_cap": 8,
+    "command": [
+      "target/release/deps/uocr-17f9463a030211d5",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "76c41ede4ac422ea2e7251ccbb8de9a202f1a6b78106397ce7a773555620e646",
+    "exit_code": 0
+  },
+  {
+    "index": 3,
+    "threads": 1,
+    "blas_cap": 8,
+    "command": [
+      "target/release/deps/uocr-17f9463a030211d5",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "76c41ede4ac422ea2e7251ccbb8de9a202f1a6b78106397ce7a773555620e646",
+    "exit_code": 0
+  },
+  {
+    "index": 4,
+    "threads": 14,
+    "blas_cap": 8,
+    "command": [
+      "target/release/deps/uocr-17f9463a030211d5",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "76c41ede4ac422ea2e7251ccbb8de9a202f1a6b78106397ce7a773555620e646",
+    "exit_code": 0
+  },
+  {
+    "index": 5,
+    "threads": 8,
+    "blas_cap": 8,
+    "command": [
+      "target/release/deps/uocr-17f9463a030211d5",
+      "fixed_work_decoder_benchmark",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "binary_sha256": "76c41ede4ac422ea2e7251ccbb8de9a202f1a6b78106397ce7a773555620e646",
+    "exit_code": 0
+  }
+]

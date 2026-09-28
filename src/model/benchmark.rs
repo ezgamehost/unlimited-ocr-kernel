@@ -34,7 +34,14 @@ fn fixed_work_decoder_benchmark() {
         embeddings.data[position * width..(position + 1) * width]
             .copy_from_slice(&features[row * width..(row + 1) * width]);
     }
-    let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
+    let threads = std::env::var("UOCR_BENCH_THREADS")
+        .map(|value| {
+            value
+                .parse::<usize>()
+                .expect("UOCR_BENCH_THREADS must be an integer")
+        })
+        .unwrap_or(8);
+    let mut cpu = CpuContext::new(Backend::Auto, threads, 1 << 30).unwrap();
     for repetition in 0..4 {
         let start = Instant::now();
         let (mut state, _) = decoder.prefill(&embeddings, &mut cpu).unwrap();
@@ -53,7 +60,7 @@ fn fixed_work_decoder_benchmark() {
             "{}",
             serde_json::json!({
                 "benchmark": "native_fixed_work_decoder", "warmup": repetition == 0,
-                "repetition": repetition, "threads": 8, "prefix_tokens": input.ids.len(),
+                "repetition": repetition, "threads": threads, "prefix_tokens": input.ids.len(),
                 "decode_steps": 512, "prefill_seconds": prefill_seconds,
                 "decode_with_checksum_seconds": start.elapsed().as_secs_f64(),
                 "logits_checksum": checksum, "precision": model.precision(),

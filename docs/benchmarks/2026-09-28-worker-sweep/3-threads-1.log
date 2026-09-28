@@ -1,0 +1,10 @@
+
+running 1 test
+test model::benchmark::fixed_work_decoder_benchmark ... {"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":9.494974166,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"precision":"int8_weights_dynamic_activations","prefill_seconds":2.4750215,"prefix_tokens":1517,"repetition":0,"threads":1,"warmup":true}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":7.3574095,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"precision":"int8_weights_dynamic_activations","prefill_seconds":2.218353042,"prefix_tokens":1517,"repetition":1,"threads":1,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":7.00703575,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"precision":"int8_weights_dynamic_activations","prefill_seconds":1.652633417,"prefix_tokens":1517,"repetition":2,"threads":1,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":6.798074041,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"precision":"int8_weights_dynamic_activations","prefill_seconds":1.5607384579999999,"prefix_tokens":1517,"repetition":3,"threads":1,"warmup":false}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 44.64s
+
