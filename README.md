@@ -93,6 +93,8 @@ immutable throughout their lifetime.
 Manually constructed `PreparedImage` values are validated before vision inference.
 `PreparedImage::image_tokens()` returns `Result<usize>` and rejects inconsistent
 crop grids, unsupported view sizes, and malformed tensor storage.
+`Decoder::new` also validates directly constructed model configurations;
+`Decoder::config()` provides read-only access after construction.
 
 ```sh
 cargo test

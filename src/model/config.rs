@@ -73,6 +73,12 @@ impl ModelConfig {
 
     pub fn from_json(json: &str) -> Result<Self> {
         let config: Self = serde_json::from_str(json)?;
+        config.validate()?;
+        Ok(config)
+    }
+
+    pub fn validate(&self) -> Result<()> {
+        let config = self;
         if config.model_type != "unlimited-ocr"
             || config.use_mla
             || config.attention_bias
@@ -111,6 +117,33 @@ impl ModelConfig {
         {
             return Err(OcrError::Shape("invalid decoder configuration".into()));
         }
-        Ok(config)
+        let shared = config
+            .moe_intermediate_size
+            .checked_mul(config.n_shared_experts)
+            .ok_or_else(|| OcrError::Shape("shared-expert width overflow".into()))?;
+        let cache_slots = config
+            .max_position_embeddings
+            .checked_add(config.sliding_window)
+            .ok_or_else(|| OcrError::Shape("cache capacity overflow".into()))?;
+        for shape in [
+            &[config.hidden_size, config.hidden_size][..],
+            &[config.vocab_size, config.hidden_size],
+            &[config.intermediate_size, config.hidden_size],
+            &[config.moe_intermediate_size, config.hidden_size],
+            &[shared, config.hidden_size],
+            &[config.n_routed_experts, config.hidden_size],
+            &[config.num_hidden_layers, cache_slots, config.hidden_size, 2],
+        ] {
+            let count = crate::tensor::element_count(shape)?;
+            if count
+                .checked_mul(std::mem::size_of::<f32>())
+                .is_none_or(|bytes| bytes > isize::MAX as usize)
+            {
+                return Err(OcrError::Shape(
+                    "derived decoder storage exceeds addressable size".into(),
+                ));
+            }
+        }
+        Ok(())
     }
 }

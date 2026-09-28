@@ -1,0 +1,30 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.89s
+     Running tests/config.rs (target/debug/deps/config-c1921ed70c2aac50)
+
+running 3 tests
+test resolves_upstream_decoder_defaults ... ok
+test rejects_overflowing_derived_decoder_dimensions ... FAILED
+test decoder_validates_direct_config_before_checkpoint_descriptors ... FAILED
+
+failures:
+
+---- rejects_overflowing_derived_decoder_dimensions stdout ----
+
+thread 'rejects_overflowing_derived_decoder_dimensions' (3952907) panicked at tests/config.rs:16:9:
+n_shared_experts
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- decoder_validates_direct_config_before_checkpoint_descriptors stdout ----
+
+thread 'decoder_validates_direct_config_before_checkpoint_descriptors' (3952906) panicked at tests/config.rs:33:5:
+assertion failed: matches!(Decoder::new(&weights, config), Err(OcrError::Shape(_)))
+
+
+failures:
+    decoder_validates_direct_config_before_checkpoint_descriptors
+    rejects_overflowing_derived_decoder_dimensions
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test config`

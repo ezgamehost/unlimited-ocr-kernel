@@ -16,7 +16,7 @@ pub struct Decoder<'a> {
         &'a crate::cpu::quantized::QuantizedWeights,
         crate::cpu::quantized::QuantizationMode,
     )>,
-    pub config: ModelConfig,
+    config: ModelConfig,
 }
 pub struct DecodeState {
     layers: Vec<LayerCache>,
@@ -29,7 +29,12 @@ impl DecodeState {
 }
 
 impl<'a> Decoder<'a> {
+    pub fn config(&self) -> &ModelConfig {
+        &self.config
+    }
+
     pub fn new(weights: &'a Checkpoint, config: ModelConfig) -> Result<Self> {
+        config.validate()?;
         let hidden = config.hidden_size;
         let expect = |name: &str, shape: &[usize]| -> Result<()> {
             let w = weights.tensor(name)?;

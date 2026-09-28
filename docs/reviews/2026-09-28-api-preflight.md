@@ -103,3 +103,19 @@ build caught an example call site needing the new Result handling; it was fixed
 before the final checks. [Verification logs](prepared-layout/) retain the results.
 Vision descriptor preflight, direct-config validation and aggregate lifetime
 optimization remain open.
+
+
+## Decoder-configuration follow-up
+
+Item 4 is addressed: JSON parsing and `Decoder::new` share configuration
+validation. Shared-expert width, matrix storage sizes and aggregate KV capacity
+use checked arithmetic and must fit addressable FP32 storage. This is arithmetic
+validation, not a promise that every accepted configuration fits physical RAM.
+Decoder configuration is private after construction, with read-only access via
+`config()`, so callers cannot invalidate checked descriptors by mutating it.
+
+Regressions reject overflowing JSON dimensions and directly modified Rust
+configurations before checkpoint descriptor access. The full Rust suite, clippy,
+and both original decoder reference tests pass. [Logs](derived-config/) retain
+RED/GREEN and artifact-dependent evidence. Vision descriptor validation and
+allocation-lifetime optimization remain open.
