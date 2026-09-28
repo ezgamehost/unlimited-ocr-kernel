@@ -1,0 +1,8 @@
+
+<|det|>header [44, 34, 227, 51]<|/det|>PURCHASE ORDER
+<|det|>text [43, 74, 289, 92]<|/det|>Order: P0-2026-0927
+<|det|>text [43, 94, 213, 112]<|/det|>Currency: USD
+<|det|>table [42, 133, 645, 310]<|/det|><table><tr><td>Item</td><td>Qty</td><td>Unit price</td><td>Amount</td></tr><tr><td>Paper reams</td><td>12</td><td>6.25</td><td>75.00</td></tr><tr><td>Ink cartridges</td><td>4</td><td>32.50</td><td>130.00</td></tr><tr><td>Archive boxes</td><td>18</td><td>4.75</td><td>85.50</td></tr><tr><td>Shipping</td><td>1</td><td>12.00</td><td>12.00</td></tr><tr><td>Subtotal</td><td></td><td></td><td>302.50</td></tr><tr><td>Tax</td><td></td><td></td><td>24.20</td></tr><tr><td>Total</td><td></td><td></td><td>326.70</td></tr></table>
+<|det|>text [43, 333, 417, 352]<|/det|>Payment due: October 27, 2026
+
+

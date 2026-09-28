@@ -8,6 +8,7 @@ einops==0.8.2
 filelock==4.0.5
 fonttools==4.66.0
 fsspec==2026.9.0
+gguf==0.19.0
 hf-xet==1.6.0
 huggingface-hub==0.36.2
 idna==3.20

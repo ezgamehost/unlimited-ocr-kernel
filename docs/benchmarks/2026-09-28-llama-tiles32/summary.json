@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "system": "macOS-26.6.2-arm64-arm-64bit",
+  "aggregate": {
+    "completed": 4,
+    "failed": 0,
+    "truncated": 0,
+    "median_seconds": 18.606114667010843,
+    "p95_seconds": 20.11343962501269
+  },
+  "per_image": {
+    "english": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 18.73838562500896,
+      "p95_seconds": 18.73838562500896
+    },
+    "chinese": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 18.473843709012726,
+      "p95_seconds": 18.473843709012726
+    },
+    "table": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 17.82118475000607,
+      "p95_seconds": 17.82118475000607
+    },
+    "dense": {
+      "completed": 1,
+      "failed": 0,
+      "truncated": 0,
+      "median_seconds": 20.11343962501269,
+      "p95_seconds": 20.11343962501269
+    }
+  },
+  "notes": [
+    "full-attention llama.cpp; n-gram suppression disabled",
+    "fresh processes, filesystem cache not cleared"
+  ]
+}

@@ -1,0 +1,60 @@
+
+<|det|>header [44, 32, 287, 46]<|/det|>TECHNICAL VALIDATION RECORD
+<|det|>text [42, 64, 550, 945]<|/det|>01. Sample 1001: measured value 7.25; status verified.
+The original record is retained for independent checking.
+02. Sample 1002: measured value 14.25; status verified.
+The original record is retained for independent checking.
+03. Sample 1003: measured value 21.25; status verified.
+The original record is retained for independent checking.
+04. Sample 1004: measured value 28.25; status verified.
+The original record is retained for independent checking.
+05. Sample 1005: measured value 35.25; status verified.
+The original record is retained for independent checking.
+06. Sample 1006: measured value 42.25; status verified.
+The original record is retained for independent checking.
+07. Sample 1007: measured value 49.25; status verified.
+The original record is retained for independent checking.
+08. Sample 1008: measured value 56.25; status verified.
+The original record is retained for independent checking.
+09. Sample 1009: measured value 63.25; status verified.
+The original record is retained for independent checking.
+10. Sample 1010: measured value 70.25; status verified.
+The original record is retained for independent checking.
+11. Sample 1011: measured value 77.25; status verified.
+The original record is retained for independent checking.
+12. Sample 1012: measured value 84.25; status verified.
+The original record is retained for independent checking.
+13. Sample 1013: measured value 91.25; status verified.
+The original record is retained for independent checking.
+14. Sample 1014: measured value 98.25; status verified.
+The original record is retained for independent checking.
+15. Sample 1015: measured value 105.25; status verified.
+The original record is retained for independent checking.
+16. Sample 1016: measured value 112.25; status verified.
+The original record is retained for independent checking.
+17. Sample 1017: measured value 119.25; status verified.
+The original record is retained for independent checking.
+18. Sample 1018: measured value 126.25; status verified.
+The original record is retained for independent checking.
+19. Sample 1019: measured value 133.25; status verified.
+The original record is retained for independent checking.
+20. Sample 1020: measured value 140.25; status verified.
+The original record is retained for independent checking.
+21. Sample 1021: measured value 147.25; status verified.
+The original record is retained for independent checking.
+22. Sample 1022: measured value 154.25; status verified.
+The original record is retained for independent checking.
+23. Sample 1023: measured value 161.25; status verified.
+The original record is retained for independent checking.
+24. Sample 1024: measured value 168.25; status verified.
+The original record is retained for independent checking.
+25. Sample 1025: measured value 175.25; status verified.
+The original record is retained for independent checking.
+26. Sample 1026: measured value 182.25; status verified.
+The original record is retained for independent checking.
+27. Sample 1027: measured value 189.25; status verified.
+The original record is retained for independent checking.
+28. Sample 1028: measured value 196.25; status verified.
+The original record is retained for independent checking.
+
+
