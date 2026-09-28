@@ -50,6 +50,17 @@ impl CpuContext {
         self.threads
     }
 
+    /// Share the existing pool while running an expert's inner kernels serially.
+    /// Caller reserves aggregate scratch and passes a nonzero task count.
+    pub(crate) fn serial_worker(&self, concurrent_tasks: usize) -> Self {
+        Self {
+            backend: self.backend,
+            threads: 1,
+            scratch_limit: self.scratch_limit / concurrent_tasks,
+            pool: Arc::clone(&self.pool),
+        }
+    }
+
     /// Keep a sequence of small parallel kernels on one pool worker, avoiding
     /// an external-thread handoff for every matrix. Nested calls are supported.
     pub fn run<R: Send>(&mut self, operation: impl FnOnce(&mut Self) -> R + Send) -> R {
@@ -62,5 +73,21 @@ impl CpuContext {
             return Err(OcrError::Resource("operation exceeds scratch limit".into()));
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn expert_worker_reuses_pool_but_limits_inner_parallelism_and_memory() {
+        let cpu = CpuContext::new(Backend::Auto, 8, 1024).unwrap();
+        let worker = cpu.serial_worker(4);
+        assert_eq!(worker.threads(), 1);
+        assert_eq!(worker.backend, cpu.backend);
+        assert!(Arc::ptr_eq(&worker.pool, &cpu.pool));
+        assert!(worker.check_elements(64).is_ok());
+        assert!(worker.check_elements(65).is_err());
     }
 }

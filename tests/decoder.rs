@@ -8,6 +8,30 @@ use uocr::{
 };
 
 #[test]
+#[ignore = "requires pinned original weights"]
+fn actual_expert_scheduling_preserves_results_with_small_scratch() {
+    let weights = Checkpoint::open(Path::new(
+        "artifacts/upstream/model-00001-of-000001.safetensors",
+    ))
+    .unwrap();
+    let config = ModelConfig::load(Path::new("artifacts/upstream/config.json")).unwrap();
+    let decoder = Decoder::new(&weights, config).unwrap();
+    let input = Tensor::new(
+        vec![1, 1280],
+        (0..1280).map(|i| (i as f32 * 0.01).sin()).collect(),
+    )
+    .unwrap();
+    let mut outputs = Vec::new();
+    for (threads, scratch) in [(1, 1 << 30), (8, 1 << 30), (8, 32768)] {
+        let mut cpu = CpuContext::new(Backend::Auto, threads, scratch).unwrap();
+        let mut cache = LayerCache::new(10, 128, 128).unwrap();
+        outputs.push(decoder.layer(1, &input, &mut cache, &mut cpu).unwrap().data);
+    }
+    assert_eq!(outputs[0], outputs[1]);
+    assert_eq!(outputs[0], outputs[2]);
+}
+
+#[test]
 #[ignore = "requires pinned original weights and exported decoder trace"]
 fn actual_decoder_layers_match_upstream_prefill_and_decode() {
     let weights = Checkpoint::open(Path::new(

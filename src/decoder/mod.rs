@@ -8,6 +8,7 @@ use crate::{
     tensor::Tensor,
 };
 use cache::LayerCache;
+use rayon::prelude::*;
 
 pub struct Decoder<'a> {
     weights: &'a Checkpoint,
@@ -139,6 +140,46 @@ impl<'a> Decoder<'a> {
             }
         }
         let mut result = self.feed_forward(x, &format!("{prefix}.shared_experts"), cpu)?;
+        if x.shape[0] == 1 && cpu.threads() > 1 {
+            let selected: Vec<_> = assignments
+                .iter()
+                .enumerate()
+                .filter_map(|(expert, rows)| rows.first().map(|&(_, p)| (expert, p)))
+                .collect();
+            // Reserve conservatively for expanded F16/F32 matrices as well as
+            // dynamic activation quantization. Low-memory requests keep the
+            // serial-expert path instead of acquiring a stricter failure mode.
+            let width = self.config.moe_intermediate_size;
+            let scratch = width
+                .checked_add(hidden)
+                .and_then(|n| n.checked_mul(3))
+                .and_then(|n| {
+                    width
+                        .checked_mul(hidden)
+                        .and_then(|matrix| n.checked_add(matrix))
+                })
+                .and_then(|n| n.checked_mul(selected.len()));
+            if !selected.is_empty() && scratch.is_some_and(|n| cpu.check_elements(n).is_ok()) {
+                let pool = std::sync::Arc::clone(&cpu.pool);
+                let outputs: Vec<_> = pool.install(|| {
+                    selected
+                        .par_iter()
+                        .map(|&(expert, _)| {
+                            let mut worker = cpu.serial_worker(selected.len());
+                            self.feed_forward(x, &format!("{prefix}.experts.{expert}"), &mut worker)
+                        })
+                        .collect()
+                });
+                // Indexed collection and ordered accumulation preserve the original
+                // expert reduction order regardless of task completion order.
+                for ((_, probability), output) in selected.into_iter().zip(outputs) {
+                    for (dest, value) in result.data.iter_mut().zip(output?.data) {
+                        *dest += probability * value;
+                    }
+                }
+                return Ok(result);
+            }
+        }
         for (expert, rows) in assignments.into_iter().enumerate() {
             if rows.is_empty() {
                 continue;

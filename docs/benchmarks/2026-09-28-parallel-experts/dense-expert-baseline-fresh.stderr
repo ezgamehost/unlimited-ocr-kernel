@@ -1,0 +1,19 @@
+{"backend":"auto","event":"loaded","load_seconds":1.8768746250000001,"precision":"bf16_weights_fp32","threads":8}
+       46.97 real       107.80 user        41.70 sys
+          5925847040  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              500420  page reclaims
+              335334  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  11  voluntary context switches
+             4357858  involuntary context switches
+       1570862245764  instructions retired
+        548688378234  cycles elapsed
+          2269861912  peak memory footprint
