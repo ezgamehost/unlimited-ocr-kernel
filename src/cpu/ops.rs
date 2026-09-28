@@ -132,18 +132,53 @@ pub fn linear_weight(
 }
 
 pub fn softmax(values: &mut [f32]) -> Result<()> {
-    if values.is_empty() || values.iter().any(|x| x.is_nan() || *x == f32::INFINITY) {
-        return Err(OcrError::Numerical("invalid softmax row".into()));
-    }
-    let maximum = values.iter().copied().fold(f32::NEG_INFINITY, f32::max);
-    if !maximum.is_finite() {
-        return Err(OcrError::Numerical("fully masked softmax row".into()));
-    }
-    let mut sum = 0.;
+    softmax_backend(values, Backend::Scalar)
+}
+
+pub fn softmax_backend(values: &mut [f32], backend: Backend) -> Result<()> {
+    let scalar_max = || {
+        if values.is_empty() || values.iter().any(|x| x.is_nan() || *x == f32::INFINITY) {
+            return None;
+        }
+        let maximum = values.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+        maximum.is_finite().then_some(maximum)
+    };
+    #[cfg(target_arch = "aarch64")]
+    let maximum = if backend == Backend::Scalar {
+        scalar_max()
+    } else {
+        super::neon::softmax_max(values)
+    };
+    #[cfg(not(target_arch = "aarch64"))]
+    let maximum = scalar_max();
+    let maximum =
+        maximum.ok_or_else(|| OcrError::Numerical("invalid or fully masked softmax row".into()))?;
     for x in values.iter_mut() {
-        *x = (*x - maximum).exp();
-        sum += *x;
+        *x -= maximum;
     }
+    #[cfg(target_os = "macos")]
+    if backend != Backend::Scalar {
+        accelerate::exp_in_place(values);
+    } else {
+        for x in values.iter_mut() {
+            *x = x.exp();
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = backend;
+        for x in values.iter_mut() {
+            *x = x.exp();
+        }
+    }
+    #[cfg(target_arch = "aarch64")]
+    let sum: f32 = if backend == Backend::Scalar {
+        values.iter().sum()
+    } else {
+        super::neon::sum(values)
+    };
+    #[cfg(not(target_arch = "aarch64"))]
+    let sum: f32 = values.iter().sum();
     for x in values.iter_mut() {
         *x /= sum;
     }
@@ -249,7 +284,7 @@ where
                 if causal {
                     scores[i * nk + start + i + 1..(i + 1) * nk].fill(f32::NEG_INFINITY);
                 }
-                softmax(&mut scores[i * nk..(i + 1) * nk])?;
+                softmax_backend(&mut scores[i * nk..(i + 1) * nk], cpu.backend)?;
             }
             let dest = &mut output[(head * nq + start) * d..(head * nq + start + count) * d];
             if fast {
@@ -300,11 +335,23 @@ fn norm(
     }
     let mut data = vec![0.; x.data.len()];
     for (input, output) in x.data.chunks_exact(width).zip(data.chunks_exact_mut(width)) {
-        let mean = if center {
-            input.iter().sum::<f32>() / width as f32
-        } else {
-            0.
-        };
+        if center {
+            // Wide, nearly constant rows lose their mean under sequential FP32
+            // summation. Retain precision through centering and variance.
+            let mean = input.iter().map(|&v| v as f64).sum::<f64>() / width as f64;
+            let variance = input
+                .iter()
+                .map(|&v| (v as f64 - mean).powi(2))
+                .sum::<f64>()
+                / width as f64;
+            let scale = (variance + eps as f64).sqrt().recip();
+            for i in 0..width {
+                output[i] = ((input[i] as f64 - mean) * scale * weight[i] as f64
+                    + bias.map_or(0., |b| b[i]) as f64) as f32;
+            }
+            continue;
+        }
+        let mean = 0.;
         let variance = input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / width as f32;
         let scale = (variance + eps).sqrt().recip();
         for i in 0..width {

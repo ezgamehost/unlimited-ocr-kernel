@@ -80,11 +80,116 @@ fn compare(name: &str, actual: &[f32], expected: &[f32]) {
         / actual.len() as f32)
         .sqrt();
     eprintln!("vision {name}: max_abs={max}, rms={rms}");
+    for (i, (a, b)) in actual
+        .iter()
+        .zip(expected)
+        .enumerate()
+        .filter(|(_, (a, b))| (*a - *b).abs() > 1e-4 + 1e-4 * b.abs())
+        .take(12)
+    {
+        eprintln!("mismatch {name} index={i} actual={a} expected={b}");
+    }
+
     assert!(
         actual
             .iter()
             .zip(expected)
             .all(|(a, b)| (a - b).abs() <= 1e-4 + 1e-4 * b.abs()),
         "{name}: max={max}"
+    );
+}
+
+#[test]
+#[ignore = "requires English multi-crop upstream vision export"]
+fn original_gundam_pixels_and_embeddings_match_rust() {
+    use uocr::preprocess::{ImageMode, prepare};
+    let image = prepare(
+        Path::new("benchmarks/corpus/english.png"),
+        ImageMode::Gundam,
+    )
+    .unwrap();
+    let directory = Path::new("artifacts/reference-english-gundam-f32");
+    let metadata: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(directory.join("metadata.json")).unwrap()).unwrap();
+    assert_eq!(
+        image.grid,
+        [
+            metadata["crop_grid"][0].as_u64().unwrap() as usize,
+            metadata["crop_grid"][1].as_u64().unwrap() as usize
+        ]
+    );
+    assert_eq!(
+        image.image_tokens(),
+        metadata["image_tokens"].as_u64().unwrap() as usize
+    );
+    let inputs = Checkpoint::open(&directory.join("preprocess.safetensors")).unwrap();
+    for (name, tensor) in std::iter::once(("global".to_string(), &image.global)).chain(
+        image
+            .crops
+            .iter()
+            .enumerate()
+            .map(|(i, t)| (format!("crop.{i}"), t)),
+    ) {
+        let expected = inputs.tensor(&name).unwrap().to_f32();
+        let pixels = tensor.shape[1] * tensor.shape[2];
+        for p in 0..pixels {
+            for c in 0..3 {
+                assert_eq!(
+                    tensor.data[3 * p + c],
+                    expected[c * pixels + p],
+                    "{name} pixel {p} channel {c}"
+                );
+            }
+        }
+    }
+    let weights = Checkpoint::open(Path::new(
+        "artifacts/upstream/model-00001-of-000001.safetensors",
+    ))
+    .unwrap();
+    let model = Vision::new(&weights).unwrap();
+    let mut cpu = CpuContext::new(Backend::Auto, 10, 1 << 30).unwrap();
+    let actual = model.encode(&image, &mut cpu).unwrap();
+    let reference = Checkpoint::open(&directory.join("vision.safetensors")).unwrap();
+    compare(
+        "gundam merged",
+        &actual.data,
+        &reference.tensor("image_embeddings").unwrap().to_f32(),
+    );
+}
+
+#[test]
+#[ignore = "requires English multi-crop upstream vision export"]
+fn original_english_global_stages_match_rust() {
+    let image = uocr::preprocess::prepare(
+        Path::new("benchmarks/corpus/english.png"),
+        uocr::preprocess::ImageMode::Base,
+    )
+    .unwrap();
+    let weights = Checkpoint::open(Path::new(
+        "artifacts/upstream/model-00001-of-000001.safetensors",
+    ))
+    .unwrap();
+    let model = Vision::new(&weights).unwrap();
+    let reference = Checkpoint::open(Path::new(
+        "artifacts/reference-english-gundam-f32/vision.safetensors",
+    ))
+    .unwrap();
+    let mut cpu = CpuContext::new(Backend::Auto, 10, 1 << 30).unwrap();
+    let (sam, clip, projected) = model.encode_view_debug(&image.global, &mut cpu).unwrap();
+    let expected = reference.tensor("global.sam").unwrap().to_f32();
+    let expected_hwc: Vec<f32> = (0..256)
+        .flat_map(|p| (0..1024).map(move |c| (p, c)))
+        .map(|(p, c)| expected[c * 256 + p])
+        .collect();
+    compare("english sam", &sam.data, &expected_hwc);
+    compare(
+        "english clip",
+        &clip.data,
+        &reference.tensor("global.clip").unwrap().to_f32(),
+    );
+    compare(
+        "english projected",
+        &projected.data,
+        &reference.tensor("global.projected").unwrap().to_f32(),
     );
 }

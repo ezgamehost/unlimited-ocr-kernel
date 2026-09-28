@@ -1,0 +1,12 @@
+width=196 backend=Scalar seconds=0.047093
+width=196 backend=Auto seconds=0.013867
+width=196 backend=Scalar seconds=0.035417
+width=196 backend=Auto seconds=0.012702
+width=196 backend=Scalar seconds=0.034592
+width=196 backend=Auto seconds=0.012747
+width=4096 backend=Scalar seconds=0.034648
+width=4096 backend=Auto seconds=0.011614
+width=4096 backend=Scalar seconds=0.034150
+width=4096 backend=Auto seconds=0.011459
+width=4096 backend=Scalar seconds=0.034364
+width=4096 backend=Auto seconds=0.011675

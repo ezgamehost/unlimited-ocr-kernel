@@ -46,3 +46,49 @@ pub(super) fn dot_bf16(weights: &[u8], x: &[f32]) -> f32 {
         sum
     }
 }
+
+/// Validate logits while reducing the maximum; negative infinity is a mask.
+#[cfg(target_arch = "aarch64")]
+pub(super) fn softmax_max(values: &[f32]) -> Option<f32> {
+    use std::arch::aarch64::*;
+    // SAFETY: AArch64 supplies NEON and each load stays inside a full chunk.
+    unsafe {
+        let mut maximum = vdupq_n_f32(f32::NEG_INFINITY);
+        let mut valid = vdupq_n_u32(u32::MAX);
+        let infinity = vdupq_n_f32(f32::INFINITY);
+        let (chunks, tail) = values.as_chunks::<4>();
+        for chunk in chunks {
+            let v = vld1q_f32(chunk.as_ptr());
+            valid = vandq_u32(
+                valid,
+                vandq_u32(vceqq_f32(v, v), vmvnq_u32(vceqq_f32(v, infinity))),
+            );
+            maximum = vmaxq_f32(maximum, v);
+        }
+        if vminvq_u32(valid) == 0 {
+            return None;
+        }
+        let mut maximum = vmaxvq_f32(maximum);
+        for &v in tail {
+            if v.is_nan() || v == f32::INFINITY {
+                return None;
+            }
+            maximum = maximum.max(v);
+        }
+        maximum.is_finite().then_some(maximum)
+    }
+}
+
+#[cfg(target_arch = "aarch64")]
+pub(super) fn sum(values: &[f32]) -> f32 {
+    use std::arch::aarch64::*;
+    // SAFETY: each load reads a complete four-float chunk of the input.
+    unsafe {
+        let mut sum = vdupq_n_f32(0.);
+        let (chunks, tail) = values.as_chunks::<4>();
+        for chunk in chunks {
+            sum = vaddq_f32(sum, vld1q_f32(chunk.as_ptr()));
+        }
+        vaddvq_f32(sum) + tail.iter().sum::<f32>()
+    }
+}

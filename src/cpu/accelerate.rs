@@ -4,6 +4,7 @@ use crate::error::{OcrError, Result};
 #[cfg(target_os = "macos")]
 #[link(name = "Accelerate", kind = "framework")]
 unsafe extern "C" {
+    fn vvexpf(y: *mut f32, x: *const f32, n: *const i32);
     fn cblas_sgemm(
         order: i32,
         trans_a: i32,
@@ -20,6 +21,16 @@ unsafe extern "C" {
         c: *mut f32,
         ldc: i32,
     );
+}
+
+#[cfg(target_os = "macos")]
+pub fn exp_in_place(values: &mut [f32]) {
+    for chunk in values.chunks_mut(i32::MAX as usize) {
+        let n = chunk.len() as i32;
+        // SAFETY: vForce permits in-place operation. Both pointers address n
+        // initialized floats in this exclusive slice, and n fits a C int.
+        unsafe { vvexpf(chunk.as_mut_ptr(), chunk.as_ptr(), &n) };
+    }
 }
 
 pub fn linear(x: &[f32], w: &[f32], y: &mut [f32], m: usize, n: usize, k: usize) -> Result<()> {

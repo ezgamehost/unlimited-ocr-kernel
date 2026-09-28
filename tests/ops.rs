@@ -97,3 +97,68 @@ fn causal_attention_excludes_future_values() {
     let y = ops::attention(&q, &k, &v, false, &mut cpu).unwrap();
     assert_eq!(y.data, [4., 6., 4., 6.]);
 }
+
+#[test]
+fn accelerated_softmax_matches_f64_oracle_for_masked_and_long_rows() {
+    for len in [1, 3, 17, 196, 4096] {
+        let input: Vec<f32> = (0..len)
+            .map(|i| {
+                if i % 7 == 3 {
+                    f32::NEG_INFINITY
+                } else {
+                    1000. + (i as f32 * 0.37).sin() * 30.
+                }
+            })
+            .collect();
+        let maximum = input.iter().copied().fold(f32::NEG_INFINITY, f32::max) as f64;
+        let exp: Vec<f64> = input.iter().map(|&x| (x as f64 - maximum).exp()).collect();
+        let sum: f64 = exp.iter().sum();
+        for backend in [Backend::Scalar, Backend::Auto] {
+            let mut row = input.clone();
+            ops::softmax_backend(&mut row, backend).unwrap();
+            for (actual, expected) in row.iter().zip(&exp) {
+                assert!((*actual as f64 - expected / sum).abs() < 2e-6);
+            }
+        }
+    }
+    for mut row in [
+        vec![],
+        vec![f32::NAN],
+        vec![f32::INFINITY],
+        vec![f32::NEG_INFINITY],
+    ] {
+        assert!(ops::softmax_backend(&mut row, Backend::Auto).is_err());
+    }
+}
+
+#[test]
+fn vector_softmax_rejects_invalid_values_in_every_lane_and_tail() {
+    for position in 0..19 {
+        for invalid in [f32::NAN, f32::INFINITY] {
+            let mut row = vec![0.; 19];
+            row[position] = invalid;
+            assert!(ops::softmax_backend(&mut row, Backend::Auto).is_err());
+        }
+    }
+    assert!(ops::softmax_backend(&mut [f32::NEG_INFINITY; 19], Backend::Auto).is_err());
+}
+
+#[test]
+fn layernorm_centers_nearly_constant_wide_rows() {
+    let width = 3072;
+    let data: Vec<f32> = (0..width)
+        .map(|i| if i % 2 == 0 { 1.0 } else { 1.0001 })
+        .collect();
+    let x = Tensor::new(vec![1, width], data).unwrap();
+    let y = ops::layer_norm(&x, &vec![1.; width], None, 1e-6).unwrap();
+    let mean = (1.0_f64 + 1.0001_f32 as f64) / 2.;
+    let deviation = 1.0001_f32 as f64 - mean;
+    let expected = deviation / (deviation * deviation + 1e-6_f32 as f64).sqrt();
+    for (i, &actual) in y.data.iter().enumerate() {
+        let expected = if i % 2 == 0 { -expected } else { expected };
+        assert!(
+            (actual as f64 - expected).abs() < 1e-6,
+            "{actual} versus {expected}"
+        );
+    }
+}

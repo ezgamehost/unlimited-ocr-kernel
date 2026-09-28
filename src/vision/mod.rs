@@ -112,15 +112,25 @@ impl Vision {
         Ok(self.encode_debug(image, cpu)?.2)
     }
 
+    /// Intermediate outputs for a single global view or local crop.
+    pub fn encode_view_debug(
+        &self,
+        image: &Tensor,
+        cpu: &mut CpuContext,
+    ) -> Result<(Tensor, Tensor, Tensor)> {
+        let sam = self.sam(image, cpu)?;
+        let clip = self.clip(&sam, cpu)?;
+        let projected = self.project(&sam, &clip, cpu)?;
+        Ok((sam, clip, projected))
+    }
+
     /// Diagnostic stage outputs support numerical audits and per-stage profiling.
     pub fn encode_debug(
         &self,
         image: &PreparedImage,
         cpu: &mut CpuContext,
     ) -> Result<(Tensor, Tensor, Tensor)> {
-        let sam = self.sam(&image.global, cpu)?;
-        let clip = self.clip(&sam, cpu)?;
-        let global = self.project(&sam, &clip, cpu)?;
+        let (sam, clip, global) = self.encode_view_debug(&image.global, cpu)?;
         let mut sequence = Vec::new();
         let [gx, gy] = image.grid;
         if !image.crops.is_empty() {
@@ -129,9 +139,7 @@ impl Vision {
             }
             let mut grid = vec![0.; gy * 10 * gx * 10 * 1280];
             for (index, crop) in image.crops.iter().enumerate() {
-                let sam = self.sam(crop, cpu)?;
-                let clip = self.clip(&sam, cpu)?;
-                let local = self.project(&sam, &clip, cpu)?;
+                let (_, _, local) = self.encode_view_debug(crop, cpu)?;
                 if local.shape != [100, 1280] {
                     return Err(OcrError::Shape("crop embedding shape".into()));
                 }
