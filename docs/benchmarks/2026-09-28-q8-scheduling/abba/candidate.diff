@@ -1,0 +1,13 @@
+diff --git a/src/cpu/quantized.rs b/src/cpu/quantized.rs
+index 25ac610..abc660c 100644
+--- a/src/cpu/quantized.rs
++++ b/src/cpu/quantized.rs
+@@ -228,7 +228,7 @@ impl Int8Matrix {
+         } else {
+             cpu.pool.install(|| {
+                 data.par_chunks_mut(4)
+-                    .with_min_len(self.rows.div_ceil(4).div_ceil(cpu.threads()))
++                    .with_min_len(self.rows.div_ceil(4).div_ceil(cpu.threads()).div_ceil(4))
+                     .enumerate()
+                     .for_each(compute_group)
+             });

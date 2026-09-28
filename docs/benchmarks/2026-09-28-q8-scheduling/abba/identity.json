@@ -1,0 +1,17 @@
+{
+  "binaries": {
+    "baseline": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/q8-scheduling/baseline",
+      "sha256": "3f1f59322ba6f224ad2b8190aa1a10593b0ca4ac3917db9757fd010c9a86ea08",
+      "source_sha256": "c4e297680cffc01d62ba5c5650ca323fab77b6a157d913648527e94c774c3bb1"
+    },
+    "fine": {
+      "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/q8-scheduling/fine",
+      "sha256": "48c1263f2a01a8cf03e8455b430f8e459af42f8d04eeaeb6763926cbb7241095",
+      "source_sha256": "b32af8d4aaa14a0235dd43914dc1d835885a05eb23da95387ce7835c034a5012"
+    }
+  },
+  "overlay": "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+  "overlay_sha256": "6981387fed4849dca9a713a717e9b54c04344adbaeff05410528773912e287ae",
+  "source_commit": "9387d0f7a3d9eb0d55b2f256bfd2eaf0e32b73dd"
+}

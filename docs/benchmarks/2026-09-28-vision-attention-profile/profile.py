@@ -1,4 +1,4 @@
-"""Capture warmed vision stacks only after the powered comparison is audited."""
+"""Capture warmed vision or decode stacks after an audited comparison."""
 import argparse
 import json
 from pathlib import Path
@@ -15,6 +15,7 @@ def main():
     parser.add_argument('--comparison', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--quality', type=Path, help='Exact 12-case quality proof for a newer binary')
+    parser.add_argument('--stage', choices=['vision', 'decode'], default='vision')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('output exists; preserve previous captures')
@@ -36,7 +37,8 @@ def main():
         assert not quality_process['resources']['forced_kill']
         expected_binary = quality_process['binary_sha256']
     assert sha256(Path(command[0])) == expected_binary
-    request_path = next(baseline.glob('*-english.request.json'))
+    page = 'dense' if args.stage == 'decode' else 'english'
+    request_path = next(baseline.glob(f'*-{page}.request.json'))
     request = json.loads(request_path.read_text())
     if quality_process:
         assert any(case['image'] == request['image'] and case['prompt'] == request['prompt']
@@ -46,7 +48,8 @@ def main():
     save(args.output / 'request.json', request)
     metadata = dict(command=command, binary_sha256=expected_binary, quality_process=quality_process,
                     comparison=str(args.comparison.resolve()), power=power,
-                    sampling_delay_seconds=0.2, sampling_duration_seconds=5,
+                    stage=args.stage, sampling_delay_seconds=0.2,
+                    sampling_duration_seconds=3 if args.stage == 'decode' else 5,
                     note='Profile overhead included. Inspect stacks for stage attribution; aggregate thread samples are not wall-time percentages.')
     child = None
     failure = None
@@ -80,7 +83,7 @@ def main():
                 if label == 'profiled':
                     time.sleep(metadata['sampling_delay_seconds'])
                     metadata['sample_start_after_request_seconds'] = time.monotonic() - started
-                    capture = subprocess.run(['sample', str(child.pid), '5', '1', '-file',
+                    capture = subprocess.run(['sample', str(child.pid), str(metadata['sampling_duration_seconds']), '1', '-file',
                                               str((args.output / 'sample.txt').resolve())],
                                              capture_output=True, timeout=30)
                     metadata['sample_end_after_request_seconds'] = time.monotonic() - started
@@ -95,6 +98,8 @@ def main():
                 result = response['result']
                 assert result['finish_reason'] == 'eos'
                 assert result['text'] == expected['text'] and result['token_ids'] == expected['token_ids']
+                if label == 'warmup' and args.stage == 'decode':
+                    metadata['sampling_delay_seconds'] = result['timings']['first_token_seconds'] + 0.15
                 print(json.dumps(dict(event=label, timings=result['timings'])), flush=True)
         except BaseException as error:
             failure = f'{type(error).__name__}: {error}'
