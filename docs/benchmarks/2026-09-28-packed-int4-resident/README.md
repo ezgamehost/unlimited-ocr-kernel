@@ -1,5 +1,9 @@
 # Full-page pilot catches an INT4 prompt sensitivity
 
+The latest comparison, including SAM tiles and parallel normalization, is
+complete in [`powered-abba-2`](powered-abba-2/README.md): 96 audited requests,
+with Rust median complete-page speed ratios of 1.26–1.44 versus llama.cpp Q8_0.
+
 The subsequent packed Q4-body/Q8-head comparison is now complete in
 [`powered-abba-1`](powered-abba-1/README.md): 96 audited requests, with Rust
 median complete-page speed ratios of 1.12–1.23 versus llama.cpp Q8_0. The pure-Q4
@@ -93,7 +97,7 @@ phase. It also requires a new `--output-root` directory and records initial and
 per-phase power status. The actual 1%-battery preflight was checked: it refused
 before creating the output directory; an existing output directory was also
 rejected. No model was loaded by either check. For a newer executable, pass its
-completed `--quality-proof`: all12 canonical cases must retain exact text,
+completed `--quality-proof`: all 12 canonical cases must retain exact text,
 tokens, EOS and image-token counts; the proof must have a normal process exit
 and match the executable hash and overlay manifest. Proof hashes are recorded
 with the benchmark identity. This replaces the old stale fixed-work-file

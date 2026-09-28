@@ -1,0 +1,30 @@
+{
+  "chinese": {
+    "wall_seconds": 9.32219547900604,
+    "vision_seconds": 5.730808583,
+    "prefill_seconds": 1.598384792,
+    "decode_seconds": 1.8473160569999991,
+    "median_vision_fraction": 0.6154470254416435
+  },
+  "dense": {
+    "wall_seconds": 12.491829457998392,
+    "vision_seconds": 5.7862686665,
+    "prefill_seconds": 1.5963276249999998,
+    "decode_seconds": 4.9204750015,
+    "median_vision_fraction": 0.46371266481027396
+  },
+  "english": {
+    "wall_seconds": 9.077655228989897,
+    "vision_seconds": 5.753562333,
+    "prefill_seconds": 1.5940161045,
+    "decode_seconds": 1.6000297939999986,
+    "median_vision_fraction": 0.6331190773072941
+  },
+  "table": {
+    "wall_seconds": 9.030164854004397,
+    "vision_seconds": 5.7156956045,
+    "prefill_seconds": 1.5915524795,
+    "decode_seconds": 1.5873587749999998,
+    "median_vision_fraction": 0.6333300582370225
+  }
+}

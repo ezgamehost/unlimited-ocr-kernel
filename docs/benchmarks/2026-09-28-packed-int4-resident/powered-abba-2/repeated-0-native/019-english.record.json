@@ -1,0 +1,27 @@
+{
+  "image_id": "english",
+  "iteration": 3,
+  "warmup": false,
+  "index": 19,
+  "image_sha256": "075d7f9e29f19be003c3a903e51bd2bcc2afabbaabcc629d8ad6d542ee7a1c9c",
+  "status": "ok",
+  "finish_reason": "eos",
+  "first_token_seconds": 7.445181584,
+  "precision": "int4_body_int8_head_dynamic_int8_activations",
+  "decode_seconds": 1.6012324579999995,
+  "decode_steps": 250,
+  "vision_seconds": 5.742388167,
+  "prefill_seconds": 1.587416584,
+  "wall_seconds": 9.067522375000408,
+  "emitted_tokens": 250,
+  "timings": {
+    "decode_seconds": 1.6012324579999995,
+    "decode_steps": 250,
+    "first_token_seconds": 7.445181584,
+    "prefill_seconds": 1.587416584,
+    "preprocess_seconds": 0.115295,
+    "total_seconds": 9.067390459,
+    "vision_seconds": 5.742388167
+  },
+  "cer": 0.0
+}

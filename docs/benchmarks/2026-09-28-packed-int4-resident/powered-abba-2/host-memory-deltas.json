@@ -1,0 +1,12 @@
+{
+  "interval_seconds": 1189.510407,
+  "deltas": {
+    "Pageins": 967333,
+    "Pageouts": 24743,
+    "Swapins": 2206,
+    "Swapouts": 0,
+    "Compressions": 4266413,
+    "Decompressions": 4080038
+  },
+  "note": "Host-wide counters; not child attribution. Start snapshot was taken after native startup."
+}

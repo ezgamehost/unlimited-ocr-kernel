@@ -9,7 +9,10 @@ competitor, not a runtime dependency.
 
 This is an active performance project. Portable scalar fallbacks exist, but
 other CPU platforms have not received equivalent optimization or benchmarking.
-The current pilots do not establish an overall win against llama.cpp.
+On the four primary synthetic pages, the latest repeated resident comparison
+measures a **1.26–1.44× median full-page speedup over llama.cpp** with the hybrid
+Q4/Q8-head decoder. Standalone token decoding remains slower. See the
+[full-page results and limits](docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-2/README.md).
 
 ## Build and run
 
@@ -103,8 +106,18 @@ The decoder body uses signed packed block32 weights with FP32 scales and ARM
 SDOT under runtime feature detection, plus a portable fallback. The original
 checkpoint is still required for unquantized tensors. This hybrid matches its
 simulation exactly on twelve prompt/page cases, all at zero character error.
-Broader quality validation and repeated full-page performance acceptance remain
-pending; see the [hybrid evidence](docs/benchmarks/2026-09-28-hybrid-int4/README.md).
+The accepted vision optimizations preserve those exact outputs. A 96-request
+resident comparison is complete: Rust median page times are 9.03–9.32s on the
+shorter pages and 12.49s on dense, versus llama's 12.94–13.26s and 15.69s. Rust
+has zero character errors on all four pages; llama has one table character
+error. Peak process RSS is 5.05–5.06GB versus 9.29–9.80GB. These systems use
+different precision and policies; broader quality and fresh-process validation
+remain pending. See [full-page evidence](docs/benchmarks/2026-09-28-packed-int4-resident/powered-abba-2/README.md)
+and [hybrid format evidence](docs/benchmarks/2026-09-28-hybrid-int4/README.md).
+
+For the measured eight-worker setup, set `VECLIB_MAXIMUM_THREADS=8` and
+`OMP_NUM_THREADS=8` in the environment before starting the process, alongside
+`--threads 8`. CLI worker count alone does not cap Accelerate's threads.
 
 All-Q4 export with `--int4` remains available. It passes the eight original-prompt
 pages but returns an empty table with the extra newline used in the llama.cpp
