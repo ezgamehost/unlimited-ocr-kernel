@@ -1,0 +1,13 @@
+torch.float64 layer 0
+torch.float64 layer 1
+torch.float64 layer 2
+torch.float64 layer 3
+torch.float64 layer 4
+torch.float64 layer 5
+torch.float64 layer 6
+torch.float64 layer 7
+torch.float64 layer 8
+torch.float64 layer 9
+torch.float64 layer 10
+torch.float64 layer 11
+FP64 one versus ten threads: {'max_abs': 1.2789769243681803e-13, 'rms': 2.5289635862147896e-14, 'outside': 0}

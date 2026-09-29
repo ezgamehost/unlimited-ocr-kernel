@@ -1,0 +1,203 @@
+torch.float32 layer 0
+torch.float32 layer 1
+torch.float32 layer 2
+torch.float32 layer 3
+torch.float32 layer 4
+torch.float32 layer 5
+torch.float32 layer 6
+torch.float32 layer 7
+torch.float32 layer 8
+torch.float32 layer 9
+torch.float32 layer 10
+torch.float32 layer 11
+FP32 graph exactly matches every upstream hidden state, route and logit
+torch.float64 layer 0
+torch.float64 layer 1
+torch.float64 layer 2
+torch.float64 layer 3
+torch.float64 layer 4
+torch.float64 layer 5
+torch.float64 layer 6
+torch.float64 layer 7
+torch.float64 layer 8
+torch.float64 layer 9
+torch.float64 layer 10
+torch.float64 layer 11
+{
+  "fp32_validation": "bitwise exact, all exported tensors",
+  "reference_vs_fp64": {
+    "max_abs": 0.00010865058700537666,
+    "rms": 2.190087851077824e-05,
+    "outside": 0
+  },
+  "native_vs_fp64": {
+    "max_abs": 0.0001720910271245657,
+    "rms": 4.424074133221517e-05,
+    "outside": 63
+  },
+  "layers": {
+    "0": {
+      "reference": {
+        "max_abs": 4.2541581180000065e-07,
+        "rms": 9.551690412655443e-08,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 4.3442088597522854e-06,
+        "rms": 3.448391264661152e-07,
+        "outside": 0
+      }
+    },
+    "1": {
+      "reference": {
+        "max_abs": 5.783456173968915e-07,
+        "rms": 1.2937562816660908e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 2.521095910923421e-06,
+        "rms": 3.750809827285716e-07,
+        "outside": 0
+      }
+    },
+    "2": {
+      "reference": {
+        "max_abs": 1.1165578099880946e-06,
+        "rms": 1.3191541957245267e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 1.7295560611474414e-06,
+        "rms": 3.208088725020455e-07,
+        "outside": 0
+      }
+    },
+    "3": {
+      "reference": {
+        "max_abs": 5.605294897612079e-07,
+        "rms": 1.4078131247382617e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 1.929820461432641e-06,
+        "rms": 3.2203004065533046e-07,
+        "outside": 0
+      }
+    },
+    "4": {
+      "reference": {
+        "max_abs": 6.974831910436241e-07,
+        "rms": 2.18641692010712e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 1.8149351190821505e-06,
+        "rms": 3.5554864153714226e-07,
+        "outside": 0
+      }
+    },
+    "5": {
+      "reference": {
+        "max_abs": 1.0064064621950752e-06,
+        "rms": 3.201165986912332e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 1.8037123963310364e-06,
+        "rms": 4.6460041939788854e-07,
+        "outside": 0
+      }
+    },
+    "6": {
+      "reference": {
+        "max_abs": 2.1272444326037032e-06,
+        "rms": 4.281503486515644e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 1.8813514883753157e-06,
+        "rms": 5.662124352392607e-07,
+        "outside": 0
+      }
+    },
+    "7": {
+      "reference": {
+        "max_abs": 1.91453870701519e-06,
+        "rms": 6.006540616243523e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 4.101978012149843e-06,
+        "rms": 8.504706761563503e-07,
+        "outside": 0
+      }
+    },
+    "8": {
+      "reference": {
+        "max_abs": 3.2225480464387335e-06,
+        "rms": 8.434956477604269e-07,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 4.053029029060795e-06,
+        "rms": 1.1639905114930604e-06,
+        "outside": 0
+      }
+    },
+    "9": {
+      "reference": {
+        "max_abs": 4.383386242923226e-06,
+        "rms": 1.1298947720208318e-06,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 5.556280257557056e-06,
+        "rms": 1.66685610265236e-06,
+        "outside": 0
+      }
+    },
+    "10": {
+      "reference": {
+        "max_abs": 1.025583698588406e-05,
+        "rms": 1.5559234550576985e-06,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 7.590165758381007e-06,
+        "rms": 2.193371244124898e-06,
+        "outside": 0
+      }
+    },
+    "11": {
+      "reference": {
+        "max_abs": 7.77293686327063e-06,
+        "rms": 2.1420576835453924e-06,
+        "outside": 0
+      },
+      "native": {
+        "max_abs": 4.1842615209120027e-05,
+        "rms": 3.6110633835097684e-06,
+        "outside": 0
+      }
+    }
+  },
+  "routes_changed": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0
+  },
+  "sha256": {
+    "artifacts/reference-thread-sensitivity/prefill-threads-10.safetensors": "598cf7141ad470c9bd501768781aacfdeb329ca134cd0c61cc6b702b10a81efd",
+    "artifacts/reference-thread-sensitivity/native-prefill.json": "b8b8a14a08cbfe615a24c70d994a632fe4b172b604e182e0e89a1f0c56070ee7",
+    "artifacts/upstream/model-00001-of-000001.safetensors": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-fp64-prefill-oracle/probe.py": "92429f1bb698669f154b2d5b37834c92bb8b5cd0343addee610a3e33090ff687"
+  }
+}

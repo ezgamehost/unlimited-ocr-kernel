@@ -1,0 +1,127 @@
+{
+  "layer.0.hidden": {
+    "max_abs": 2.7755575615628914e-17,
+    "rms": 7.641517386530311e-20,
+    "outside": 0
+  },
+  "layer.1.expert_weights": {
+    "max_abs": 5.551115123125783e-17,
+    "rms": 3.988506880356562e-18,
+    "outside": 0
+  },
+  "layer.1.hidden": {
+    "max_abs": 4.440892098500626e-16,
+    "rms": 1.2718678305701513e-17,
+    "outside": 0
+  },
+  "layer.2.expert_weights": {
+    "max_abs": 7.771561172376096e-16,
+    "rms": 7.23457005938595e-17,
+    "outside": 0
+  },
+  "layer.2.hidden": {
+    "max_abs": 8.881784197001252e-15,
+    "rms": 6.968746255531303e-17,
+    "outside": 0
+  },
+  "layer.3.expert_weights": {
+    "max_abs": 1.887379141862766e-15,
+    "rms": 1.213999175737597e-16,
+    "outside": 0
+  },
+  "layer.3.hidden": {
+    "max_abs": 7.105427357601002e-15,
+    "rms": 1.1874893975732003e-16,
+    "outside": 0
+  },
+  "layer.4.expert_weights": {
+    "max_abs": 1.5543122344752192e-15,
+    "rms": 1.18832028353981e-16,
+    "outside": 0
+  },
+  "layer.4.hidden": {
+    "max_abs": 7.105427357601002e-15,
+    "rms": 1.683272482588788e-16,
+    "outside": 0
+  },
+  "layer.5.expert_weights": {
+    "max_abs": 1.6653345369377348e-15,
+    "rms": 1.232502323636335e-16,
+    "outside": 0
+  },
+  "layer.5.hidden": {
+    "max_abs": 4.263256414560601e-14,
+    "rms": 2.3267229795164493e-16,
+    "outside": 0
+  },
+  "layer.6.expert_weights": {
+    "max_abs": 2.6645352591003757e-15,
+    "rms": 1.5734096055947628e-16,
+    "outside": 0
+  },
+  "layer.6.hidden": {
+    "max_abs": 1.4210854715202004e-14,
+    "rms": 2.865867832391445e-16,
+    "outside": 0
+  },
+  "layer.7.expert_weights": {
+    "max_abs": 2.1094237467877974e-15,
+    "rms": 1.4694239113988006e-16,
+    "outside": 0
+  },
+  "layer.7.hidden": {
+    "max_abs": 2.842170943040401e-14,
+    "rms": 3.9901473522557077e-16,
+    "outside": 0
+  },
+  "layer.8.expert_weights": {
+    "max_abs": 2.3314683517128287e-15,
+    "rms": 1.5174420051515007e-16,
+    "outside": 0
+  },
+  "layer.8.hidden": {
+    "max_abs": 7.815970093361102e-14,
+    "rms": 7.411016718049202e-16,
+    "outside": 0
+  },
+  "layer.9.expert_weights": {
+    "max_abs": 5.440092820663267e-15,
+    "rms": 2.4216799003464373e-16,
+    "outside": 0
+  },
+  "layer.9.hidden": {
+    "max_abs": 7.815970093361102e-14,
+    "rms": 8.327654007387549e-16,
+    "outside": 0
+  },
+  "layer.10.expert_weights": {
+    "max_abs": 2.886579864025407e-15,
+    "rms": 1.612982273998118e-16,
+    "outside": 0
+  },
+  "layer.10.hidden": {
+    "max_abs": 7.815970093361102e-14,
+    "rms": 9.119801099034812e-16,
+    "outside": 0
+  },
+  "layer.11.expert_weights": {
+    "max_abs": 2.7200464103316335e-15,
+    "rms": 1.7510002360908471e-16,
+    "outside": 0
+  },
+  "layer.11.hidden": {
+    "max_abs": 7.815970093361102e-14,
+    "rms": 1.0103434995423825e-15,
+    "outside": 0
+  },
+  "logits": {
+    "max_abs": 1.2789769243681803e-13,
+    "rms": 2.5289635862147896e-14,
+    "outside": 0
+  },
+  "sha256": {
+    "artifacts/fp64-prefill-oracle/prefill.safetensors": "f1d4d777e4d72ef688fe6c95847c7c790bb476081d3315ad8d74964b4a03c8e1",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-fp64-prefill-oracle/stability.py": "09aa5db8b159669b47a957a11f372747e94145add79f4dba91c2fa0a8f7649b0",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-fp64-prefill-oracle/probe.py": "92429f1bb698669f154b2d5b37834c92bb8b5cd0343addee610a3e33090ff687"
+  }
+}
