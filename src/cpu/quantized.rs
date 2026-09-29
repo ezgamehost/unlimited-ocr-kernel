@@ -50,13 +50,24 @@ impl Int8Matrix {
                 "quantization expects a nonempty matrix".into(),
             ));
         }
-        if matrix.data.iter().any(|v| !v.is_finite()) {
+        Self::quantize_rows(&matrix.data, matrix.shape[1])
+    }
+
+    pub(super) fn quantize_row(values: &[f32]) -> Result<Self> {
+        Self::quantize_rows(values, values.len())
+    }
+
+    fn quantize_rows(values: &[f32], cols: usize) -> Result<Self> {
+        if cols == 0 || values.is_empty() || !values.len().is_multiple_of(cols) {
+            return Err(OcrError::Shape("quantization row storage".into()));
+        }
+        if values.iter().any(|v| !v.is_finite()) {
             return Err(OcrError::Numerical("nonfinite quantization input".into()));
         }
-        let (rows, cols) = (matrix.shape[0], matrix.shape[1]);
-        let mut weights = Vec::with_capacity(matrix.data.len());
+        let rows = values.len() / cols;
+        let mut weights = Vec::with_capacity(values.len());
         let mut scales = Vec::with_capacity(rows * cols.div_ceil(BLOCK));
-        for row in matrix.data.chunks_exact(cols) {
+        for row in values.chunks_exact(cols) {
             for block in row.chunks(BLOCK) {
                 #[cfg(target_arch = "aarch64")]
                 if block.len() == BLOCK {
@@ -172,12 +183,11 @@ impl Int8Matrix {
         }
         let scratch = self
             .cols
-            .checked_mul(2)
-            .and_then(|n| n.checked_add(self.rows))
+            .checked_add(self.rows)
             .and_then(|n| n.checked_add(self.cols.div_ceil(BLOCK)))
             .ok_or_else(|| OcrError::Resource("dynamic INT8 scratch overflow".into()))?;
         cpu.check_elements(scratch)?;
-        let activation = Self::quantize(&Tensor::new(vec![1, self.cols], x.data.clone())?)?;
+        let activation = Self::quantize_row(&x.data)?;
         let blocks = self.cols.div_ceil(BLOCK);
         #[cfg(target_arch = "aarch64")]
         let dotprod =

@@ -1,0 +1,105 @@
+diff --git a/src/cpu/int4.rs b/src/cpu/int4.rs
+index ca88f08..a18a30e 100644
+--- a/src/cpu/int4.rs
++++ b/src/cpu/int4.rs
+@@ -170,12 +170,11 @@ impl Int4Matrix {
+         }
+         let scratch = self
+             .cols
+-            .checked_mul(2)
+-            .and_then(|n| n.checked_add(self.rows))
++            .checked_add(self.rows)
+             .and_then(|n| n.checked_add(self.blocks))
+             .ok_or_else(|| OcrError::Resource("dynamic INT4 scratch overflow".into()))?;
+         cpu.check_elements(scratch)?;
+-        let activation = Int8Matrix::quantize(&Tensor::new(vec![1, self.cols], x.data.clone())?)?;
++        let activation = Int8Matrix::quantize_row(&x.data)?;
+         let (codes, scales) = activation.parts();
+         // Match the simulation backend's accumulation identity, including
+         // signed zero: Iterator::sum uses -0, while SDOT starts with +0.
+diff --git a/src/cpu/quantized.rs b/src/cpu/quantized.rs
+index a5cf025..eebd15f 100644
+--- a/src/cpu/quantized.rs
++++ b/src/cpu/quantized.rs
+@@ -50,13 +50,24 @@ impl Int8Matrix {
+                 "quantization expects a nonempty matrix".into(),
+             ));
+         }
+-        if matrix.data.iter().any(|v| !v.is_finite()) {
++        Self::quantize_rows(&matrix.data, matrix.shape[1])
++    }
++
++    pub(super) fn quantize_row(values: &[f32]) -> Result<Self> {
++        Self::quantize_rows(values, values.len())
++    }
++
++    fn quantize_rows(values: &[f32], cols: usize) -> Result<Self> {
++        if cols == 0 || values.is_empty() || !values.len().is_multiple_of(cols) {
++            return Err(OcrError::Shape("quantization row storage".into()));
++        }
++        if values.iter().any(|v| !v.is_finite()) {
+             return Err(OcrError::Numerical("nonfinite quantization input".into()));
+         }
+-        let (rows, cols) = (matrix.shape[0], matrix.shape[1]);
+-        let mut weights = Vec::with_capacity(matrix.data.len());
++        let rows = values.len() / cols;
++        let mut weights = Vec::with_capacity(values.len());
+         let mut scales = Vec::with_capacity(rows * cols.div_ceil(BLOCK));
+-        for row in matrix.data.chunks_exact(cols) {
++        for row in values.chunks_exact(cols) {
+             for block in row.chunks(BLOCK) {
+                 #[cfg(target_arch = "aarch64")]
+                 if block.len() == BLOCK {
+@@ -172,12 +183,11 @@ impl Int8Matrix {
+         }
+         let scratch = self
+             .cols
+-            .checked_mul(2)
+-            .and_then(|n| n.checked_add(self.rows))
++            .checked_add(self.rows)
+             .and_then(|n| n.checked_add(self.cols.div_ceil(BLOCK)))
+             .ok_or_else(|| OcrError::Resource("dynamic INT8 scratch overflow".into()))?;
+         cpu.check_elements(scratch)?;
+-        let activation = Self::quantize(&Tensor::new(vec![1, self.cols], x.data.clone())?)?;
++        let activation = Self::quantize_row(&x.data)?;
+         let blocks = self.cols.div_ceil(BLOCK);
+         #[cfg(target_arch = "aarch64")]
+         let dotprod =
+diff --git a/tests/int4.rs b/tests/int4.rs
+index 87ad5fa..792dc7f 100644
+--- a/tests/int4.rs
++++ b/tests/int4.rs
+@@ -7,6 +7,33 @@ fn bits(values: &[f32]) -> Vec<u32> {
+     values.iter().map(|v| v.to_bits()).collect()
+ }
+ 
++#[test]
++fn dynamic_projections_fit_without_activation_clone_scratch() {
++    let (rows, cols) = (9, 33);
++    let weights = Tensor::new(vec![rows, cols], vec![0.5; rows * cols]).unwrap();
++    let q8 = Int8Matrix::quantize(&weights).unwrap();
++    let mut packed = vec![0; rows * 32];
++    for row in 0..rows {
++        packed[row * 32..row * 32 + 16].fill(0x11);
++        packed[row * 32 + 16] = 1;
++    }
++    let q4 = Int4Matrix::from_parts(rows, cols, packed, vec![0.5; rows * 2]).unwrap();
++    for shape in [vec![cols], vec![1, cols], vec![1, 1, cols]] {
++        let x = Tensor::new(shape, vec![0.25; cols]).unwrap();
++        let budget = (cols + rows + cols.div_ceil(32)) * 4;
++        let mut small = CpuContext::new(Backend::Auto, 1, budget).unwrap();
++        let mut large = CpuContext::new(Backend::Auto, 1, 1 << 20).unwrap();
++        assert_eq!(
++            bits(&q8.linear_dynamic_int8(&x, &mut small).unwrap().data),
++            bits(&q8.linear_dynamic_int8(&x, &mut large).unwrap().data)
++        );
++        assert_eq!(
++            bits(&q4.linear_dynamic_int8(&x, &mut small).unwrap().data),
++            bits(&q4.linear_dynamic_int8(&x, &mut large).unwrap().data)
++        );
++    }
++}
++
+ #[test]
+ fn literal_nibbles_and_invalid_storage() {
+     let mut bytes = vec![0; 32];

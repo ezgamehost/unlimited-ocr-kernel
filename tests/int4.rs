@@ -8,6 +8,33 @@ fn bits(values: &[f32]) -> Vec<u32> {
 }
 
 #[test]
+fn dynamic_projections_fit_without_activation_clone_scratch() {
+    let (rows, cols) = (9, 33);
+    let weights = Tensor::new(vec![rows, cols], vec![0.5; rows * cols]).unwrap();
+    let q8 = Int8Matrix::quantize(&weights).unwrap();
+    let mut packed = vec![0; rows * 32];
+    for row in 0..rows {
+        packed[row * 32..row * 32 + 16].fill(0x11);
+        packed[row * 32 + 16] = 1;
+    }
+    let q4 = Int4Matrix::from_parts(rows, cols, packed, vec![0.5; rows * 2]).unwrap();
+    for shape in [vec![cols], vec![1, cols], vec![1, 1, cols]] {
+        let x = Tensor::new(shape, vec![0.25; cols]).unwrap();
+        let budget = (cols + rows + cols.div_ceil(32)) * 4;
+        let mut small = CpuContext::new(Backend::Auto, 1, budget).unwrap();
+        let mut large = CpuContext::new(Backend::Auto, 1, 1 << 20).unwrap();
+        assert_eq!(
+            bits(&q8.linear_dynamic_int8(&x, &mut small).unwrap().data),
+            bits(&q8.linear_dynamic_int8(&x, &mut large).unwrap().data)
+        );
+        assert_eq!(
+            bits(&q4.linear_dynamic_int8(&x, &mut small).unwrap().data),
+            bits(&q4.linear_dynamic_int8(&x, &mut large).unwrap().data)
+        );
+    }
+}
+
+#[test]
 fn literal_nibbles_and_invalid_storage() {
     let mut bytes = vec![0; 32];
     bytes[0] = 0x79;

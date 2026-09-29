@@ -170,12 +170,11 @@ impl Int4Matrix {
         }
         let scratch = self
             .cols
-            .checked_mul(2)
-            .and_then(|n| n.checked_add(self.rows))
+            .checked_add(self.rows)
             .and_then(|n| n.checked_add(self.blocks))
             .ok_or_else(|| OcrError::Resource("dynamic INT4 scratch overflow".into()))?;
         cpu.check_elements(scratch)?;
-        let activation = Int8Matrix::quantize(&Tensor::new(vec![1, self.cols], x.data.clone())?)?;
+        let activation = Int8Matrix::quantize_row(&x.data)?;
         let (codes, scales) = activation.parts();
         // Match the simulation backend's accumulation identity, including
         // signed zero: Iterator::sum uses -0, while SDOT starts with +0.

@@ -1,0 +1,25 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0599]: no associated function or constant named `quantize` found for struct `Int4Matrix` in the current scope
+  --> tests/int4.rs:15:26
+   |
+15 |     let q4 = Int4Matrix::quantize(&weights).unwrap();
+   |                          ^^^^^^^^ associated function or constant not found in `Int4Matrix`
+   |
+note: if you're trying to build a new `Int4Matrix`, consider using `Int4Matrix::from_parts` which returns `Result<Int4Matrix, OcrError>`
+  --> src/cpu/int4.rs:25:5
+   |
+25 | /     pub fn from_parts(
+26 | |         rows: usize,
+27 | |         cols: usize,
+28 | |         weights: Vec<u8>,
+29 | |         scales: Vec<f32>,
+30 | |     ) -> Result<Self> {
+   | |_____________________^
+help: there is a method `dequantize` with a similar name, but with different arguments
+  --> src/cpu/int4.rs:76:5
+   |
+76 |     pub fn dequantize(&self) -> Result<Tensor> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `uocr` (test "int4") due to 1 previous error
