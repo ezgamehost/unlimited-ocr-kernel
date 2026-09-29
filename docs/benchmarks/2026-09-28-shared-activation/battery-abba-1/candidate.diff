@@ -1,0 +1,248 @@
+diff --git a/src/cpu/int4.rs b/src/cpu/int4.rs
+index a18a30e..ed08748 100644
+--- a/src/cpu/int4.rs
++++ b/src/cpu/int4.rs
+@@ -1,7 +1,7 @@
+ //! Block32 signed INT4 weights: low sixteen codes, then high sixteen codes.
+ use super::{
+     Backend, CpuContext, ops,
+-    quantized::{BLOCK, Int8Matrix},
++    quantized::{BLOCK, QuantizedActivation},
+ };
+ use crate::{
+     error::{OcrError, Result},
+@@ -174,8 +174,26 @@ impl Int4Matrix {
+             .and_then(|n| n.checked_add(self.blocks))
+             .ok_or_else(|| OcrError::Resource("dynamic INT4 scratch overflow".into()))?;
+         cpu.check_elements(scratch)?;
+-        let activation = Int8Matrix::quantize_row(&x.data)?;
+-        let (codes, scales) = activation.parts();
++        let activation = QuantizedActivation::new(x)?;
++        self.linear_prepared(&activation, cpu)
++    }
++
++    /// Apply packed weights to an already quantized activation row.
++    pub fn linear_prepared(
++        &self,
++        prepared: &QuantizedActivation,
++        cpu: &mut CpuContext,
++    ) -> Result<Tensor> {
++        if prepared.width() != self.cols {
++            return Err(OcrError::Shape("prepared INT4 activation width".into()));
++        }
++        let scratch = self
++            .cols
++            .checked_add(self.rows)
++            .and_then(|n| n.checked_add(self.blocks))
++            .ok_or_else(|| OcrError::Resource("dynamic INT4 scratch overflow".into()))?;
++        cpu.check_elements(scratch)?;
++        let (codes, scales) = prepared.matrix.parts();
+         // Match the simulation backend's accumulation identity, including
+         // signed zero: Iterator::sum uses -0, while SDOT starts with +0.
+         let initial = -0.0f32;
+@@ -242,7 +260,7 @@ impl Int4Matrix {
+                     .for_each(compute)
+             });
+         }
+-        let mut shape = x.shape.clone();
++        let mut shape = vec![1; prepared.rank];
+         *shape.last_mut().unwrap() = self.rows;
+         Tensor::new(shape, data)
+     }
+diff --git a/src/cpu/quantized.rs b/src/cpu/quantized.rs
+index eebd15f..d81f4a8 100644
+--- a/src/cpu/quantized.rs
++++ b/src/cpu/quantized.rs
+@@ -8,6 +8,32 @@ use rayon::prelude::*;
+ 
+ pub const BLOCK: usize = 32;
+ 
++/// One quantized activation row, reusable across projections with the same input.
++pub struct QuantizedActivation {
++    pub(super) matrix: Int8Matrix,
++    pub(super) rank: usize,
++}
++
++impl QuantizedActivation {
++    pub fn new(input: &Tensor) -> Result<Self> {
++        input.validate()?;
++        if input.data.is_empty() || input.shape.last() != Some(&input.data.len()) {
++            return Err(OcrError::Shape(
++                "activation requires one nonempty row".into(),
++            ));
++        }
++        Ok(Self {
++            matrix: Int8Matrix::quantize_row(&input.data)?,
++            // A validated nonempty single row has only unit leading dimensions.
++            rank: input.shape.len(),
++        })
++    }
++
++    pub(super) fn width(&self) -> usize {
++        self.matrix.cols
++    }
++}
++
+ pub struct Int8Matrix {
+     rows: usize,
+     cols: usize,
+@@ -187,7 +213,26 @@ impl Int8Matrix {
+             .and_then(|n| n.checked_add(self.cols.div_ceil(BLOCK)))
+             .ok_or_else(|| OcrError::Resource("dynamic INT8 scratch overflow".into()))?;
+         cpu.check_elements(scratch)?;
+-        let activation = Self::quantize_row(&x.data)?;
++        let activation = QuantizedActivation::new(x)?;
++        self.linear_prepared(&activation, cpu)
++    }
++
++    /// Apply weights to an already quantized row without repeating quantization.
++    pub fn linear_prepared(
++        &self,
++        prepared: &QuantizedActivation,
++        cpu: &mut CpuContext,
++    ) -> Result<Tensor> {
++        if prepared.width() != self.cols {
++            return Err(OcrError::Shape("prepared INT8 activation width".into()));
++        }
++        let scratch = self
++            .cols
++            .checked_add(self.rows)
++            .and_then(|n| n.checked_add(self.cols.div_ceil(BLOCK)))
++            .ok_or_else(|| OcrError::Resource("dynamic INT8 scratch overflow".into()))?;
++        cpu.check_elements(scratch)?;
++        let activation = &prepared.matrix;
+         let blocks = self.cols.div_ceil(BLOCK);
+         #[cfg(target_arch = "aarch64")]
+         let dotprod =
+@@ -251,7 +296,7 @@ impl Int8Matrix {
+                     .for_each(compute_group)
+             });
+         }
+-        let mut shape = x.shape.clone();
++        let mut shape = vec![1; prepared.rank];
+         *shape.last_mut().unwrap() = self.rows;
+         Tensor::new(shape, data)
+     }
+@@ -290,6 +335,17 @@ pub enum QuantizedMatrix {
+     Int4(super::int4::Int4Matrix),
+ }
+ impl QuantizedMatrix {
++    pub fn linear_prepared(
++        &self,
++        activation: &QuantizedActivation,
++        cpu: &mut CpuContext,
++    ) -> Result<Tensor> {
++        match self {
++            Self::Int8(m) => m.linear_prepared(activation, cpu),
++            Self::Int4(m) => m.linear_prepared(activation, cpu),
++        }
++    }
++
+     pub fn linear(&self, x: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
+         match self {
+             Self::Int8(m) => m.linear(x, cpu),
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index 3bea5a1..d6d7125 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -144,19 +144,36 @@ impl<'a> Decoder<'a> {
+             && cpu.threads() >= 3
+             && scratch.is_some_and(|n| cpu.check_elements(n).is_ok())
+         {
++            let matrices = self.quantized.and_then(|(weights, mode)| {
++                if mode != crate::cpu::quantized::QuantizationMode::DynamicActivations {
++                    return None;
++                }
++                Some([
++                    weights.get(&names[0])?,
++                    weights.get(&names[1])?,
++                    weights.get(&names[2])?,
++                ])
++            });
++            let activation = matrices
++                .as_ref()
++                .map(|_| crate::cpu::quantized::QuantizedActivation::new(x))
++                .transpose()?;
++            let project = |index: usize, worker: &mut CpuContext| {
++                if let (Some(matrices), Some(activation)) = (matrices.as_ref(), activation.as_ref())
++                {
++                    matrices[index].linear_prepared(activation, worker)
++                } else {
++                    self.projection(x, &names[index], worker)
++                }
++            };
+             let mut q_cpu = cpu.serial_worker(3);
+             let mut k_cpu = cpu.serial_worker(3);
+             let mut v_cpu = cpu.serial_worker(3);
+             let pool = std::sync::Arc::clone(&cpu.pool);
+             let (q, (k, v)) = pool.install(|| {
+                 rayon::join(
+-                    || self.projection(x, &names[0], &mut q_cpu),
+-                    || {
+-                        rayon::join(
+-                            || self.projection(x, &names[1], &mut k_cpu),
+-                            || self.projection(x, &names[2], &mut v_cpu),
+-                        )
+-                    },
++                    || project(0, &mut q_cpu),
++                    || rayon::join(|| project(1, &mut k_cpu), || project(2, &mut v_cpu)),
+                 )
+             });
+             return Ok((q?, k?, v?));
+diff --git a/tests/int4.rs b/tests/int4.rs
+index 792dc7f..52bfee6 100644
+--- a/tests/int4.rs
++++ b/tests/int4.rs
+@@ -7,6 +7,52 @@ fn bits(values: &[f32]) -> Vec<u32> {
+     values.iter().map(|v| v.to_bits()).collect()
+ }
+ 
++#[test]
++fn prepared_activation_matches_dynamic_paths_and_rejects_wrong_width() {
++    use uocr::cpu::quantized::QuantizedActivation;
++    for cols in [1usize, 31, 32, 33, 1280] {
++        let rows = 9;
++        let blocks = cols.div_ceil(32);
++        let mut packed = vec![0; rows * blocks * 16];
++        for row in 0..rows {
++            for col in 0..cols {
++                packed[(row * blocks + col / 32) * 16 + col % 16] |=
++                    ((col % 7) as u8) << (4 * ((col % 32) / 16));
++            }
++        }
++        let q4 = Int4Matrix::from_parts(rows, cols, packed, vec![0.13; rows * blocks]).unwrap();
++        let q8 = Int8Matrix::quantize(&q4.dequantize().unwrap()).unwrap();
++        for shape in [vec![cols], vec![1, cols], vec![1, 1, cols]] {
++            let x =
++                Tensor::new(shape, (0..cols).map(|i| (i as f32 * 0.17).sin()).collect()).unwrap();
++            let ready = QuantizedActivation::new(&x).unwrap();
++            for backend in [Backend::Scalar, Backend::Auto] {
++                let mut cpu = CpuContext::new(backend, 3, 1 << 20).unwrap();
++                let a = q8.linear_dynamic_int8(&x, &mut cpu).unwrap();
++                let b = q8.linear_prepared(&ready, &mut cpu).unwrap();
++                assert_eq!(a.shape, b.shape);
++                assert_eq!(bits(&a.data), bits(&b.data));
++                let a = q4.linear_dynamic_int8(&x, &mut cpu).unwrap();
++                let b = q4.linear_prepared(&ready, &mut cpu).unwrap();
++                assert_eq!(a.shape, b.shape);
++                assert_eq!(bits(&a.data), bits(&b.data));
++            }
++        }
++        let wrong =
++            QuantizedActivation::new(&Tensor::new(vec![1, cols + 1], vec![1.; cols + 1]).unwrap())
++                .unwrap();
++        let mut cpu = CpuContext::new(Backend::Auto, 1, 1 << 20).unwrap();
++        assert!(q8.linear_prepared(&wrong, &mut cpu).is_err());
++        assert!(q4.linear_prepared(&wrong, &mut cpu).is_err());
++    }
++    for x in [
++        Tensor::new(vec![2, 3], vec![1.; 6]).unwrap(),
++        Tensor::new(vec![1, 1], vec![f32::NAN]).unwrap(),
++    ] {
++        assert!(QuantizedActivation::new(&x).is_err());
++    }
++}
++
+ #[test]
+ fn dynamic_projections_fit_without_activation_clone_scratch() {
+     let (rows, cols) = (9, 33);

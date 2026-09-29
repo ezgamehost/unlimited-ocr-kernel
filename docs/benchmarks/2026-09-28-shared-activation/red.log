@@ -1,0 +1,36 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0432]: unresolved import `uocr::cpu::quantized::QuantizedActivation`
+  --> tests/int4.rs:12:9
+   |
+12 |     use uocr::cpu::quantized::QuantizedActivation;
+   |         ^^^^^^^^^^^^^^^^^^^^^^-------------------
+   |                               |
+   |                               no `QuantizedActivation` in `cpu::quantized`
+
+error[E0599]: no method named `linear_prepared` found for struct `Int8Matrix` in the current scope
+  --> tests/int4.rs:31:28
+   |
+31 |                 let b = q8.linear_prepared(&ready, &mut cpu).unwrap();
+   |                            ^^^^^^^^^^^^^^^ method not found in `Int8Matrix`
+
+error[E0599]: no method named `linear_prepared` found for struct `Int4Matrix` in the current scope
+  --> tests/int4.rs:35:28
+   |
+35 |                 let b = q4.linear_prepared(&ready, &mut cpu).unwrap();
+   |                            ^^^^^^^^^^^^^^^ method not found in `Int4Matrix`
+
+error[E0599]: no method named `linear_prepared` found for struct `Int8Matrix` in the current scope
+  --> tests/int4.rs:42:20
+   |
+42 |         assert!(q8.linear_prepared(&wrong, &mut cpu).is_err());
+   |                    ^^^^^^^^^^^^^^^ method not found in `Int8Matrix`
+
+error[E0599]: no method named `linear_prepared` found for struct `Int4Matrix` in the current scope
+  --> tests/int4.rs:43:20
+   |
+43 |         assert!(q4.linear_prepared(&wrong, &mut cpu).is_err());
+   |                    ^^^^^^^^^^^^^^^ method not found in `Int4Matrix`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `uocr` (test "int4") due to 5 previous errors

@@ -1,0 +1,23 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 18.25s
+     Running tests/int4.rs (target/release/deps/int4-db0f57895fc4905f)
+
+running 4 tests
+test literal_nibbles_and_invalid_storage ... ok
+test dynamic_projections_fit_without_activation_clone_scratch ... ok
+test prepared_activation_matches_dynamic_paths_and_rejects_wrong_width ... ok
+test packed_matches_simulation_for_dequantization_and_linear ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/quantized.rs (target/release/deps/quantized-21e3b1163353c50f)
+
+running 5 tests
+test dequantization_matches_correctly_rounded_products_across_row_tails ... ok
+test invalid_int8_storage_scales_and_weights_are_rejected ... ok
+test quantization_preserves_scalar_products_across_full_blocks_and_tails ... ok
+test dynamic_int8_activation_dot_matches_explicit_quantized_reference ... ok
+test int8_blocks_roundtrip_zero_rows_tails_and_linear ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
