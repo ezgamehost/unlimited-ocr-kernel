@@ -1,0 +1,9 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `capture_routes` in module `moe`
+   --> src/decoder/mod.rs:504:49
+    |
+504 |                     let (result, routes) = moe::capture_routes(|| decoder.layer(layer, &x, &mut cache, cpu));
+    |                                                 ^^^^^^^^^^^^^^ not found in `moe`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 1 previous error

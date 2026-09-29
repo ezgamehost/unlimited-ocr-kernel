@@ -175,7 +175,13 @@ the downloaded weights and offline reference fixtures. With those present:
 ```sh
 cargo test --release --test decoder -- --ignored --test-threads=1
 cargo test --release --test vision -- --ignored --test-threads=1
+cargo test --release --lib expert_routes_match_upstream -- --ignored --test-threads=1
 ```
+
+The [expert-routing fixture gates](docs/benchmarks/2026-09-28-expert-route-reference/README.md)
+check all eleven MoE layers across 277 prefill and 300 decode positions. Selected
+expert IDs match exactly in both isolated-layer and full native trajectories;
+routing-weight errors and the diagnostic tolerance are reported separately.
 
 The full-decoder teacher-forced logit gate currently fails at prefill: 24 of
 129280 values exceed the existing per-layer tolerance, while all eight sampled

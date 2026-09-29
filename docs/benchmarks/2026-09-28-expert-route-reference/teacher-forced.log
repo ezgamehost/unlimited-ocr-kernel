@@ -1,0 +1,20 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 16.30s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 1 test
+test decoder::tests::actual_teacher_forced_expert_routes_match_upstream ... {"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":1,"max_weight_error":2.562999725341797e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":2,"max_weight_error":2.60770320892334e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":3,"max_weight_error":1.9371509552001953e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":4,"max_weight_error":1.4901161193847656e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":5,"max_weight_error":2.4139881134033203e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":6,"max_weight_error":3.2782554626464844e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":7,"max_weight_error":5.185604095458984e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":8,"max_weight_error":0.000010073184967041016,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":9,"max_weight_error":8.463859558105469e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":10,"max_weight_error":9.000301361083984e-6,"positions":577,"weight_tolerance_violations":0}
+{"gate":"teacher_forced_expert_routes","id_mismatches":0,"layer":11,"max_weight_error":3.3974647521972656e-6,"positions":577,"weight_tolerance_violations":0}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 16 filtered out; finished in 8.77s
+

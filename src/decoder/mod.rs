@@ -473,6 +473,261 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore = "requires original weights and upstream teacher-forced routing trace"]
+    fn actual_teacher_forced_expert_routes_match_upstream() {
+        use crate::{checkpoint::DType, cpu::Backend};
+        use std::path::Path;
+        let weights = Checkpoint::open(Path::new(
+            "artifacts/upstream/model-00001-of-000001.safetensors",
+        ))
+        .unwrap();
+        let fixture = Checkpoint::open(Path::new(
+            "artifacts/reference-logo-f32/decoder.safetensors",
+        ))
+        .unwrap();
+        let config = ModelConfig::load(Path::new("artifacts/upstream/config.json")).unwrap();
+        assert_eq!(config.num_hidden_layers, 12);
+        assert_eq!(config.first_k_dense_replace, 1);
+        assert_eq!(config.num_experts_per_tok, 6);
+        assert_eq!(config.n_routed_experts, 64);
+        assert_eq!(config.sliding_window, 128);
+        assert_eq!(config.num_attention_heads, 10);
+        assert_eq!(config.hidden_size, 1280);
+        let decoder = Decoder::new(&weights, config.clone()).unwrap();
+        let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
+        let (prefix, positions) = (277usize, 577usize);
+        let view = fixture.tensor("decode_token_ids").unwrap();
+        assert_eq!(view.dtype, DType::I64);
+        let tokens: Vec<u32> = view
+            .bytes
+            .as_chunks::<8>()
+            .0
+            .iter()
+            .map(|b| u32::try_from(i64::from_le_bytes(*b)).unwrap())
+            .collect();
+        assert_eq!(tokens.len(), positions - prefix);
+        let embeddings = fixture.tensor("input_embeddings").unwrap();
+        assert_eq!(embeddings.shape, [1, positions, config.hidden_size]);
+        let x = Tensor::new(
+            vec![prefix, config.hidden_size],
+            embeddings.to_f32()[..prefix * config.hidden_size].to_vec(),
+        )
+        .unwrap();
+        let ((mut state, _), prefill_routes) = cpu.run(|cpu| {
+            let (result, routes) = moe::capture_routes(|| decoder.prefill(&x, cpu));
+            (result.unwrap(), routes)
+        });
+        assert_eq!(state.position(), prefix);
+        assert!(state.layers.iter().all(LayerCache::is_head_major));
+        let routed_layers = config.num_hidden_layers - 1;
+        assert_eq!(prefill_routes.len(), routed_layers * prefix);
+        let mut actual: Vec<Vec<Vec<(usize, f32)>>> = (0..routed_layers)
+            .map(|_| Vec::with_capacity(positions))
+            .collect();
+        for (i, row) in prefill_routes.into_iter().enumerate() {
+            actual[i / prefix].push(row);
+        }
+        for (step, token) in tokens.into_iter().enumerate() {
+            let routes = cpu.run(|cpu| {
+                let (result, routes) = moe::capture_routes(|| decoder.step(token, &mut state, cpu));
+                result.unwrap();
+                routes
+            });
+            assert_eq!(state.position(), prefix + step + 1);
+            assert!(state.layers.iter().all(|cache| cache.is_head_major()
+                && cache.tokens() == prefix + (step + 1).min(config.sliding_window)));
+            assert_eq!(routes.len(), routed_layers);
+            for (layer, row) in routes.into_iter().enumerate() {
+                actual[layer].push(row);
+            }
+        }
+        let mut total_mismatches = 0;
+        for (layer_index, actual) in actual.into_iter().enumerate() {
+            let layer = layer_index + 1;
+            assert_eq!(actual.len(), positions);
+            let ids = fixture
+                .tensor(&format!("layer.{layer}.expert_ids"))
+                .unwrap();
+            assert_eq!(ids.dtype, DType::I64);
+            assert_eq!(ids.shape, [positions, config.num_experts_per_tok]);
+            let ids: Vec<usize> = ids
+                .bytes
+                .as_chunks::<8>()
+                .0
+                .iter()
+                .map(|b| usize::try_from(i64::from_le_bytes(*b)).unwrap())
+                .collect();
+            let probabilities = fixture
+                .tensor(&format!("layer.{layer}.expert_weights"))
+                .unwrap();
+            assert_eq!(probabilities.dtype, DType::F32);
+            assert_eq!(probabilities.shape, [positions, config.num_experts_per_tok]);
+            let probabilities = probabilities.to_f32();
+            let (mut id_mismatches, mut weight_mismatches, mut max_error) = (0, 0, 0f32);
+            for (position, mut actual) in actual.into_iter().enumerate() {
+                let begin = position * config.num_experts_per_tok;
+                let mut expected: Vec<_> = ids[begin..begin + config.num_experts_per_tok]
+                    .iter()
+                    .copied()
+                    .zip(
+                        probabilities[begin..begin + config.num_experts_per_tok]
+                            .iter()
+                            .copied(),
+                    )
+                    .collect();
+                assert_eq!(actual.len(), expected.len());
+                actual.sort_unstable_by_key(|&(id, _)| id);
+                expected.sort_unstable_by_key(|&(id, _)| id);
+                assert!(expected.windows(2).all(|w| w[0].0 != w[1].0));
+                for ((actual_id, a), (expected_id, e)) in actual.into_iter().zip(expected) {
+                    assert!(
+                        actual_id < config.n_routed_experts
+                            && expected_id < config.n_routed_experts
+                    );
+                    assert!(a.is_finite() && e.is_finite() && a >= 0. && e >= 0.);
+                    if actual_id != expected_id {
+                        id_mismatches += 1;
+                        continue;
+                    }
+                    let error = (a - e).abs();
+                    max_error = max_error.max(error);
+                    if error > 1e-5 + 1e-4 * e.abs() {
+                        weight_mismatches += 1;
+                    }
+                }
+            }
+            println!(
+                "{}",
+                serde_json::json!({"gate":"teacher_forced_expert_routes","layer":layer,"positions":positions,"id_mismatches":id_mismatches,"weight_tolerance_violations":weight_mismatches,"max_weight_error":max_error})
+            );
+            total_mismatches += id_mismatches + weight_mismatches;
+        }
+        assert_eq!(
+            total_mismatches, 0,
+            "teacher-forced expert routing differs from upstream"
+        );
+    }
+
+    #[test]
+    #[ignore = "requires original weights and upstream expert ID/weight trace"]
+    fn actual_expert_routes_match_upstream_all_moe_layers() {
+        use crate::{checkpoint::DType, cpu::Backend};
+        use std::path::Path;
+        let weights = Checkpoint::open(Path::new(
+            "artifacts/upstream/model-00001-of-000001.safetensors",
+        ))
+        .unwrap();
+        let fixture = Checkpoint::open(Path::new(
+            "artifacts/reference-logo-f32/decoder.safetensors",
+        ))
+        .unwrap();
+        let config = ModelConfig::load(Path::new("artifacts/upstream/config.json")).unwrap();
+        assert_eq!(config.num_hidden_layers, 12);
+        assert_eq!(config.first_k_dense_replace, 1);
+        assert_eq!(config.num_experts_per_tok, 6);
+        assert_eq!(config.n_routed_experts, 64);
+        assert_eq!(config.sliding_window, 128);
+        assert_eq!(config.num_attention_heads, 10);
+        assert_eq!(config.hidden_size, 1280);
+        let decoder = Decoder::new(&weights, config.clone()).unwrap();
+        let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
+        let (prefix, positions) = (277usize, 577usize);
+        assert_eq!(config.num_experts_per_tok, 6);
+        for layer in 1..config.num_hidden_layers {
+            let input = fixture
+                .tensor(&format!("layer.{}.hidden", layer - 1))
+                .unwrap();
+            assert_eq!(input.shape, [1, positions, config.hidden_size]);
+            let input = input.to_f32();
+            let ids = fixture
+                .tensor(&format!("layer.{layer}.expert_ids"))
+                .unwrap();
+            assert_eq!(ids.dtype, DType::I64);
+            assert_eq!(ids.shape, [positions, config.num_experts_per_tok]);
+            let ids: Vec<usize> = ids
+                .bytes
+                .as_chunks::<8>()
+                .0
+                .iter()
+                .map(|b| usize::try_from(i64::from_le_bytes(*b)).unwrap())
+                .collect();
+            let probabilities = fixture
+                .tensor(&format!("layer.{layer}.expert_weights"))
+                .unwrap();
+            assert_eq!(probabilities.dtype, DType::F32);
+            assert_eq!(probabilities.shape, [positions, config.num_experts_per_tok]);
+            let probabilities = probabilities.to_f32();
+            let mut cache = LayerCache::new(
+                config.num_attention_heads,
+                config.hidden_size / config.num_attention_heads,
+                config.sliding_window,
+            )
+            .unwrap();
+            let mut actual = Vec::with_capacity(positions);
+            for (start, count) in
+                std::iter::once((0, prefix)).chain((prefix..positions).map(|p| (p, 1)))
+            {
+                let x = Tensor::new(
+                    vec![count, config.hidden_size],
+                    input[start * config.hidden_size..(start + count) * config.hidden_size]
+                        .to_vec(),
+                )
+                .unwrap();
+                let captured = cpu.run(|cpu| {
+                    let (result, routes) =
+                        moe::capture_routes(|| decoder.layer(layer, &x, &mut cache, cpu));
+                    result.unwrap();
+                    routes
+                });
+                assert_eq!(captured.len(), count, "layer={layer} start={start}");
+                actual.extend(captured);
+                if start == 0 {
+                    cache.pack_heads().unwrap();
+                }
+                assert!(cache.is_head_major());
+                assert_eq!(cache.position(), start + count);
+                assert_eq!(
+                    cache.tokens(),
+                    prefix + (start + count - prefix).min(config.sliding_window)
+                );
+            }
+            assert_eq!(actual.len(), positions);
+            let mut max_error = 0f32;
+            for (position, mut actual) in actual.into_iter().enumerate() {
+                let begin = position * config.num_experts_per_tok;
+                let mut expected: Vec<_> = ids[begin..begin + config.num_experts_per_tok]
+                    .iter()
+                    .copied()
+                    .zip(
+                        probabilities[begin..begin + config.num_experts_per_tok]
+                            .iter()
+                            .copied(),
+                    )
+                    .collect();
+                assert_eq!(actual.len(), expected.len());
+                actual.sort_unstable_by_key(|&(id, _)| id);
+                expected.sort_unstable_by_key(|&(id, _)| id);
+                assert!(expected.windows(2).all(|w| w[0].0 != w[1].0));
+                for ((actual_id, a), (expected_id, e)) in actual.into_iter().zip(expected) {
+                    assert!(expected_id < config.n_routed_experts);
+                    assert_eq!(actual_id, expected_id, "layer={layer} position={position}");
+                    assert!(a.is_finite() && e.is_finite() && a >= 0. && e >= 0.);
+                    let error = (a - e).abs();
+                    max_error = max_error.max(error);
+                    assert!(
+                        error <= 1e-5 + 1e-4 * e.abs(),
+                        "layer={layer} position={position} expert={actual_id} actual={a} expected={e}"
+                    );
+                }
+            }
+            println!(
+                "{}",
+                serde_json::json!({"gate":"expert_routes", "layer":layer,"positions":positions,"prefill_positions":prefix,"decode_positions":positions-prefix,"selected_ids_exact":true,"max_weight_error":max_error})
+            );
+        }
+    }
+
+    #[test]
     #[ignore = "requires pinned original model weights"]
     fn qkv_matches_independent_projections_across_worker_and_memory_budgets() {
         use crate::cpu::Backend;

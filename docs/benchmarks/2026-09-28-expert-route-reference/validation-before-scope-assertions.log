@@ -1,0 +1,6 @@
+fmt passed
+rust-tests passed
+clippy passed
+expert-reference passed
+decoder-reference passed
+build passed

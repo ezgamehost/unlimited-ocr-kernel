@@ -1,0 +1,5 @@
+{
+  "binary": "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/expert-route-reference/baseline-unit",
+  "sha256": "62d03e57494b6f61f5787dd6c9c04625da1d0a1758399ce152cda66894772447",
+  "purpose": "accepted runtime plus test-only route capture; use matching harness for future fixed-work comparisons"
+}
