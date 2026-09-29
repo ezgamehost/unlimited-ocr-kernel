@@ -1,0 +1,7 @@
+{
+  "artifacts/upstream/model-00001-of-000001.safetensors": "2bc48a7a110061ea58fff65d3169367eebe3aee371ca6968dc2219c1b2855fc6",
+  "artifacts/reference-thread-sensitivity/prefill-threads-10.safetensors": "598cf7141ad470c9bd501768781aacfdeb329ca134cd0c61cc6b702b10a81efd",
+  "artifacts/fp64-prefill-oracle/prefill.safetensors": "f1d4d777e4d72ef688fe6c95847c7c790bb476081d3315ad8d74964b4a03c8e1",
+  "artifacts/reference-thread-sensitivity/native-prefill.json": "b8b8a14a08cbfe615a24c70d994a632fe4b172b604e182e0e89a1f0c56070ee7",
+  "src/cpu/ops.rs": "9d0092c03806ad5260da10d4a1cd75186b41acac707b45685f3fb7f2d7c68bee"
+}

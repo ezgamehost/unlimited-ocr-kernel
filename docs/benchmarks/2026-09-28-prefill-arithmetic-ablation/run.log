@@ -1,0 +1,52 @@
+torch.float32 layer 0
+torch.float32 layer 1
+torch.float32 layer 2
+torch.float32 layer 3
+torch.float32 layer 4
+torch.float32 layer 5
+torch.float32 layer 6
+torch.float32 layer 7
+torch.float32 layer 8
+torch.float32 layer 9
+torch.float32 layer 10
+torch.float32 layer 11
+unchanged_control {'vs_fp64': {'max_abs': 0.00010865058700537666, 'rms': 2.190087851077824e-05, 'outside': 0}, 'vs_native': {'max_abs': 0.00015163421630859375, 'rms': 3.9947460117138504e-05, 'outside': 23}, 'first_layer_last_vs_fp64': {'max_abs': 4.2541581180000065e-07, 'rms': 9.551690412655443e-08, 'outside': 0}, 'route_set_changes_vs_control': 0, 'source_sha256': 'ac8d39097302a6b385b68c0f09426275c6896b5142c35889d9402aa0fd54b7ac'}
+torch.float32 layer 0
+torch.float32 layer 1
+torch.float32 layer 2
+torch.float32 layer 3
+torch.float32 layer 4
+torch.float32 layer 5
+torch.float32 layer 6
+torch.float32 layer 7
+torch.float32 layer 8
+torch.float32 layer 9
+torch.float32 layer 10
+torch.float32 layer 11
+scalar_rms {'vs_fp64': {'max_abs': 0.0001336109781790995, 'rms': 3.223833895037785e-05, 'outside': 0}, 'vs_native': {'max_abs': 0.0001354217529296875, 'rms': 2.6754304176671642e-05, 'outside': 0}, 'first_layer_last_vs_fp64': {'max_abs': 4.105790280650723e-06, 'rms': 3.313665499115367e-07, 'outside': 0}, 'route_set_changes_vs_control': 0, 'source_sha256': 'b9860ccfc65887520cc7cbcfa70de9322f1c9ae049c0d36483471f4dc92f9fa5'}
+torch.float32 layer 0
+torch.float32 layer 1
+torch.float32 layer 2
+torch.float32 layer 3
+torch.float32 layer 4
+torch.float32 layer 5
+torch.float32 layer 6
+torch.float32 layer 7
+torch.float32 layer 8
+torch.float32 layer 9
+torch.float32 layer 10
+torch.float32 layer 11
+reciprocal_attention_scale {'vs_fp64': {'max_abs': 7.454248654648055e-05, 'rms': 1.532424255230993e-05, 'outside': 0}, 'vs_native': {'max_abs': 0.00018346309661865234, 'rms': 4.438200339283429e-05, 'outside': 62}, 'first_layer_last_vs_fp64': {'max_abs': 3.9050084849057143e-07, 'rms': 9.121100898007235e-08, 'outside': 0}, 'route_set_changes_vs_control': 0, 'source_sha256': '5043115ed2e1e443e716c99df23289f917e3331052f9bc59fd5bf9b1213b5327'}
+torch.float32 layer 0
+torch.float32 layer 1
+torch.float32 layer 2
+torch.float32 layer 3
+torch.float32 layer 4
+torch.float32 layer 5
+torch.float32 layer 6
+torch.float32 layer 7
+torch.float32 layer 8
+torch.float32 layer 9
+torch.float32 layer 10
+torch.float32 layer 11
+both {'vs_fp64': {'max_abs': 0.00015165277409323608, 'rms': 3.920880089052701e-05, 'outside': 14}, 'vs_native': {'max_abs': 0.0001049041748046875, 'rms': 2.0668607847262927e-05, 'outside': 0}, 'first_layer_last_vs_fp64': {'max_abs': 4.3442088597522854e-06, 'rms': 3.331012583436661e-07, 'outside': 0}, 'route_set_changes_vs_control': 0, 'source_sha256': '7e3586d976517d83930a295221f5fd71ef9b37db1204ae48697dc3a7459025f5'}
