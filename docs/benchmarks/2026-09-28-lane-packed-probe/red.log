@@ -1,0 +1,15 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `dot_lanes` in this scope
+  --> src/cpu/lane_probe.rs:40:35
+   |
+40 |             let actual = unsafe { dot_lanes(&unaligned[offset..], &x[offset..], &unaligned_scales[offset..], &xs) };
+   |                                   ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `unpack_lanes` in this scope
+  --> src/cpu/lane_probe.rs:44:13
+   |
+44 |             unpack_lanes(&unaligned[offset..], &unaligned_scales[offset..], &mut output[offset..offset + 4 * cols], cols);
+   |             ^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 2 previous errors

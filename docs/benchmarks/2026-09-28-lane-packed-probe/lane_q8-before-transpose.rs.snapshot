@@ -1,0 +1,118 @@
+//! Four-byte-lane-interleaved Q8 kernels.
+#[target_feature(enable = "dotprod")]
+pub(super) unsafe fn dot_lanes(w: &[i8], x: &[i8], ws: &[f32], xs: &[f32]) -> [f32; 4] {
+    use std::arch::aarch64::*;
+    assert!(x.len().is_multiple_of(32));
+    assert_eq!(w.len(), 4 * x.len());
+    assert_eq!(ws.len(), x.len() / 8);
+    assert_eq!(xs.len(), x.len() / 32);
+    let mut total = vdupq_n_f32(0.);
+    for b in 0..xs.len() {
+        // SAFETY: caller verifies dotprod; sizes cover each complete block.
+        unsafe {
+            let p = w.as_ptr().add(b * 128);
+            let x0 = vld1q_s8(x.as_ptr().add(b * 32));
+            let x1 = vld1q_s8(x.as_ptr().add(b * 32 + 16));
+            let mut sum = vdupq_n_s32(0);
+            sum = vdotq_laneq_s32::<0>(sum, vld1q_s8(p), x0);
+            sum = vdotq_laneq_s32::<1>(sum, vld1q_s8(p.add(16)), x0);
+            sum = vdotq_laneq_s32::<2>(sum, vld1q_s8(p.add(32)), x0);
+            sum = vdotq_laneq_s32::<3>(sum, vld1q_s8(p.add(48)), x0);
+            sum = vdotq_laneq_s32::<0>(sum, vld1q_s8(p.add(64)), x1);
+            sum = vdotq_laneq_s32::<1>(sum, vld1q_s8(p.add(80)), x1);
+            sum = vdotq_laneq_s32::<2>(sum, vld1q_s8(p.add(96)), x1);
+            sum = vdotq_laneq_s32::<3>(sum, vld1q_s8(p.add(112)), x1);
+            total = vaddq_f32(
+                total,
+                vmulq_n_f32(
+                    vmulq_f32(vcvtq_f32_s32(sum), vld1q_f32(ws.as_ptr().add(b * 4))),
+                    xs[b],
+                ),
+            );
+        }
+    }
+    let mut out = [0.; 4];
+    unsafe {
+        vst1q_f32(out.as_mut_ptr(), total);
+    }
+    out
+}
+
+pub(super) fn unpack_lanes(w: &[i8], scales: &[f32], out: &mut [f32], cols: usize) {
+    use std::arch::aarch64::*;
+    assert!(cols.is_multiple_of(32));
+    assert_eq!(w.len(), 4 * cols);
+    assert_eq!(scales.len(), cols / 8);
+    assert_eq!(out.len(), 4 * cols);
+    for b in 0..cols / 32 {
+        for half in 0..2 {
+            // SAFETY: four-way 32-bit interleaving gathers 16 bytes per row.
+            // The load is unaligned-safe and bounded by one 128-byte block.
+            unsafe {
+                let rows = vld4q_s32(w.as_ptr().add(b * 128 + half * 64).cast());
+                for (row, bytes) in [rows.0, rows.1, rows.2, rows.3].into_iter().enumerate() {
+                    let bytes = vreinterpretq_s8_s32(bytes);
+                    let lo = vmovl_s8(vget_low_s8(bytes));
+                    let hi = vmovl_s8(vget_high_s8(bytes));
+                    let chunks = [
+                        vmovl_s16(vget_low_s16(lo)),
+                        vmovl_s16(vget_high_s16(lo)),
+                        vmovl_s16(vget_low_s16(hi)),
+                        vmovl_s16(vget_high_s16(hi)),
+                    ];
+                    for (chunk, ints) in chunks.into_iter().enumerate() {
+                        vst1q_f32(
+                            out.as_mut_ptr()
+                                .add(row * cols + b * 32 + half * 16 + chunk * 4),
+                            vmulq_n_f32(vcvtq_f32_s32(ints), scales[b * 4 + row]),
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Weight-only four-output kernel, retaining each original row's FP32 order.
+pub(super) fn dot_weight_only_four(w: &[i8], x: &[f32], scales: &[f32]) -> [f32; 4] {
+    use std::arch::aarch64::*;
+    assert!(x.len().is_multiple_of(32));
+    assert_eq!(w.len(), 4 * x.len());
+    assert_eq!(scales.len(), x.len() / 8);
+    // SAFETY: sizes bound every load, and AArch64 guarantees NEON.
+    unsafe {
+        let zero = vdupq_n_f32(0.);
+        let mut totals = [zero; 4];
+        for b in 0..x.len() / 32 {
+            let mut a = [zero; 4];
+            let mut c = a;
+            let mut d = a;
+            let mut e = a;
+            for half in 0..2 {
+                let rows = vld4q_s32(w.as_ptr().add(b * 128 + half * 64).cast());
+                let input = x.as_ptr().add(b * 32 + half * 16);
+                let x0 = vld1q_f32(input);
+                let x1 = vld1q_f32(input.add(4));
+                let x2 = vld1q_f32(input.add(8));
+                let x3 = vld1q_f32(input.add(12));
+                for (row, bytes) in [rows.0, rows.1, rows.2, rows.3].into_iter().enumerate() {
+                    let bytes = vreinterpretq_s8_s32(bytes);
+                    let lo = vmovl_s8(vget_low_s8(bytes));
+                    let hi = vmovl_s8(vget_high_s8(bytes));
+                    a[row] = vfmaq_f32(a[row], vcvtq_f32_s32(vmovl_s16(vget_low_s16(lo))), x0);
+                    c[row] = vfmaq_f32(c[row], vcvtq_f32_s32(vmovl_s16(vget_high_s16(lo))), x1);
+                    d[row] = vfmaq_f32(d[row], vcvtq_f32_s32(vmovl_s16(vget_low_s16(hi))), x2);
+                    e[row] = vfmaq_f32(e[row], vcvtq_f32_s32(vmovl_s16(vget_high_s16(hi))), x3);
+                }
+            }
+            for row in 0..4 {
+                totals[row] = vfmaq_n_f32(
+                    totals[row],
+                    vaddq_f32(vaddq_f32(a[row], c[row]), vaddq_f32(d[row], e[row])),
+                    scales[b * 4 + row],
+                );
+            }
+        }
+        totals.map(|total| vaddvq_f32(total) + 0.)
+    }
+}

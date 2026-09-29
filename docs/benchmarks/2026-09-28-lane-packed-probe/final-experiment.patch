@@ -1,0 +1,664 @@
+diff --git a/src/cpu/mod.rs b/src/cpu/mod.rs
+index 6eb9a5d..11954f3 100644
+--- a/src/cpu/mod.rs
++++ b/src/cpu/mod.rs
+@@ -6,6 +6,10 @@ mod blas_threads;
+ #[cfg(test)]
+ mod cache_probe;
+ pub mod int4;
++#[cfg(all(test, target_arch = "aarch64"))]
++mod lane_probe;
++#[cfg(target_arch = "aarch64")]
++mod lane_q8;
+ mod neon;
+ #[cfg(target_arch = "aarch64")]
+ mod neon_gelu;
+diff --git a/src/cpu/quantized.rs b/src/cpu/quantized.rs
+index 25ac610..5a44e3d 100644
+--- a/src/cpu/quantized.rs
++++ b/src/cpu/quantized.rs
+@@ -13,6 +13,7 @@ pub struct Int8Matrix {
+     cols: usize,
+     weights: Vec<i8>,
+     scales: Vec<f32>,
++    lane_packed: bool,
+ }
+ impl Int8Matrix {
+     pub(super) fn parts(&self) -> (&[i8], &[f32]) {
+@@ -41,8 +42,60 @@ impl Int8Matrix {
+             cols,
+             weights,
+             scales,
++            lane_packed: false,
+         })
+     }
++    /// Reorder in place, with one four-row temporary, without duplicating the model.
++    pub(crate) fn prepare_dynamic(&mut self) {
++        if !cfg!(target_arch = "aarch64")
++            || self.lane_packed
++            || !self.rows.is_multiple_of(4)
++            || !self.cols.is_multiple_of(BLOCK)
++        {
++            return;
++        }
++        let blocks = self.cols / BLOCK;
++        let mut w = vec![0; 4 * self.cols];
++        let mut scales = vec![0.; 4 * blocks];
++        for group in 0..self.rows / 4 {
++            let source = &mut self.weights[group * 4 * self.cols..(group + 1) * 4 * self.cols];
++            let source_scales = &mut self.scales[group * 4 * blocks..(group + 1) * 4 * blocks];
++            for b in 0..blocks {
++                for row in 0..4 {
++                    scales[b * 4 + row] = source_scales[row * blocks + b];
++                    for chunk in 0..8 {
++                        w[b * 128 + chunk * 16 + row * 4..b * 128 + chunk * 16 + row * 4 + 4]
++                            .copy_from_slice(
++                                &source[row * self.cols + b * 32 + chunk * 4
++                                    ..row * self.cols + b * 32 + chunk * 4 + 4],
++                            );
++                    }
++                }
++            }
++            source.copy_from_slice(&w);
++            source_scales.copy_from_slice(&scales);
++        }
++        self.lane_packed = true;
++    }
++    fn code(&self, row: usize, col: usize) -> i8 {
++        if self.lane_packed {
++            self.weights[(row / 4) * 4 * self.cols
++                + (col / 32) * 128
++                + (col % 32 / 4) * 16
++                + (row % 4) * 4
++                + col % 4]
++        } else {
++            self.weights[row * self.cols + col]
++        }
++    }
++    fn scale(&self, row: usize, block: usize) -> f32 {
++        let blocks = self.cols.div_ceil(BLOCK);
++        self.scales[if self.lane_packed {
++            row / 4 * 4 * blocks + block * 4 + row % 4
++        } else {
++            row * blocks + block
++        }]
++    }
+     pub fn quantize(matrix: &Tensor) -> Result<Self> {
+         matrix.validate()?;
+         if matrix.shape.len() != 2 || matrix.shape.contains(&0) {
+@@ -78,6 +131,18 @@ impl Int8Matrix {
+     pub fn dequantize(&self) -> Result<Tensor> {
+         let blocks = self.cols.div_ceil(BLOCK);
+         let mut data = vec![0.; self.weights.len()];
++        #[cfg(target_arch = "aarch64")]
++        if self.lane_packed {
++            for (group, out) in data.chunks_exact_mut(4 * self.cols).enumerate() {
++                super::lane_q8::unpack_lanes(
++                    &self.weights[group * 4 * self.cols..(group + 1) * 4 * self.cols],
++                    &self.scales[group * 4 * blocks..(group + 1) * 4 * blocks],
++                    out,
++                    self.cols,
++                );
++            }
++            return Tensor::new(vec![self.rows, self.cols], data);
++        }
+         for ((weights, scales), output) in self
+             .weights
+             .chunks_exact(self.cols)
+@@ -119,7 +184,36 @@ impl Int8Matrix {
+             return ops::linear(x, &self.dequantize()?, None, cpu);
+         }
+         let blocks = self.cols.div_ceil(BLOCK);
++        #[cfg(target_arch = "aarch64")]
++        if self.lane_packed && cpu.backend != Backend::Scalar {
++            let mut data = vec![0.; self.rows];
++            let compute = |(group, out): (usize, &mut [f32])| {
++                out.copy_from_slice(&super::lane_q8::dot_weight_only_four(
++                    &self.weights[group * 4 * self.cols..(group + 1) * 4 * self.cols],
++                    &x.data,
++                    &self.scales[group * 4 * blocks..(group + 1) * 4 * blocks],
++                ));
++            };
++            if cpu.threads() == 1 || self.weights.len() <= 128 * 1024 {
++                data.chunks_mut(4).enumerate().for_each(compute);
++            } else {
++                cpu.pool.install(|| {
++                    data.par_chunks_mut(4)
++                        .with_min_len(self.rows.div_ceil(4).div_ceil(cpu.threads()))
++                        .enumerate()
++                        .for_each(compute)
++                });
++            }
++            let mut shape = x.shape.clone();
++            *shape.last_mut().unwrap() = self.rows;
++            return Tensor::new(shape, data);
++        }
+         let dot = |row: usize| {
++            if self.lane_packed {
++                return (0..self.cols)
++                    .map(|i| self.code(row, i) as f32 * self.scale(row, i / BLOCK) * x.data[i])
++                    .sum();
++            }
+             let w = &self.weights[row * self.cols..(row + 1) * self.cols];
+             let scales = &self.scales[row * blocks..(row + 1) * blocks];
+             #[cfg(target_arch = "aarch64")]
+@@ -175,6 +269,17 @@ impl Int8Matrix {
+         let dotprod =
+             cpu.backend != Backend::Scalar && std::arch::is_aarch64_feature_detected!("dotprod");
+         let dot = |row: usize| {
++            if self.lane_packed {
++                return (0..blocks)
++                    .map(|b| {
++                        let sum: i32 = (b * BLOCK..((b + 1) * BLOCK).min(self.cols))
++                            .map(|i| self.code(row, i) as i32 * activation.weights[i] as i32)
++                            .sum();
++                        sum as f32 * self.scale(row, b) * activation.scales[b]
++                    })
++                    .sum();
++            }
++
+             let weights = &self.weights[row * self.cols..(row + 1) * self.cols];
+             let scales = &self.scales[row * blocks..(row + 1) * blocks];
+             #[cfg(target_arch = "aarch64")]
+@@ -208,7 +313,12 @@ impl Int8Matrix {
+                 // SAFETY: feature detection above; four complete validated rows
+                 // with columns divisible by the kernel's 32-element block.
+                 let result = unsafe {
+-                    super::neon::dot_int8_four_rows(
++                    let kernel = if self.lane_packed {
++                        super::lane_q8::dot_lanes
++                    } else {
++                        super::neon::dot_int8_four_rows
++                    };
++                    kernel(
+                         &self.weights[first * self.cols..(first + 4) * self.cols],
+                         &activation.weights,
+                         &self.scales[first * blocks..(first + 4) * blocks],
+@@ -431,6 +541,16 @@ impl QuantizedWeights {
+             q8_head,
+         })
+     }
++    pub(crate) fn prepare_dynamic(&mut self) {
++        for (name, matrix) in &mut self.matrices {
++            if name == "lm_head.weight" {
++                continue;
++            }
++            if let QuantizedMatrix::Int8(matrix) = matrix {
++                matrix.prepare_dynamic();
++            }
++        }
++    }
+     pub fn precision(&self, mode: QuantizationMode) -> &'static str {
+         if self.q8_head {
+             return match mode {
+@@ -451,3 +571,111 @@ impl QuantizedWeights {
+         self.matrices.get(name)
+     }
+ }
++
++#[cfg(test)]
++mod lane_layout_tests {
++    use super::*;
++
++    #[test]
++    #[ignore = "actual matrix dequantization allocation/layout probe"]
++    fn packed_q8_dequantization_probe() {
++        use std::{hint::black_box, time::Instant};
++        for (rows, cols) in [(896usize, 1280usize), (1280, 896), (1280, 1280)] {
++            let weights: Vec<i8> = (0..rows * cols).map(|i| (i * 71 + i / 17) as i8).collect();
++            let scales: Vec<f32> = (0..rows * cols / 32)
++                .map(|i| (i % 29 + 1) as f32 / 731.)
++                .collect();
++            let original =
++                Int8Matrix::from_parts(rows, cols, weights.clone(), scales.clone()).unwrap();
++            let mut packed = Int8Matrix::from_parts(rows, cols, weights, scales).unwrap();
++            packed.prepare_dynamic();
++            for iteration in 0..7 {
++                for lane in if iteration % 2 == 0 {
++                    [false, true]
++                } else {
++                    [true, false]
++                } {
++                    let matrix = if lane { &packed } else { &original };
++                    let start = Instant::now();
++                    for _ in 0..32 {
++                        black_box(black_box(matrix).dequantize().unwrap());
++                    }
++                    println!(
++                        "{}",
++                        serde_json::json!({"probe":"actual_dequantization", "rows":rows,"cols":cols,"iteration":iteration,"lane_packed":lane,"seconds":start.elapsed().as_secs_f64() / 32.})
++                    );
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn packed_q8_preserves_all_paths_and_storage() {
++        for (rows, cols) in [
++            (4usize, 32usize),
++            (8, 96),
++            (12, 896),
++            (4, 1280),
++            (5, 33),
++            (3, 32),
++        ] {
++            let weights: Vec<i8> = (0..rows * cols).map(|i| (i * 71 + i / 17) as i8).collect();
++            let scales: Vec<f32> = (0..rows * cols.div_ceil(32))
++                .map(|i| [0., -0., 0.00317, 0.7, 1e-10, 17.][i % 6])
++                .collect();
++            let original =
++                Int8Matrix::from_parts(rows, cols, weights.clone(), scales.clone()).unwrap();
++            let mut packed = Int8Matrix::from_parts(rows, cols, weights, scales).unwrap();
++            packed.prepare_dynamic();
++            assert_eq!(original.storage_bytes(), packed.storage_bytes());
++            let before = packed.dequantize().unwrap();
++            packed.prepare_dynamic();
++            assert_eq!(
++                before.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
++                packed
++                    .dequantize()
++                    .unwrap()
++                    .data
++                    .iter()
++                    .map(|v| v.to_bits())
++                    .collect::<Vec<_>>()
++            );
++            assert_eq!(
++                before.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
++                original
++                    .dequantize()
++                    .unwrap()
++                    .data
++                    .iter()
++                    .map(|v| v.to_bits())
++                    .collect::<Vec<_>>()
++            );
++            for backend in [Backend::Scalar, Backend::Auto] {
++                let mut cpu = CpuContext::new(backend, 4, 1 << 24).unwrap();
++                for batch in [1, 3] {
++                    let x = Tensor::new(
++                        vec![batch, cols],
++                        (0..batch * cols)
++                            .map(|i| ((i * 13 % 113) as f32 - 56.) / 37.)
++                            .collect(),
++                    )
++                    .unwrap();
++                    let a = original.linear(&x, &mut cpu).unwrap();
++                    let b = packed.linear(&x, &mut cpu).unwrap();
++                    assert_eq!(
++                        a.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
++                        b.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
++                    );
++                    if batch == 1 {
++                        let a = original.linear_dynamic_int8(&x, &mut cpu).unwrap();
++                        let b = packed.linear_dynamic_int8(&x, &mut cpu).unwrap();
++                        assert_eq!(
++                            a.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>(),
++                            b.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>()
++                        );
++                    }
++                }
++            }
++        }
++    }
++}
+diff --git a/src/model/mod.rs b/src/model/mod.rs
+index 95718cc..92c788b 100644
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -122,9 +122,14 @@ impl Model {
+         }
+         let checkpoint = Checkpoint::open(&directory.join("model-00001-of-000001.safetensors"))?;
+         Decoder::new(&checkpoint, config.clone())?;
+-        let quantized = overlay
++        let mut quantized = overlay
+             .map(|path| crate::cpu::quantized::QuantizedWeights::load(path, &checkpoint))
+             .transpose()?;
++        if mode == crate::cpu::quantized::QuantizationMode::DynamicActivations
++            && let Some(weights) = &mut quantized
++        {
++            weights.prepare_dynamic();
++        }
+         let vision = Vision::new(&checkpoint)?;
+         let tokenizer = PromptEncoder::load(&directory.join("tokenizer.json"))?;
+         Ok(Self {
+diff --git a/src/cpu/lane_q8.rs b/src/cpu/lane_q8.rs
+new file mode 100644
+index 0000000..ba730bc
+--- /dev/null
++++ b/src/cpu/lane_q8.rs
+@@ -0,0 +1,140 @@
++//! Four-byte-lane-interleaved Q8 kernels.
++#[target_feature(enable = "dotprod")]
++pub(super) unsafe fn dot_lanes(w: &[i8], x: &[i8], ws: &[f32], xs: &[f32]) -> [f32; 4] {
++    use std::arch::aarch64::*;
++    assert!(x.len().is_multiple_of(32));
++    assert_eq!(w.len(), 4 * x.len());
++    assert_eq!(ws.len(), x.len() / 8);
++    assert_eq!(xs.len(), x.len() / 32);
++    let mut total = vdupq_n_f32(0.);
++    for b in 0..xs.len() {
++        // SAFETY: caller verifies dotprod; sizes cover each complete block.
++        unsafe {
++            let p = w.as_ptr().add(b * 128);
++            let x0 = vld1q_s8(x.as_ptr().add(b * 32));
++            let x1 = vld1q_s8(x.as_ptr().add(b * 32 + 16));
++            let mut sum = vdupq_n_s32(0);
++            sum = vdotq_laneq_s32::<0>(sum, vld1q_s8(p), x0);
++            sum = vdotq_laneq_s32::<1>(sum, vld1q_s8(p.add(16)), x0);
++            sum = vdotq_laneq_s32::<2>(sum, vld1q_s8(p.add(32)), x0);
++            sum = vdotq_laneq_s32::<3>(sum, vld1q_s8(p.add(48)), x0);
++            sum = vdotq_laneq_s32::<0>(sum, vld1q_s8(p.add(64)), x1);
++            sum = vdotq_laneq_s32::<1>(sum, vld1q_s8(p.add(80)), x1);
++            sum = vdotq_laneq_s32::<2>(sum, vld1q_s8(p.add(96)), x1);
++            sum = vdotq_laneq_s32::<3>(sum, vld1q_s8(p.add(112)), x1);
++            total = vaddq_f32(
++                total,
++                vmulq_n_f32(
++                    vmulq_f32(vcvtq_f32_s32(sum), vld1q_f32(ws.as_ptr().add(b * 4))),
++                    xs[b],
++                ),
++            );
++        }
++    }
++    let mut out = [0.; 4];
++    unsafe {
++        vst1q_f32(out.as_mut_ptr(), total);
++    }
++    out
++}
++
++pub(super) fn unpack_lanes(w: &[i8], scales: &[f32], out: &mut [f32], cols: usize) {
++    use std::arch::aarch64::*;
++    assert!(cols.is_multiple_of(32));
++    assert_eq!(w.len(), 4 * cols);
++    assert_eq!(scales.len(), cols / 8);
++    assert_eq!(out.len(), 4 * cols);
++    for b in 0..cols / 32 {
++        for half in 0..2 {
++            // SAFETY: four-way 32-bit interleaving gathers 16 bytes per row.
++            // The load is unaligned-safe and bounded by one 128-byte block.
++            unsafe {
++                let rows = load_rows(w.as_ptr().add(b * 128 + half * 64));
++                for (row, bytes) in [rows.0, rows.1, rows.2, rows.3].into_iter().enumerate() {
++                    let bytes = vreinterpretq_s8_s32(bytes);
++                    let lo = vmovl_s8(vget_low_s8(bytes));
++                    let hi = vmovl_s8(vget_high_s8(bytes));
++                    let chunks = [
++                        vmovl_s16(vget_low_s16(lo)),
++                        vmovl_s16(vget_high_s16(lo)),
++                        vmovl_s16(vget_low_s16(hi)),
++                        vmovl_s16(vget_high_s16(hi)),
++                    ];
++                    for (chunk, ints) in chunks.into_iter().enumerate() {
++                        vst1q_f32(
++                            out.as_mut_ptr()
++                                .add(row * cols + b * 32 + half * 16 + chunk * 4),
++                            vmulq_n_f32(vcvtq_f32_s32(ints), scales[b * 4 + row]),
++                        );
++                    }
++                }
++            }
++        }
++    }
++}
++
++/// Weight-only four-output kernel, retaining each original row's FP32 order.
++pub(super) fn dot_weight_only_four(w: &[i8], x: &[f32], scales: &[f32]) -> [f32; 4] {
++    use std::arch::aarch64::*;
++    assert!(x.len().is_multiple_of(32));
++    assert_eq!(w.len(), 4 * x.len());
++    assert_eq!(scales.len(), x.len() / 8);
++    // SAFETY: sizes bound every load, and AArch64 guarantees NEON.
++    unsafe {
++        let zero = vdupq_n_f32(0.);
++        let mut totals = [zero; 4];
++        for b in 0..x.len() / 32 {
++            let mut a = [zero; 4];
++            let mut c = a;
++            let mut d = a;
++            let mut e = a;
++            for half in 0..2 {
++                let rows = load_rows(w.as_ptr().add(b * 128 + half * 64));
++                let input = x.as_ptr().add(b * 32 + half * 16);
++                let x0 = vld1q_f32(input);
++                let x1 = vld1q_f32(input.add(4));
++                let x2 = vld1q_f32(input.add(8));
++                let x3 = vld1q_f32(input.add(12));
++                for (row, bytes) in [rows.0, rows.1, rows.2, rows.3].into_iter().enumerate() {
++                    let bytes = vreinterpretq_s8_s32(bytes);
++                    let lo = vmovl_s8(vget_low_s8(bytes));
++                    let hi = vmovl_s8(vget_high_s8(bytes));
++                    a[row] = vfmaq_f32(a[row], vcvtq_f32_s32(vmovl_s16(vget_low_s16(lo))), x0);
++                    c[row] = vfmaq_f32(c[row], vcvtq_f32_s32(vmovl_s16(vget_high_s16(lo))), x1);
++                    d[row] = vfmaq_f32(d[row], vcvtq_f32_s32(vmovl_s16(vget_low_s16(hi))), x2);
++                    e[row] = vfmaq_f32(e[row], vcvtq_f32_s32(vmovl_s16(vget_high_s16(hi))), x3);
++                }
++            }
++            for row in 0..4 {
++                totals[row] = vfmaq_n_f32(
++                    totals[row],
++                    vaddq_f32(vaddq_f32(a[row], c[row]), vaddq_f32(d[row], e[row])),
++                    scales[b * 4 + row],
++                );
++            }
++        }
++        totals.map(|total| vaddvq_f32(total) + 0.)
++    }
++}
++
++#[inline(always)]
++unsafe fn load_rows(p: *const i8) -> std::arch::aarch64::int32x4x4_t {
++    use std::arch::aarch64::*;
++    // SAFETY: caller provides 64 readable bytes. Loads do not require alignment.
++    unsafe {
++        let a = vreinterpretq_s32_s8(vld1q_s8(p));
++        let b = vreinterpretq_s32_s8(vld1q_s8(p.add(16)));
++        let c = vreinterpretq_s32_s8(vld1q_s8(p.add(32)));
++        let d = vreinterpretq_s32_s8(vld1q_s8(p.add(48)));
++        let ac = vtrn1q_s32(a, b);
++        let bd = vtrn2q_s32(a, b);
++        let eg = vtrn1q_s32(c, d);
++        let fh = vtrn2q_s32(c, d);
++        int32x4x4_t(
++            vcombine_s32(vget_low_s32(ac), vget_low_s32(eg)),
++            vcombine_s32(vget_low_s32(bd), vget_low_s32(fh)),
++            vcombine_s32(vget_high_s32(ac), vget_high_s32(eg)),
++            vcombine_s32(vget_high_s32(bd), vget_high_s32(fh)),
++        )
++    }
++}
+diff --git a/src/cpu/lane_probe.rs b/src/cpu/lane_probe.rs
+new file mode 100644
+index 0000000..2301aa8
+--- /dev/null
++++ b/src/cpu/lane_probe.rs
+@@ -0,0 +1,187 @@
++//! Test-only investigation of four-byte-lane-interleaved Q8 weights.
++use super::{
++    lane_q8::{dot_lanes, unpack_lanes},
++    neon,
++};
++
++fn pack(weights: &[i8], scales: &[f32], cols: usize) -> (Vec<i8>, Vec<f32>) {
++    let blocks = cols / 32;
++    assert_eq!(weights.len(), 4 * cols);
++    assert_eq!(scales.len(), 4 * blocks);
++    let mut packed = vec![0; weights.len()];
++    let mut packed_scales = vec![0.; scales.len()];
++    for b in 0..blocks {
++        for row in 0..4 {
++            packed_scales[b * 4 + row] = scales[row * blocks + b];
++            for chunk in 0..8 {
++                for lane in 0..4 {
++                    packed[b * 128 + chunk * 16 + row * 4 + lane] =
++                        weights[row * cols + b * 32 + chunk * 4 + lane];
++                }
++            }
++        }
++    }
++    (packed, packed_scales)
++}
++
++#[test]
++fn lane_packed_dot_and_unpack_match_bits() {
++    if !std::arch::is_aarch64_feature_detected!("dotprod") {
++        return;
++    }
++    for cols in [32usize, 64, 96, 896, 1280, 6848] {
++        let blocks = cols / 32;
++        for offset in 0..4 {
++            let weights: Vec<i8> = (0..4 * cols).map(|i| (i * 71 + i / 17) as i8).collect();
++            let scales: Vec<f32> = (0..4 * blocks)
++                .map(|i| [0., -0., 0.00317, 0.7, 1e-10, 17.][i % 6])
++                .collect();
++            let mut x = vec![0i8; offset];
++            x.extend((0..cols).map(|i| (i * 53 + i / 11) as i8));
++            let xs: Vec<f32> = (0..blocks).map(|i| (i % 17 + 1) as f32 / 123.).collect();
++            let (packed, ps) = pack(&weights, &scales, cols);
++            let mut unaligned = vec![0i8; offset];
++            unaligned.extend(&packed);
++            let mut unaligned_scales = vec![0.; offset];
++            unaligned_scales.extend(&ps);
++            let actual = unsafe {
++                dot_lanes(
++                    &unaligned[offset..],
++                    &x[offset..],
++                    &unaligned_scales[offset..],
++                    &xs,
++                )
++            };
++            let expected =
++                unsafe { neon::dot_int8_four_rows(&weights, &x[offset..], &scales, &xs) };
++            assert_eq!(actual.map(f32::to_bits), expected.map(f32::to_bits));
++            let mut output = vec![f32::NAN; 4 * cols + 2 * offset];
++            unpack_lanes(
++                &unaligned[offset..],
++                &unaligned_scales[offset..],
++                &mut output[offset..offset + 4 * cols],
++                cols,
++            );
++            for i in 0..4 * cols {
++                let expected = weights[i] as f32 * scales[i / cols * blocks + i % cols / 32];
++                assert_eq!(
++                    output[offset + i].to_bits(),
++                    expected.to_bits(),
++                    "cols={cols} offset={offset} i={i}"
++                );
++            }
++            assert!(
++                output[..offset]
++                    .iter()
++                    .chain(&output[offset + 4 * cols..])
++                    .all(|v| v.is_nan())
++            );
++        }
++    }
++}
++
++#[test]
++#[ignore = "isolated Q8 layout microbenchmark; no full-model speed claim"]
++fn lane_packed_microbenchmark() {
++    use std::{hint::black_box, time::Instant};
++    assert!(std::arch::is_aarch64_feature_detected!("dotprod"));
++    for (rows, cols, repeats) in [
++        (896usize, 1280usize, 128usize),
++        (1280, 896, 128),
++        (1280, 1280, 128),
++        (129280, 1280, 4),
++    ] {
++        let blocks = cols / 32;
++        let weights: Vec<i8> = (0..rows * cols).map(|i| (i * 71 + i / 17) as i8).collect();
++        let scales: Vec<f32> = (0..rows * blocks)
++            .map(|i| (i % 29 + 1) as f32 / 731.)
++            .collect();
++        let x: Vec<i8> = (0..cols).map(|i| (i * 53 + i / 11) as i8).collect();
++        let xs: Vec<f32> = (0..blocks).map(|i| (i % 17 + 1) as f32 / 123.).collect();
++        let mut packed = vec![0i8; weights.len()];
++        let mut packed_scales = vec![0.; scales.len()];
++        let start = Instant::now();
++        for group in 0..rows / 4 {
++            let (w, s) = pack(
++                &weights[group * 4 * cols..(group + 1) * 4 * cols],
++                &scales[group * 4 * blocks..(group + 1) * 4 * blocks],
++                cols,
++            );
++            packed[group * 4 * cols..(group + 1) * 4 * cols].copy_from_slice(&w);
++            packed_scales[group * 4 * blocks..(group + 1) * 4 * blocks].copy_from_slice(&s);
++        }
++        println!(
++            "{}",
++            serde_json::json!({"kind":"packing", "rows":rows,"cols":cols,"seconds":start.elapsed().as_secs_f64()})
++        );
++        let mut output = vec![0.; rows];
++        let mut dequantized = vec![0.; rows * cols];
++        for iteration in 0..7 {
++            for lane in if iteration % 2 == 0 {
++                [false, true]
++            } else {
++                [true, false]
++            } {
++                let start = Instant::now();
++                for _ in 0..repeats {
++                    for (group, out) in output.chunks_exact_mut(4).enumerate() {
++                        let (w, s) = if lane {
++                            (&packed, &packed_scales)
++                        } else {
++                            (&weights, &scales)
++                        };
++                        let w = black_box(&w[group * 4 * cols..(group + 1) * 4 * cols]);
++                        let s = black_box(&s[group * 4 * blocks..(group + 1) * 4 * blocks]);
++                        let result = unsafe {
++                            if lane {
++                                dot_lanes(w, black_box(&x), s, black_box(&xs))
++                            } else {
++                                neon::dot_int8_four_rows(w, black_box(&x), s, black_box(&xs))
++                            }
++                        };
++                        out.copy_from_slice(&result);
++                    }
++                    black_box(&output);
++                }
++                let dot_seconds = start.elapsed().as_secs_f64() / repeats as f64;
++                let checksum: u64 = output.iter().map(|v| u64::from(v.to_bits())).sum();
++                let start = Instant::now();
++                for _ in 0..repeats.min(8) {
++                    if lane {
++                        for (group, out) in dequantized.chunks_exact_mut(4 * cols).enumerate() {
++                            unpack_lanes(
++                                black_box(&packed[group * 4 * cols..(group + 1) * 4 * cols]),
++                                black_box(
++                                    &packed_scales[group * 4 * blocks..(group + 1) * 4 * blocks],
++                                ),
++                                out,
++                                cols,
++                            );
++                        }
++                    } else {
++                        for ((w, s), out) in black_box(&weights)
++                            .chunks_exact(cols)
++                            .zip(black_box(&scales).chunks_exact(blocks))
++                            .zip(dequantized.chunks_exact_mut(cols))
++                        {
++                            for ((w, &scale), out) in
++                                w.chunks_exact(32).zip(s).zip(out.chunks_exact_mut(32))
++                            {
++                                for (dest, &value) in out.iter_mut().zip(w) {
++                                    *dest = value as f32 * scale;
++                                }
++                            }
++                        }
++                    }
++                    black_box(&dequantized);
++                }
++                let unpack_seconds = start.elapsed().as_secs_f64() / repeats.min(8) as f64;
++                let unpack_checksum: u64 = dequantized.iter().map(|v| u64::from(v.to_bits())).sum();
++                println!(
++                    "{}",
++                    serde_json::json!({"kind":"sample","rows":rows,"cols":cols,"lane_packed":lane,"iteration":iteration,"warmup":iteration==0,"dot_seconds":dot_seconds,"unpack_seconds":unpack_seconds,"checksum":checksum,"unpack_checksum":unpack_checksum})
++                );
++            }
++        }
++    }
++}

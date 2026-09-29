@@ -1,0 +1,21 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0599]: no method named `prepare_dynamic` found for struct `quantized::Int8Matrix` in the current scope
+   --> src/cpu/quantized.rs:466:20
+    |
+ 11 | pub struct Int8Matrix {
+    | --------------------- method `prepare_dynamic` not found for this struct
+...
+466 |             packed.prepare_dynamic();
+    |                    ^^^^^^^^^^^^^^^ method not found in `quantized::Int8Matrix`
+
+error[E0599]: no method named `prepare_dynamic` found for struct `quantized::Int8Matrix` in the current scope
+   --> src/cpu/quantized.rs:469:20
+    |
+ 11 | pub struct Int8Matrix {
+    | --------------------- method `prepare_dynamic` not found for this struct
+...
+469 |             packed.prepare_dynamic();
+    |                    ^^^^^^^^^^^^^^^ method not found in `quantized::Int8Matrix`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `uocr` (lib test) due to 2 previous errors

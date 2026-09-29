@@ -1,0 +1,40 @@
+{
+  "power_source": "ac",
+  "all_16_logit_hashes_equal": true,
+  "logits_sha256": "3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da",
+  "variants": {
+    "baseline": {
+      "decode_with_checksum_seconds": {
+        "median": 3.3284450210000003,
+        "minimum": 3.309942667,
+        "maximum": 3.340472208,
+        "n": 6
+      },
+      "prefill_seconds": {
+        "median": 1.4923184379999999,
+        "minimum": 1.467743917,
+        "maximum": 1.506888958,
+        "n": 6
+      }
+    },
+    "candidate": {
+      "decode_with_checksum_seconds": {
+        "median": 3.2589402705,
+        "minimum": 3.248058625,
+        "maximum": 3.28505375,
+        "n": 6
+      },
+      "prefill_seconds": {
+        "median": 1.540629167,
+        "minimum": 1.532512583,
+        "maximum": 1.566603459,
+        "n": 6
+      }
+    }
+  },
+  "notes": [
+    "Includes all-logit hashing in decode.",
+    "Process lifetime includes load/prepare, fixture setup and four timed repetitions; not an isolated startup measurement.",
+    "Battery results are exploratory; AC confirmation and full OCR gates required before speed claims."
+  ]
+}

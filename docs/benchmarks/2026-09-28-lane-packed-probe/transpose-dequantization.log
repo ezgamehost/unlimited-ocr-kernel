@@ -1,0 +1,51 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 15.70s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 1 test
+{"cols":1280,"iteration":0,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.0000837135625}
+{"cols":1280,"iteration":0,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.00009049609375}
+{"cols":1280,"iteration":1,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.00009272265625}
+{"cols":1280,"iteration":1,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.00008098565625}
+{"cols":1280,"iteration":2,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.00008075}
+{"cols":1280,"iteration":2,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.00009223696875}
+{"cols":1280,"iteration":3,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.0000923580625}
+{"cols":1280,"iteration":3,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.0000807265625}
+{"cols":1280,"iteration":4,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.0000807565}
+{"cols":1280,"iteration":4,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.00009102996875}
+{"cols":1280,"iteration":5,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.00009151434375}
+{"cols":1280,"iteration":5,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.000080834625}
+{"cols":1280,"iteration":6,"lane_packed":false,"probe":"actual_dequantization","rows":896,"seconds":0.000080875}
+{"cols":1280,"iteration":6,"lane_packed":true,"probe":"actual_dequantization","rows":896,"seconds":0.00010503253125}
+{"cols":896,"iteration":0,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00007919921875}
+{"cols":896,"iteration":0,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.0000910013125}
+{"cols":896,"iteration":1,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00009217446875}
+{"cols":896,"iteration":1,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00008150521875}
+{"cols":896,"iteration":2,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00008301171875}
+{"cols":896,"iteration":2,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00009279165625}
+{"cols":896,"iteration":3,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.0000934453125}
+{"cols":896,"iteration":3,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00008431121875}
+{"cols":896,"iteration":4,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00007770703125}
+{"cols":896,"iteration":4,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00009050259375}
+{"cols":896,"iteration":5,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00009643096875}
+{"cols":896,"iteration":5,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.000080819}
+{"cols":896,"iteration":6,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.000079622375}
+{"cols":896,"iteration":6,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00009087109375}
+{"cols":1280,"iteration":0,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00012281640625}
+{"cols":1280,"iteration":0,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00013177603125}
+{"cols":1280,"iteration":1,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00012852734375}
+{"cols":1280,"iteration":1,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00011538021875}
+{"cols":1280,"iteration":2,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00011519009375}
+{"cols":1280,"iteration":2,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.0001299765625}
+{"cols":1280,"iteration":3,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00013153646875}
+{"cols":1280,"iteration":3,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.000114734375}
+{"cols":1280,"iteration":4,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00011478125}
+{"cols":1280,"iteration":4,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.000129296875}
+{"cols":1280,"iteration":5,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.00013013671875}
+{"cols":1280,"iteration":5,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00011589584375}
+{"cols":1280,"iteration":6,"lane_packed":false,"probe":"actual_dequantization","rows":1280,"seconds":0.00011489190625}
+{"cols":1280,"iteration":6,"lane_packed":true,"probe":"actual_dequantization","rows":1280,"seconds":0.000129359375}
+test cpu::quantized::lane_layout_tests::packed_q8_dequantization_probe ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.14s
+

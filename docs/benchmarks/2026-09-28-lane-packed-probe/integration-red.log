@@ -1,0 +1,31 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0689]: can't call method `div_ceil` on ambiguous numeric type `{integer}`
+   --> src/cpu/quantized.rs:463:52
+    |
+461 |         for (rows, cols) in [(4, 32), (8, 96), (12, 896), (4, 1280), (5, 33), (3, 32)] {
+    |                    ---- you must specify a type for this binding, like `i32`
+462 |             let weights: Vec<i8> = (0..rows * cols).map(|i| (i * 71 + i / 17) as i8).collect();
+463 |             let scales: Vec<f32> = (0..rows * cols.div_ceil(32)).map(|i| [0., -0., 0.00317, 0.7, 1e-10, 17.][i % 6]).collect();
+    |                                                    ^^^^^^^^
+
+error[E0599]: no method named `prepare_dynamic` found for struct `quantized::Int8Matrix` in the current scope
+   --> src/cpu/quantized.rs:466:20
+    |
+ 11 | pub struct Int8Matrix {
+    | --------------------- method `prepare_dynamic` not found for this struct
+...
+466 |             packed.prepare_dynamic();
+    |                    ^^^^^^^^^^^^^^^ method not found in `quantized::Int8Matrix`
+
+error[E0599]: no method named `prepare_dynamic` found for struct `quantized::Int8Matrix` in the current scope
+   --> src/cpu/quantized.rs:469:20
+    |
+ 11 | pub struct Int8Matrix {
+    | --------------------- method `prepare_dynamic` not found for this struct
+...
+469 |             packed.prepare_dynamic();
+    |                    ^^^^^^^^^^^^^^^ method not found in `quantized::Int8Matrix`
+
+Some errors have detailed explanations: E0599, E0689.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `uocr` (lib test) due to 3 previous errors
