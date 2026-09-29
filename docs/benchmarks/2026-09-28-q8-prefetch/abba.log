@@ -1,0 +1,13 @@
+{"phase": 0, "variant": "baseline", "decode_seconds": [3.2879803340000002, 3.316484875, 3.249582, 3.23189425]}
+Traceback (most recent call last):
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-q8-prefetch/run.py", line 105, in <module>
+    main()
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-q8-prefetch/run.py", line 78, in main
+    row['power_after']=power(args.power_source)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-q8-prefetch/run.py", line 25, in power
+    assert f"Now drawing from '{expected}'" in battery,battery
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Now drawing from 'Battery Power'
+ -InternalBattery-0 (id=6226019)	99%; discharging; (no estimate) present: true
+

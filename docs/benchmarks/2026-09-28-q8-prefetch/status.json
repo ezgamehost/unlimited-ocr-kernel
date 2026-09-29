@@ -1,0 +1,9 @@
+{
+  "state": "interrupted_power_change",
+  "completed_processes": 2,
+  "normal_process_exits": 2,
+  "exact_logit_repetitions": 8,
+  "logits_sha256": "3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da",
+  "performance_series_valid": false,
+  "reason": "Candidate began on AC; post-phase check found Battery Power. No performance comparison accepted."
+}

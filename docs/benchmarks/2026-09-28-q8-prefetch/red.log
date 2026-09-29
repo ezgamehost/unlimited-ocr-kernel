@@ -1,0 +1,24 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `dot_int8_four_rows_prefetch` in this scope
+   --> src/cpu/neon.rs:358:34
+    |
+234 | / pub(super) unsafe fn dot_int8_four_rows(
+235 | |     weights: &[i8],
+236 | |     x: &[i8],
+237 | |     ws: &[f32],
+...   |
+282 | |     result
+283 | | }
+    | |_- similarly named function `dot_int8_four_rows` defined here
+...
+358 |                   let b = unsafe { dot_int8_four_rows_prefetch(&weights[offset..], &x[offset..], &scales, &xs) };
+    |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: a function with a similar name exists
+    |
+358 -                 let b = unsafe { dot_int8_four_rows_prefetch(&weights[offset..], &x[offset..], &scales, &xs) };
+358 +                 let b = unsafe { dot_int8_four_rows(&weights[offset..], &x[offset..], &scales, &xs) };
+    |
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 1 previous error

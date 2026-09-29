@@ -1,0 +1,26 @@
+{
+  "phase": 1,
+  "variant": "candidate",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/q8-prefetch/candidate",
+    "model::benchmark::fixed_work_decoder_benchmark",
+    "--ignored",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 4491706368,
+    "user_cpu_seconds": 75.811112,
+    "system_cpu_seconds": 18.834081,
+    "major_faults": 1137,
+    "minor_faults": 763281
+  },
+  "power_before": {
+    "battery": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=6226019)\t99%; finishing charge; 0:15 remaining present: true\n",
+    "profile": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "process_wall_seconds": 25.94613812500029
+}
