@@ -1,0 +1,16 @@
+{
+  "manifests": [
+    {
+      "path": "benchmarks/corpus/manifest.json",
+      "sha256": "3880a129dba88e265d3a2a093e3ca774aea756ef8fee0a55ddec6a4ea6587244"
+    },
+    {
+      "path": "benchmarks/heldout/manifest.json",
+      "sha256": "73b8f9acddcb61684e31f56115d47ee99d94d41ae6699fe45f2209def594172c"
+    }
+  ],
+  "coordinate_projection": "int(value / 999 * image dimension), matching upstream draw",
+  "bounds": "Rendered typographic text bounds; grouped table regions use unions of contiguous lines.",
+  "limits": "Synthetic text layout only, not a general document layout benchmark. Cases selected because raw outputs changed.",
+  "cases": []
+}

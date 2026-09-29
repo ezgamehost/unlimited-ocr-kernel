@@ -40,3 +40,26 @@ No global change is accepted. A BF16-specific numerical improvement may still be
 useful, but needs its own broad BF16 OCR comparison and performance assessment;
 these Q8 results cannot establish that. The global candidate remains available
 for that investigation without altering the accepted benchmark runtime.
+
+## Subsequent matched BF16 quality comparison
+
+bf16_quality.py runs the accepted CLI (05616a6d...) and preserved global candidate
+(7561f20d...) with no quantized overlay on the same twelve requests. It verifies
+both executable hashes, frozen image hashes, the BF16 precision label, twelve
+successful responses per process, normal exit status, and absence of forced kills.
+The process completed successfully: **all twelve candidate raw outputs and token
+IDs exactly match baseline, including coordinates; all 24 requests reach EOS.**
+CER is unchanged, zero except the matched table request at 0.003984063745.
+score_bf16.py confirms there are no changed boxes to score.
+
+This establishes quality preservation on the tested BF16 corpus despite the Q8
+coordinate changes. It supports evaluating a BF16-only decoder dispatch to the
+more accurate reduction, while retaining the accepted quantized arithmetic.
+That dispatch has not been implemented or benchmarked by this experiment. The
+full-model parity result above belongs to the same candidate arithmetic; a final
+scoped implementation must rerun its own parity and output checks. These sequential
+runs took place on battery and their timing fields are not performance evidence.
+
+Reproduce with `PYTHONPATH=. .venv/bin/python` followed by this directory's
+bf16_quality.py, then score_bf16.py. Use a fresh bf16-quality output directory;
+the quality harness refuses overwrite.

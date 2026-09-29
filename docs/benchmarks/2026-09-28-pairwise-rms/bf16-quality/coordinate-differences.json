@@ -1,0 +1,122 @@
+[
+  {
+    "case": "corpus-english-original",
+    "boxes": 9,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-english-matched",
+    "boxes": 9,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-chinese-original",
+    "boxes": 12,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-chinese-matched",
+    "boxes": 12,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-table-original",
+    "boxes": 5,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-table-matched",
+    "boxes": 5,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-dense-original",
+    "boxes": 57,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-dense-matched",
+    "boxes": 2,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "heldout-receipt-original",
+    "boxes": 8,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "heldout-wide_report-original",
+    "boxes": 11,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "heldout-bilingual_notice-original",
+    "boxes": 16,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "heldout-archive_register-original",
+    "boxes": 54,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  }
+]

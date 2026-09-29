@@ -1,0 +1,124 @@
+baseline completed
+candidate completed
+[
+  {
+    "case": "corpus-english-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "corpus-english-matched",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "corpus-chinese-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "corpus-chinese-matched",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "corpus-table-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "corpus-table-matched",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.00398406374501992,
+    "candidate_cer": 0.00398406374501992
+  },
+  {
+    "case": "corpus-dense-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "corpus-dense-matched",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "heldout-receipt-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "heldout-wide_report-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "heldout-bilingual_notice-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  },
+  {
+    "case": "heldout-archive_register-original",
+    "raw_equal": true,
+    "normalized_equal": true,
+    "tokens_equal": true,
+    "baseline_eos": true,
+    "candidate_eos": true,
+    "baseline_cer": 0.0,
+    "candidate_cer": 0.0
+  }
+]
