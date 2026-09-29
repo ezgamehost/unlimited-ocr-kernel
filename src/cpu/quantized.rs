@@ -8,6 +8,32 @@ use rayon::prelude::*;
 
 pub const BLOCK: usize = 32;
 
+/// One quantized activation row, reusable across projections with the same input.
+pub struct QuantizedActivation {
+    pub(super) matrix: Int8Matrix,
+    pub(super) rank: usize,
+}
+
+impl QuantizedActivation {
+    pub fn new(input: &Tensor) -> Result<Self> {
+        input.validate()?;
+        if input.data.is_empty() || input.shape.last() != Some(&input.data.len()) {
+            return Err(OcrError::Shape(
+                "activation requires one nonempty row".into(),
+            ));
+        }
+        Ok(Self {
+            matrix: Int8Matrix::quantize_row(&input.data)?,
+            // A validated nonempty single row has only unit leading dimensions.
+            rank: input.shape.len(),
+        })
+    }
+
+    pub(super) fn width(&self) -> usize {
+        self.matrix.cols
+    }
+}
+
 pub struct Int8Matrix {
     rows: usize,
     cols: usize,
@@ -187,7 +213,26 @@ impl Int8Matrix {
             .and_then(|n| n.checked_add(self.cols.div_ceil(BLOCK)))
             .ok_or_else(|| OcrError::Resource("dynamic INT8 scratch overflow".into()))?;
         cpu.check_elements(scratch)?;
-        let activation = Self::quantize_row(&x.data)?;
+        let activation = QuantizedActivation::new(x)?;
+        self.linear_prepared(&activation, cpu)
+    }
+
+    /// Apply weights to an already quantized row without repeating quantization.
+    pub fn linear_prepared(
+        &self,
+        prepared: &QuantizedActivation,
+        cpu: &mut CpuContext,
+    ) -> Result<Tensor> {
+        if prepared.width() != self.cols {
+            return Err(OcrError::Shape("prepared INT8 activation width".into()));
+        }
+        let scratch = self
+            .cols
+            .checked_add(self.rows)
+            .and_then(|n| n.checked_add(self.cols.div_ceil(BLOCK)))
+            .ok_or_else(|| OcrError::Resource("dynamic INT8 scratch overflow".into()))?;
+        cpu.check_elements(scratch)?;
+        let activation = &prepared.matrix;
         let blocks = self.cols.div_ceil(BLOCK);
         #[cfg(target_arch = "aarch64")]
         let dotprod =
@@ -251,7 +296,7 @@ impl Int8Matrix {
                     .for_each(compute_group)
             });
         }
-        let mut shape = x.shape.clone();
+        let mut shape = vec![1; prepared.rank];
         *shape.last_mut().unwrap() = self.rows;
         Tensor::new(shape, data)
     }
@@ -290,6 +335,17 @@ pub enum QuantizedMatrix {
     Int4(super::int4::Int4Matrix),
 }
 impl QuantizedMatrix {
+    pub fn linear_prepared(
+        &self,
+        activation: &QuantizedActivation,
+        cpu: &mut CpuContext,
+    ) -> Result<Tensor> {
+        match self {
+            Self::Int8(m) => m.linear_prepared(activation, cpu),
+            Self::Int4(m) => m.linear_prepared(activation, cpu),
+        }
+    }
+
     pub fn linear(&self, x: &Tensor, cpu: &mut CpuContext) -> Result<Tensor> {
         match self {
             Self::Int8(m) => m.linear(x, cpu),

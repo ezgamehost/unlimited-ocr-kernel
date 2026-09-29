@@ -8,6 +8,52 @@ fn bits(values: &[f32]) -> Vec<u32> {
 }
 
 #[test]
+fn prepared_activation_matches_dynamic_paths_and_rejects_wrong_width() {
+    use uocr::cpu::quantized::QuantizedActivation;
+    for cols in [1usize, 31, 32, 33, 1280] {
+        let rows = 9;
+        let blocks = cols.div_ceil(32);
+        let mut packed = vec![0; rows * blocks * 16];
+        for row in 0..rows {
+            for col in 0..cols {
+                packed[(row * blocks + col / 32) * 16 + col % 16] |=
+                    ((col % 7) as u8) << (4 * ((col % 32) / 16));
+            }
+        }
+        let q4 = Int4Matrix::from_parts(rows, cols, packed, vec![0.13; rows * blocks]).unwrap();
+        let q8 = Int8Matrix::quantize(&q4.dequantize().unwrap()).unwrap();
+        for shape in [vec![cols], vec![1, cols], vec![1, 1, cols]] {
+            let x =
+                Tensor::new(shape, (0..cols).map(|i| (i as f32 * 0.17).sin()).collect()).unwrap();
+            let ready = QuantizedActivation::new(&x).unwrap();
+            for backend in [Backend::Scalar, Backend::Auto] {
+                let mut cpu = CpuContext::new(backend, 3, 1 << 20).unwrap();
+                let a = q8.linear_dynamic_int8(&x, &mut cpu).unwrap();
+                let b = q8.linear_prepared(&ready, &mut cpu).unwrap();
+                assert_eq!(a.shape, b.shape);
+                assert_eq!(bits(&a.data), bits(&b.data));
+                let a = q4.linear_dynamic_int8(&x, &mut cpu).unwrap();
+                let b = q4.linear_prepared(&ready, &mut cpu).unwrap();
+                assert_eq!(a.shape, b.shape);
+                assert_eq!(bits(&a.data), bits(&b.data));
+            }
+        }
+        let wrong =
+            QuantizedActivation::new(&Tensor::new(vec![1, cols + 1], vec![1.; cols + 1]).unwrap())
+                .unwrap();
+        let mut cpu = CpuContext::new(Backend::Auto, 1, 1 << 20).unwrap();
+        assert!(q8.linear_prepared(&wrong, &mut cpu).is_err());
+        assert!(q4.linear_prepared(&wrong, &mut cpu).is_err());
+    }
+    for x in [
+        Tensor::new(vec![2, 3], vec![1.; 6]).unwrap(),
+        Tensor::new(vec![1, 1], vec![f32::NAN]).unwrap(),
+    ] {
+        assert!(QuantizedActivation::new(&x).is_err());
+    }
+}
+
+#[test]
 fn dynamic_projections_fit_without_activation_clone_scratch() {
     let (rows, cols) = (9, 33);
     let weights = Tensor::new(vec![rows, cols], vec![0.5; rows * cols]).unwrap();

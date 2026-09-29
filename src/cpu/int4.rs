@@ -1,7 +1,7 @@
 //! Block32 signed INT4 weights: low sixteen codes, then high sixteen codes.
 use super::{
     Backend, CpuContext, ops,
-    quantized::{BLOCK, Int8Matrix},
+    quantized::{BLOCK, QuantizedActivation},
 };
 use crate::{
     error::{OcrError, Result},
@@ -174,8 +174,26 @@ impl Int4Matrix {
             .and_then(|n| n.checked_add(self.blocks))
             .ok_or_else(|| OcrError::Resource("dynamic INT4 scratch overflow".into()))?;
         cpu.check_elements(scratch)?;
-        let activation = Int8Matrix::quantize_row(&x.data)?;
-        let (codes, scales) = activation.parts();
+        let activation = QuantizedActivation::new(x)?;
+        self.linear_prepared(&activation, cpu)
+    }
+
+    /// Apply packed weights to an already quantized activation row.
+    pub fn linear_prepared(
+        &self,
+        prepared: &QuantizedActivation,
+        cpu: &mut CpuContext,
+    ) -> Result<Tensor> {
+        if prepared.width() != self.cols {
+            return Err(OcrError::Shape("prepared INT4 activation width".into()));
+        }
+        let scratch = self
+            .cols
+            .checked_add(self.rows)
+            .and_then(|n| n.checked_add(self.blocks))
+            .ok_or_else(|| OcrError::Resource("dynamic INT4 scratch overflow".into()))?;
+        cpu.check_elements(scratch)?;
+        let (codes, scales) = prepared.matrix.parts();
         // Match the simulation backend's accumulation identity, including
         // signed zero: Iterator::sum uses -0, while SDOT starts with +0.
         let initial = -0.0f32;
@@ -242,7 +260,7 @@ impl Int4Matrix {
                     .for_each(compute)
             });
         }
-        let mut shape = x.shape.clone();
+        let mut shape = vec![1; prepared.rank];
         *shape.last_mut().unwrap() = self.rows;
         Tensor::new(shape, data)
     }

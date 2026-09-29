@@ -1,0 +1,18 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0599]: no method named `feed_forward_prepared` found for struct `decoder::Decoder<'a>` in the current scope
+   --> src/decoder/mod.rs:521:40
+    |
+ 13 | pub struct Decoder<'a> {
+    | ---------------------- method `feed_forward_prepared` not found for this struct
+...
+521 |                 let prepared = decoder.feed_forward_prepared(&input, prefix, Some(&activation), &mut cpu).unwrap();
+    |                                        ^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `feed_forward` with a similar name, but with different arguments
+   --> src/decoder/mod.rs:188:5
+    |
+188 |     fn feed_forward(&self, x: &Tensor, prefix: &str, cpu: &mut CpuContext) -> Result<Tensor> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `uocr` (lib test) due to 1 previous error

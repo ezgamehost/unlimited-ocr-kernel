@@ -32,6 +32,11 @@ a further **1.60%** decoder improvement with the same output checks. The whole-p
 llama.cpp comparison above predates both changes; these stage gains are not a new
 whole-page speedup claim.
 
+The decoder also [shares quantized activations across Q/K/V and MoE projections](docs/benchmarks/2026-09-28-shared-moe-activation/README.md),
+preserving all 24 tested Q8/hybrid OCR outputs exactly. A battery-only comparison
+observed a 4.94% lower median decode time with overlapping ranges; this is not a
+confirmed AC improvement or a new whole-page speedup claim.
+
 ## Build and run
 
 The toolchain is pinned in `rust-toolchain.toml`. On macOS, building also requires

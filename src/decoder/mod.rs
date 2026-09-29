@@ -144,19 +144,36 @@ impl<'a> Decoder<'a> {
             && cpu.threads() >= 3
             && scratch.is_some_and(|n| cpu.check_elements(n).is_ok())
         {
+            let matrices = self.quantized.and_then(|(weights, mode)| {
+                if mode != crate::cpu::quantized::QuantizationMode::DynamicActivations {
+                    return None;
+                }
+                Some([
+                    weights.get(&names[0])?,
+                    weights.get(&names[1])?,
+                    weights.get(&names[2])?,
+                ])
+            });
+            let activation = matrices
+                .as_ref()
+                .map(|_| crate::cpu::quantized::QuantizedActivation::new(x))
+                .transpose()?;
+            let project = |index: usize, worker: &mut CpuContext| {
+                if let (Some(matrices), Some(activation)) = (matrices.as_ref(), activation.as_ref())
+                {
+                    matrices[index].linear_prepared(activation, worker)
+                } else {
+                    self.projection(x, &names[index], worker)
+                }
+            };
             let mut q_cpu = cpu.serial_worker(3);
             let mut k_cpu = cpu.serial_worker(3);
             let mut v_cpu = cpu.serial_worker(3);
             let pool = std::sync::Arc::clone(&cpu.pool);
             let (q, (k, v)) = pool.install(|| {
                 rayon::join(
-                    || self.projection(x, &names[0], &mut q_cpu),
-                    || {
-                        rayon::join(
-                            || self.projection(x, &names[1], &mut k_cpu),
-                            || self.projection(x, &names[2], &mut v_cpu),
-                        )
-                    },
+                    || project(0, &mut q_cpu),
+                    || rayon::join(|| project(1, &mut k_cpu), || project(2, &mut v_cpu)),
                 )
             });
             return Ok((q?, k?, v?));
@@ -169,8 +186,29 @@ impl<'a> Decoder<'a> {
     }
 
     fn feed_forward(&self, x: &Tensor, prefix: &str, cpu: &mut CpuContext) -> Result<Tensor> {
-        let mut gate = self.projection(x, &format!("{prefix}.gate_proj.weight"), cpu)?;
-        let up = self.projection(x, &format!("{prefix}.up_proj.weight"), cpu)?;
+        self.feed_forward_prepared(x, prefix, None, cpu)
+    }
+
+    fn feed_forward_prepared(
+        &self,
+        x: &Tensor,
+        prefix: &str,
+        prepared: Option<&crate::cpu::quantized::QuantizedActivation>,
+        cpu: &mut CpuContext,
+    ) -> Result<Tensor> {
+        let project = |name: &str, cpu: &mut CpuContext| {
+            if let Some(activation) = prepared
+                && let Some((weights, mode)) = self.quantized
+                && mode == crate::cpu::quantized::QuantizationMode::DynamicActivations
+                && let Some(matrix) = weights.get(name)
+            {
+                matrix.linear_prepared(activation, cpu)
+            } else {
+                self.projection(x, name, cpu)
+            }
+        };
+        let mut gate = project(&format!("{prefix}.gate_proj.weight"), cpu)?;
+        let up = project(&format!("{prefix}.up_proj.weight"), cpu)?;
         ops::silu(&mut gate.data);
         for (value, u) in gate.data.iter_mut().zip(up.data) {
             *value *= u;
@@ -224,6 +262,15 @@ impl<'a> Decoder<'a> {
                 .and_then(|n| n.checked_mul(task_count));
 
             if !selected.is_empty() && scratch.is_some_and(|n| cpu.check_elements(n).is_ok()) {
+                // Every selected expert consumes this same normalized row.
+                // Down projections still quantize their distinct intermediates.
+                let activation = if self.quantized.is_some_and(|(_, mode)| {
+                    mode == crate::cpu::quantized::QuantizationMode::DynamicActivations
+                }) {
+                    Some(crate::cpu::quantized::QuantizedActivation::new(x)?)
+                } else {
+                    None
+                };
                 let pool = std::sync::Arc::clone(&cpu.pool);
                 let outputs: Vec<_> = pool.install(|| {
                     (0..task_count)
@@ -239,7 +286,7 @@ impl<'a> Decoder<'a> {
                             } else {
                                 format!("{prefix}.experts.{}", selected[task - 1].0)
                             };
-                            self.feed_forward(x, &name, &mut worker)
+                            self.feed_forward_prepared(x, &name, activation.as_ref(), &mut worker)
                         })
                         .collect()
                 });
@@ -481,6 +528,69 @@ impl<'a> Decoder<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires original weights and Q8/hybrid overlays"]
+    fn prepared_expert_inputs_preserve_independent_projection_outputs() {
+        use crate::cpu::{
+            Backend,
+            quantized::{QuantizationMode, QuantizedActivation, QuantizedWeights},
+        };
+        use std::path::Path;
+        let weights = Checkpoint::open(Path::new(
+            "artifacts/upstream/model-00001-of-000001.safetensors",
+        ))
+        .unwrap();
+        let config = ModelConfig::load(Path::new("artifacts/upstream/config.json")).unwrap();
+        let input = Tensor::new(
+            vec![1, config.hidden_size],
+            (0..config.hidden_size)
+                .map(|i| (i as f32 * 0.017).sin())
+                .collect(),
+        )
+        .unwrap();
+        let activation = QuantizedActivation::new(&input).unwrap();
+        for path in [
+            "artifacts/unlimited-ocr-q8-block32.safetensors",
+            "artifacts/unlimited-ocr-q4-q8head-block32.safetensors",
+        ] {
+            let overlay = QuantizedWeights::load(Path::new(path), &weights).unwrap();
+            let decoder = Decoder::new(&weights, config.clone())
+                .unwrap()
+                .with_quantization(&overlay, QuantizationMode::DynamicActivations);
+            let mut cpu = CpuContext::new(Backend::Auto, 8, 1 << 30).unwrap();
+            for prefix in [
+                "model.layers.0.mlp",
+                "model.layers.1.mlp.shared_experts",
+                "model.layers.1.mlp.experts.0",
+                "model.layers.1.mlp.experts.7",
+                "model.layers.11.mlp.experts.63",
+            ] {
+                let ordinary = decoder.feed_forward(&input, prefix, &mut cpu).unwrap();
+                let prepared = decoder
+                    .feed_forward_prepared(&input, prefix, Some(&activation), &mut cpu)
+                    .unwrap();
+                assert_eq!(ordinary.shape, prepared.shape);
+                assert!(
+                    ordinary
+                        .data
+                        .iter()
+                        .zip(&prepared.data)
+                        .all(|(a, b)| a.to_bits() == b.to_bits()),
+                    "{path}: {prefix}"
+                );
+            }
+            let mut outputs = Vec::new();
+            for (threads, scratch) in [(1, 1 << 30), (8, 1 << 30), (8, 32768)] {
+                let mut cpu = CpuContext::new(Backend::Auto, threads, scratch).unwrap();
+                let mut cache = LayerCache::new(10, 128, 128).unwrap();
+                let output = decoder.layer(1, &input, &mut cache, &mut cpu).unwrap();
+                outputs.push(output.data.iter().map(|v| v.to_bits()).collect::<Vec<_>>());
+            }
+            assert_eq!(outputs[0], outputs[1], "{path}: parallel expert reuse");
+            assert_eq!(outputs[0], outputs[2], "{path}: low-scratch fallback");
+        }
+    }
 
     #[test]
     #[ignore = "requires original weights and upstream teacher-forced routing trace"]

@@ -49,8 +49,9 @@ Decode median is about 0.34% higher and ranges overlap. This battery-only result
 does not establish a gain or a reliable regression; it does not change the AC
 headline. The Q/K/V-only candidate is not accepted as a speed optimization.
 
-The complete implementation is preserved in source.patch and remains uncommitted
-for the next experiment: sharing the same prepared row across the selected MoE
+The Q/K/V-only implementation is preserved in source.patch. The subsequent
+[combined implementation](../2026-09-28-shared-moe-activation/README.md) shares
+the same prepared row across the selected MoE
 gate/up projections, which currently repeat its quantization fourteen times per
 layer (six routed experts plus one shared expert, two projections each). That
-broader experiment must independently establish output equivalence and performance.
+broader experiment records its own output-equivalence and performance results.
