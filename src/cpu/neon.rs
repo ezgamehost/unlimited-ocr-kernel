@@ -93,6 +93,50 @@ pub(super) fn sum(values: &[f32]) -> f32 {
     }
 }
 
+/// Quantize one finite block with the scalar path's exact division and rounding.
+/// Caller rejects nonfinite input. None denotes a nonzero block scale underflow.
+#[cfg(target_arch = "aarch64")]
+pub(super) fn quantize_block32(values: &[f32]) -> Option<([i8; 32], f32)> {
+    use std::arch::aarch64::*;
+    assert_eq!(values.len(), 32);
+    // SAFETY: NEON is mandatory on AArch64 and the fixed block bounds all loads.
+    unsafe {
+        let mut maximum = vdupq_n_f32(0.);
+        for chunk in values.as_chunks::<4>().0 {
+            maximum = vmaxq_f32(maximum, vabsq_f32(vld1q_f32(chunk.as_ptr())));
+        }
+        let maximum = vmaxvq_f32(maximum);
+        let scale = maximum / 127.;
+        if maximum > 0. && scale == 0. {
+            return None;
+        }
+        if scale == 0. {
+            return Some(([0; 32], scale));
+        }
+        let divisor = vdupq_n_f32(scale);
+        let minimum = vdupq_n_f32(-127.);
+        let maximum = vdupq_n_f32(127.);
+        let mut out = [0i8; 32];
+        for half in 0..2 {
+            let p = values.as_ptr().add(half * 16);
+            let convert = |v| {
+                vcvtq_s32_f32(vminq_f32(
+                    maximum,
+                    vmaxq_f32(minimum, vrndnq_f32(vdivq_f32(v, divisor))),
+                ))
+            };
+            let a = vqmovn_s32(convert(vld1q_f32(p)));
+            let b = vqmovn_s32(convert(vld1q_f32(p.add(4))));
+            let c = vqmovn_s32(convert(vld1q_f32(p.add(8))));
+            let d = vqmovn_s32(convert(vld1q_f32(p.add(12))));
+            let lo = vqmovn_s16(vcombine_s16(a, b));
+            let hi = vqmovn_s16(vcombine_s16(c, d));
+            vst1q_s8(out.as_mut_ptr().add(half * 16), vcombine_s8(lo, hi));
+        }
+        Some((out, scale))
+    }
+}
+
 /// Weight-only INT8: activations are never quantized.
 #[cfg(target_arch = "aarch64")]
 pub(super) fn dot_int8(weights: &[i8], x: &[f32], scales: &[f32]) -> f32 {
@@ -297,6 +341,76 @@ pub(super) unsafe fn dot_int4_four_rows(
 #[cfg(all(test, target_arch = "aarch64"))]
 mod tests {
     use super::*;
+
+    #[test]
+    fn block_quantization_matches_scalar_bytes_and_scale() {
+        let mut seed = 0x12345678u32;
+        for exponent in [-140, -120, -40, 0, 40, 120] {
+            for offset in 0..4 {
+                for trial in 0..128 {
+                    let mut storage = vec![0.; offset + 32];
+                    for value in &mut storage[offset..] {
+                        seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);
+                        *value = (seed as i32 as f32 / i32::MAX as f32) * 2f32.powi(exponent);
+                    }
+                    if trial == 0 {
+                        storage[offset..].fill(-0.);
+                    }
+                    let block = &storage[offset..];
+                    let maximum = block.iter().map(|v| v.abs()).fold(0., f32::max);
+                    let scale = maximum / 127.;
+                    let actual = quantize_block32(block);
+                    if maximum > 0. && scale == 0. {
+                        assert!(actual.is_none());
+                        continue;
+                    }
+                    let (codes, actual_scale) = actual.unwrap();
+                    assert_eq!(scale.to_bits(), actual_scale.to_bits());
+                    for (i, &v) in block.iter().enumerate() {
+                        let expected = if scale == 0. {
+                            0
+                        } else {
+                            (v / scale).round_ties_even().clamp(-127., 127.) as i8
+                        };
+                        assert_eq!(
+                            codes[i], expected,
+                            "exp={exponent} offset={offset} trial={trial} i={i}"
+                        );
+                    }
+                }
+            }
+        }
+        for value in [f32::from_bits(1), -f32::from_bits(1)] {
+            assert!(quantize_block32(&[value; 32]).is_none());
+        }
+        for value in [f32::MAX, -f32::MAX, f32::MIN_POSITIVE, f32::from_bits(127)] {
+            let mut block = [value; 32];
+            block[1] = -value;
+            let (codes, scale) = quantize_block32(&block).unwrap();
+            assert_eq!(scale.to_bits(), (value.abs() / 127.).to_bits());
+            for (code, value) in codes.iter().zip(block) {
+                assert_eq!(
+                    *code,
+                    (value / scale).round_ties_even().clamp(-127., 127.) as i8
+                );
+            }
+        }
+        for scale in [0.125f32, 1., 8.] {
+            for n in -126..127 {
+                let value = (n as f32 + 0.5) * scale;
+                for value in [value.next_down(), value, value.next_up()] {
+                    let mut block = [value; 32];
+                    block[0] = 127. * scale;
+                    let (codes, actual_scale) = quantize_block32(&block).unwrap();
+                    assert_eq!(actual_scale.to_bits(), scale.to_bits());
+                    assert_eq!(
+                        codes[1],
+                        (value / scale).round_ties_even().clamp(-127., 127.) as i8
+                    );
+                }
+            }
+        }
+    }
 
     #[test]
     fn packed_four_rows_match_i8_simulation_bits() {

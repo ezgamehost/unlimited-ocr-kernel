@@ -1,0 +1,56 @@
+[
+  {
+    "name": "fmt",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "fmt",
+      "--check"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 42483712,
+      "user_cpu_seconds": 0.07753399999999999,
+      "system_cpu_seconds": 0.051283999999999996,
+      "major_faults": 2475,
+      "minor_faults": 6585
+    }
+  },
+  {
+    "name": "rust-tests",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "test",
+      "--release"
+    ],
+    "resources": {
+      "exit_code": 0,
+      "forced_kill": false,
+      "peak_rss_bytes": 494174208,
+      "user_cpu_seconds": 252.65876,
+      "system_cpu_seconds": 9.931478,
+      "major_faults": 18834,
+      "minor_faults": 2167526
+    }
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/.tools/cargo/bin/cargo",
+      "clippy",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "resources": {
+      "exit_code": 101,
+      "forced_kill": false,
+      "peak_rss_bytes": 447315968,
+      "user_cpu_seconds": 29.293595,
+      "system_cpu_seconds": 9.677508,
+      "major_faults": 17068,
+      "minor_faults": 2098142
+    }
+  }
+]

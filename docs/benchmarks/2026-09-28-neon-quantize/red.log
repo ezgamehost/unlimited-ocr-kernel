@@ -1,0 +1,15 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `quantize_block32` in this scope
+   --> src/cpu/neon.rs:316:34
+    |
+316 |                     let actual = quantize_block32(block);
+    |                                  ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `quantize_block32` in this scope
+   --> src/cpu/neon.rs:333:49
+    |
+333 |                     let (codes, actual_scale) = quantize_block32(&block).unwrap();
+    |                                                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 2 previous errors

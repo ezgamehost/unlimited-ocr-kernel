@@ -1,0 +1,7 @@
+fmt passed
+rust-tests passed
+Traceback (most recent call last):
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-neon-quantize/validate.py", line 35, in <module>
+    assert resources['exit_code']==0 and not resources['forced_kill'], name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: clippy

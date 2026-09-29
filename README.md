@@ -26,8 +26,11 @@ above includes both changes; their individual decoder gains were measured separa
 
 The subsequent [paired RoPE change](docs/benchmarks/2026-09-28-rope-pair/README.md)
 reduces native fixed-work decode time by **1.78%** and prefill by **8.04%**, with
-identical checked logits and all 24 Q8/hybrid OCR outputs. The whole-page
-llama.cpp comparison above predates this change.
+identical checked logits and all 24 Q8/hybrid OCR outputs. The subsequent
+[exact NEON quantizer](docs/benchmarks/2026-09-28-neon-quantize/README.md) confirms
+a further **1.60%** decoder improvement with the same output checks. The whole-page
+llama.cpp comparison above predates both changes; these stage gains are not a new
+whole-page speedup claim.
 
 ## Build and run
 

@@ -118,3 +118,39 @@ fn dynamic_int8_activation_dot_matches_explicit_quantized_reference() {
         }
     }
 }
+
+#[test]
+fn quantization_preserves_scalar_products_across_full_blocks_and_tails() {
+    for cols in [1usize, 31, 32, 33, 63, 64, 65, 896, 1280] {
+        let rows = 3;
+        let values: Vec<f32> = (0..rows * cols)
+            .map(|i| ((i * 71 % 257) as f32 - 128.) / 37.)
+            .collect();
+        let input = Tensor::new(vec![rows, cols], values.clone()).unwrap();
+        let actual = Int8Matrix::quantize(&input).unwrap().dequantize().unwrap();
+        for (row, restored) in values
+            .chunks_exact(cols)
+            .zip(actual.data.chunks_exact(cols))
+        {
+            for (block, restored) in row.chunks(32).zip(restored.chunks(32)) {
+                let scale = block.iter().map(|v| v.abs()).fold(0., f32::max) / 127.;
+                for (&value, &actual) in block.iter().zip(restored) {
+                    let code = if scale == 0. {
+                        0
+                    } else {
+                        (value / scale).round_ties_even().clamp(-127., 127.) as i8
+                    };
+                    assert_eq!(actual.to_bits(), (code as f32 * scale).to_bits());
+                }
+            }
+        }
+    }
+    for bad in [
+        f32::NAN,
+        f32::INFINITY,
+        f32::NEG_INFINITY,
+        f32::from_bits(1),
+    ] {
+        assert!(Int8Matrix::quantize(&Tensor::new(vec![1, 32], vec![bad; 32]).unwrap()).is_err());
+    }
+}

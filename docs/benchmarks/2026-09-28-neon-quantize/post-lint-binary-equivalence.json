@@ -1,0 +1,7 @@
+{
+  "timed_binary": "artifacts/neon-quantize/candidate",
+  "rebuilt_binary": "target/release/deps/uocr-17f9463a030211d5",
+  "sha256": "e95db99e865882c9fadf11b87a0d65925f2c80dc4b6dcc1dc02a7733796f0788",
+  "exact_executable_bytes_equal": true,
+  "change": "chunks_exact(4) to as_chunks::<4>().0"
+}

@@ -58,6 +58,14 @@ impl Int8Matrix {
         let mut scales = Vec::with_capacity(rows * cols.div_ceil(BLOCK));
         for row in matrix.data.chunks_exact(cols) {
             for block in row.chunks(BLOCK) {
+                #[cfg(target_arch = "aarch64")]
+                if block.len() == BLOCK {
+                    let (codes, scale) = super::neon::quantize_block32(block)
+                        .ok_or_else(|| OcrError::Numerical("INT8 scale underflow".into()))?;
+                    weights.extend_from_slice(&codes);
+                    scales.push(scale);
+                    continue;
+                }
                 let max = block.iter().map(|v| v.abs()).fold(0., f32::max);
                 let scale = max / 127.;
                 if max > 0. && scale == 0. {
