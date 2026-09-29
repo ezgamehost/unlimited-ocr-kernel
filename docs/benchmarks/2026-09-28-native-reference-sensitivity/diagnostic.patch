@@ -1,0 +1,37 @@
+diff --git a/tests/decoder.rs b/tests/decoder.rs
+index 0e8390e..9bb1de8 100644
+--- a/tests/decoder.rs
++++ b/tests/decoder.rs
+@@ -139,6 +139,7 @@ fn actual_decoder_teacher_forced_logits_match_upstream() {
+ #[test]
+ #[ignore = "diagnostic: isolate whole-prefill drift from output-head drift"]
+ fn prefill_logit_component_diagnostic() {
++    let mut snapshot = serde_json::Map::new();
+     let weights = Checkpoint::open(Path::new(
+         "artifacts/upstream/model-00001-of-000001.safetensors",
+     ))
+@@ -186,6 +187,10 @@ fn prefill_logit_component_diagnostic() {
+     for index in 0..config.num_hidden_layers {
+         let mut cache = LayerCache::new(10, 128, 128).unwrap();
+         hidden = decoder.layer(index, &hidden, &mut cache, &mut cpu).unwrap();
++        snapshot.insert(
++            format!("layer.{index}.last_hidden"),
++            serde_json::json!(&hidden.data[(prefix - 1) * width..]),
++        );
+         let expected = fixture
+             .tensor(&format!("layer.{index}.hidden"))
+             .unwrap()
+@@ -221,6 +226,13 @@ fn prefill_logit_component_diagnostic() {
+     let expected_logits = fixture.tensor("logits").unwrap().to_f32();
+     let expected_logits = &expected_logits[..config.vocab_size];
+     let actual_logits = decoder.logits(&hidden, &mut cpu).unwrap();
++    snapshot.insert("logits".to_owned(), serde_json::json!(&actual_logits.data));
++    let output = std::fs::OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open("artifacts/reference-thread-sensitivity/native-prefill.json")
++        .unwrap();
++    serde_json::to_writer(output, &snapshot).unwrap();
+     report(
+         "cumulative_prefill_logits",
+         11,

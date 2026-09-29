@@ -1,0 +1,321 @@
+{
+  "original": {
+    "logits": {
+      "max_abs": 0.00015401840209960938,
+      "rms": 4.0026908257231556e-05,
+      "outside": 24,
+      "outside_indices": [
+        13404,
+        18432,
+        32885,
+        38037,
+        38256,
+        50523,
+        62773,
+        67268,
+        67734,
+        74289,
+        79354,
+        85730,
+        86572,
+        88459,
+        97234,
+        97744,
+        99894,
+        104772,
+        105741,
+        111954,
+        114682,
+        120207,
+        124379,
+        124477
+      ]
+    },
+    "same_top1": true,
+    "last_hidden_by_layer": {
+      "0": {
+        "max_abs": 4.5299530029296875e-06,
+        "rms": 3.27422178794595e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "1": {
+        "max_abs": 3.0994415283203125e-06,
+        "rms": 3.611977513284024e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "2": {
+        "max_abs": 1.7881393432617188e-06,
+        "rms": 3.1475163408660894e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "3": {
+        "max_abs": 2.115964889526367e-06,
+        "rms": 3.301403893395189e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "4": {
+        "max_abs": 2.384185791015625e-06,
+        "rms": 3.899819036322126e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "5": {
+        "max_abs": 1.9073486328125e-06,
+        "rms": 4.924166186694772e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "6": {
+        "max_abs": 2.86102294921875e-06,
+        "rms": 6.126128871200777e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "7": {
+        "max_abs": 3.5762786865234375e-06,
+        "rms": 8.689126012541345e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "8": {
+        "max_abs": 5.125999450683594e-06,
+        "rms": 1.1992369284645593e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "9": {
+        "max_abs": 5.27501106262207e-06,
+        "rms": 1.499120077863828e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "10": {
+        "max_abs": 6.258487701416016e-06,
+        "rms": 2.0761805649305194e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "11": {
+        "max_abs": 4.482269287109375e-05,
+        "rms": 3.2093741093699206e-06,
+        "outside": 0,
+        "outside_indices": []
+      }
+    }
+  },
+  "threads10": {
+    "logits": {
+      "max_abs": 0.00015163421630859375,
+      "rms": 3.9947460117138504e-05,
+      "outside": 23,
+      "outside_indices": [
+        13404,
+        18432,
+        32885,
+        38037,
+        38256,
+        50523,
+        62773,
+        67268,
+        67734,
+        74289,
+        79354,
+        85730,
+        86572,
+        88459,
+        97234,
+        97744,
+        99894,
+        105741,
+        114682,
+        120207,
+        120459,
+        124379,
+        124477
+      ]
+    },
+    "same_top1": true,
+    "last_hidden_by_layer": {
+      "0": {
+        "max_abs": 4.5299530029296875e-06,
+        "rms": 3.27422178794595e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "1": {
+        "max_abs": 3.0994415283203125e-06,
+        "rms": 3.611977513284024e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "2": {
+        "max_abs": 1.7881393432617188e-06,
+        "rms": 3.1475163408660894e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "3": {
+        "max_abs": 2.115964889526367e-06,
+        "rms": 3.301403893395189e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "4": {
+        "max_abs": 2.384185791015625e-06,
+        "rms": 3.899819036322126e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "5": {
+        "max_abs": 1.9073486328125e-06,
+        "rms": 4.924166186694772e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "6": {
+        "max_abs": 2.86102294921875e-06,
+        "rms": 6.126128871200777e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "7": {
+        "max_abs": 3.5762786865234375e-06,
+        "rms": 8.689126012541345e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "8": {
+        "max_abs": 5.125999450683594e-06,
+        "rms": 1.1992369284645593e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "9": {
+        "max_abs": 5.27501106262207e-06,
+        "rms": 1.499120077863828e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "10": {
+        "max_abs": 6.258487701416016e-06,
+        "rms": 2.0761805649305194e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "11": {
+        "max_abs": 4.482269287109375e-05,
+        "rms": 3.2093741093699206e-06,
+        "outside": 0,
+        "outside_indices": []
+      }
+    }
+  },
+  "threads1": {
+    "logits": {
+      "max_abs": 0.00015306472778320312,
+      "rms": 3.358814599400541e-05,
+      "outside": 9,
+      "outside_indices": [
+        1934,
+        26027,
+        44547,
+        52993,
+        65079,
+        69855,
+        72611,
+        79354,
+        86572
+      ]
+    },
+    "same_top1": true,
+    "last_hidden_by_layer": {
+      "0": {
+        "max_abs": 4.5299530029296875e-06,
+        "rms": 3.273625588751835e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "1": {
+        "max_abs": 2.9802322387695312e-06,
+        "rms": 3.602993720263199e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "2": {
+        "max_abs": 1.6689300537109375e-06,
+        "rms": 3.1156312095894634e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "3": {
+        "max_abs": 1.9371509552001953e-06,
+        "rms": 3.292307303991639e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "4": {
+        "max_abs": 2.592802047729492e-06,
+        "rms": 3.882638081251848e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "5": {
+        "max_abs": 2.771615982055664e-06,
+        "rms": 4.915734656579954e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "6": {
+        "max_abs": 2.0526349544525146e-06,
+        "rms": 5.627288528490917e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "7": {
+        "max_abs": 4.351139068603516e-06,
+        "rms": 8.698932937278791e-07,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "8": {
+        "max_abs": 7.62939453125e-06,
+        "rms": 1.301597432845609e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "9": {
+        "max_abs": 6.4373016357421875e-06,
+        "rms": 1.642573417764835e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "10": {
+        "max_abs": 6.973743438720703e-06,
+        "rms": 2.1233801956766427e-06,
+        "outside": 0,
+        "outside_indices": []
+      },
+      "11": {
+        "max_abs": 5.6743621826171875e-05,
+        "rms": 3.557943063359587e-06,
+        "outside": 0,
+        "outside_indices": []
+      }
+    }
+  },
+  "failed_in_all_references": [
+    79354,
+    86572
+  ],
+  "sha256": {
+    "artifacts/reference-thread-sensitivity/native-prefill.json": "b8b8a14a08cbfe615a24c70d994a632fe4b172b604e182e0e89a1f0c56070ee7",
+    "artifacts/reference-logo-f32/decoder.safetensors": "57764f4b353619b2c88eefb573037698d67fd6d8108183b02f434c1a721269ce",
+    "artifacts/reference-thread-sensitivity/prefill-threads-10.safetensors": "598cf7141ad470c9bd501768781aacfdeb329ca134cd0c61cc6b702b10a81efd",
+    "artifacts/reference-thread-sensitivity/prefill-threads-1.safetensors": "8bbf90777876b71236e780bdbe93648fb3f1736ad18d9b744dc70ef67061571f",
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-native-reference-sensitivity/compare.py": "3f38cc92e1b7b1a5c185e4035def329609001188e55587bf73c75f1152c4bc5c"
+  }
+}
