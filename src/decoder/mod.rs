@@ -324,13 +324,8 @@ impl<'a> Decoder<'a> {
         let heads = self.config.num_attention_heads;
         let dim = hidden / heads;
         for row in 0..rows {
-            ops::rope(
+            ops::rope_pair(
                 &mut q.data[row * hidden..(row + 1) * hidden],
-                dim,
-                position + row,
-                self.config.rope_theta,
-            )?;
-            ops::rope(
                 &mut k.data[row * hidden..(row + 1) * hidden],
                 dim,
                 position + row,

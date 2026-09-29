@@ -1,0 +1,15 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0425]: cannot find function `rope_pair` in this scope
+   --> src/cpu/ops.rs:740:25
+    |
+740 |                         rope_pair(&mut actual_q, &mut actual_k, dim, position, theta).unwrap();
+    |                         ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `rope_pair` in this scope
+   --> src/cpu/ops.rs:755:21
+    |
+755 |             assert!(rope_pair(&mut q, &mut k, dim, 13, theta).is_err());
+    |                     ^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `uocr` (lib test) due to 2 previous errors

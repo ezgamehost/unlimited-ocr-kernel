@@ -24,6 +24,11 @@ by a further **8.28%** against that accepted runtime. Each AC comparison preserv
 every checked logit and all 24 Q8/hybrid OCR outputs. The latest full-page comparison
 above includes both changes; their individual decoder gains were measured separately.
 
+The subsequent [paired RoPE change](docs/benchmarks/2026-09-28-rope-pair/README.md)
+reduces native fixed-work decode time by **1.78%** and prefill by **8.04%**, with
+identical checked logits and all 24 Q8/hybrid OCR outputs. The whole-page
+llama.cpp comparison above predates this change.
+
 ## Build and run
 
 The toolchain is pinned in `rust-toolchain.toml`. On macOS, building also requires

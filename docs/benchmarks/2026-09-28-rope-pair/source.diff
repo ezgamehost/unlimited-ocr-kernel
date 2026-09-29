@@ -1,0 +1,125 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index ff01997..892ea2e 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -513,6 +513,40 @@ pub fn rope(values: &mut [f32], head_dim: usize, position: usize, theta: f32) ->
+     Ok(())
+ }
+ 
++/// Rotate queries and keys with one coefficient calculation per channel pair.
++/// Heads share absolute position and base; each output retains the scalar formula.
++pub(crate) fn rope_pair(
++    q: &mut [f32],
++    k: &mut [f32],
++    head_dim: usize,
++    position: usize,
++    theta: f32,
++) -> Result<()> {
++    if head_dim == 0
++        || !head_dim.is_multiple_of(2)
++        || !q.len().is_multiple_of(head_dim)
++        || q.len() != k.len()
++        || !theta.is_finite()
++        || theta <= 0.
++    {
++        return Err(OcrError::Shape(
++            "invalid paired rotary dimensions or base".into(),
++        ));
++    }
++    for i in 0..head_dim / 2 {
++        let angle = position as f32 / theta.powf(2. * i as f32 / head_dim as f32);
++        let (sin, cos) = angle.sin_cos();
++        for values in [&mut *q, &mut *k] {
++            for head in values.chunks_exact_mut(head_dim) {
++                let (a, b) = (head[i], head[i + head_dim / 2]);
++                head[i] = a * cos - b * sin;
++                head[i + head_dim / 2] = b * cos + a * sin;
++            }
++        }
++    }
++    Ok(())
++}
++
+ /// Input NHWC; weights OIHW, matching PyTorch convolution checkpoints.
+ pub fn conv2d(
+     x: &Tensor,
+@@ -720,3 +754,60 @@ fn attention_decode_layout(
+     }
+     Tensor::new(q.shape.clone(), output)
+ }
++
++#[cfg(test)]
++mod rope_pair_tests {
++    use super::*;
++
++    #[test]
++    fn paired_rotary_matches_independent_calls_bitwise() {
++        for dim in [2, 4, 128, 256] {
++            for heads in [0, 1, 2, 10] {
++                for position in [0, 1, 127, 128, 1517, 8192, 131071, usize::MAX] {
++                    for theta in [1., 10000., 500000.] {
++                        let q: Vec<f32> = (0..dim * heads)
++                            .map(|i| [0., -0., 0.00317, -0.7, 1e-10, 17., -23.][i % 7])
++                            .collect();
++                        let k: Vec<f32> = q.iter().rev().copied().collect();
++                        let (mut expected_q, mut expected_k) = (q.clone(), k.clone());
++                        rope(&mut expected_q, dim, position, theta).unwrap();
++                        rope(&mut expected_k, dim, position, theta).unwrap();
++                        let (mut actual_q, mut actual_k) = (q, k);
++                        rope_pair(&mut actual_q, &mut actual_k, dim, position, theta).unwrap();
++                        for (actual, expected) in actual_q
++                            .iter()
++                            .chain(&actual_k)
++                            .zip(expected_q.iter().chain(&expected_k))
++                        {
++                            assert_eq!(
++                                actual.to_bits(),
++                                expected.to_bits(),
++                                "dim={dim}, heads={heads}, pos={position}, theta={theta}"
++                            );
++                        }
++                    }
++                }
++            }
++        }
++    }
++
++    #[test]
++    fn paired_rotary_rejects_invalid_layout_before_mutating() {
++        for (q_len, k_len, dim, theta) in [
++            (4, 4, 0, 10000.),
++            (4, 4, 3, 10000.),
++            (4, 3, 2, 10000.),
++            (3, 3, 2, 10000.),
++            (4, 4, 2, 0.),
++            (4, 4, 2, -1.),
++            (4, 4, 2, f32::NAN),
++            (4, 4, 2, f32::INFINITY),
++        ] {
++            let mut q = vec![1.; q_len];
++            let mut k = vec![2.; k_len];
++            assert!(rope_pair(&mut q, &mut k, dim, 13, theta).is_err());
++            assert_eq!(q, vec![1.; q_len]);
++            assert_eq!(k, vec![2.; k_len]);
++        }
++    }
++}
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index 3e38469..d56c964 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -324,13 +324,8 @@ impl<'a> Decoder<'a> {
+         let heads = self.config.num_attention_heads;
+         let dim = hidden / heads;
+         for row in 0..rows {
+-            ops::rope(
++            ops::rope_pair(
+                 &mut q.data[row * hidden..(row + 1) * hidden],
+-                dim,
+-                position + row,
+-                self.config.rope_theta,
+-            )?;
+-            ops::rope(
+                 &mut k.data[row * hidden..(row + 1) * hidden],
+                 dim,
+                 position + row,
