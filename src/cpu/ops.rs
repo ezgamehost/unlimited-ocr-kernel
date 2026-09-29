@@ -401,12 +401,28 @@ where
     Tensor::new(q.shape.clone(), output)
 }
 
+#[derive(Clone, Copy)]
+enum Normalization {
+    Layer,
+    RmsSequential,
+    RmsPairwise,
+}
+
+fn pairwise_square_sum(input: &[f32]) -> f32 {
+    if input.len() <= 16 {
+        input.iter().map(|v| v * v).sum()
+    } else {
+        let (left, right) = input.split_at(input.len() / 2);
+        pairwise_square_sum(left) + pairwise_square_sum(right)
+    }
+}
+
 fn norm(
     x: &Tensor,
     weight: &[f32],
     bias: Option<&[f32]>,
     eps: f32,
-    center: bool,
+    kind: Normalization,
     cpu: Option<&CpuContext>,
 ) -> Result<Tensor> {
     x.validate()?;
@@ -432,7 +448,7 @@ fn norm(
     }
     let mut data = vec![0.; x.data.len()];
     let normalize = |(input, output): (&[f32], &mut [f32])| {
-        if center {
+        if matches!(kind, Normalization::Layer) {
             // Wide, nearly constant rows lose their mean under sequential FP32
             // summation. Retain precision through centering and variance.
             let mean = input.iter().map(|&v| v as f64).sum::<f64>() / width as f64;
@@ -449,7 +465,12 @@ fn norm(
             return;
         }
         let mean = 0.;
-        let variance = input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / width as f32;
+        let sum = if matches!(kind, Normalization::RmsPairwise) {
+            pairwise_square_sum(input)
+        } else {
+            input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>()
+        };
+        let variance = sum / width as f32;
         let scale = (variance + eps).sqrt().recip();
         for i in 0..width {
             output[i] = (input[i] - mean) * scale * weight[i] + bias.map_or(0., |b| b[i]);
@@ -476,7 +497,7 @@ fn norm(
 }
 
 pub fn layer_norm(x: &Tensor, w: &[f32], b: Option<&[f32]>, eps: f32) -> Result<Tensor> {
-    norm(x, w, b, eps, true, None)
+    norm(x, w, b, eps, Normalization::Layer, None)
 }
 /// Distribute independent rows without changing each row's reduction order.
 pub fn layer_norm_parallel(
@@ -486,10 +507,16 @@ pub fn layer_norm_parallel(
     eps: f32,
     cpu: &CpuContext,
 ) -> Result<Tensor> {
-    norm(x, w, b, eps, true, Some(cpu))
+    norm(x, w, b, eps, Normalization::Layer, Some(cpu))
 }
 pub fn rms_norm(x: &Tensor, w: &[f32], eps: f32) -> Result<Tensor> {
-    norm(x, w, None, eps, false, None)
+    norm(x, w, None, eps, Normalization::RmsSequential, None)
+}
+
+/// RMS normalization with a balanced FP32 reduction for wide unquantized rows.
+/// The sequential variant remains available for quantized output compatibility.
+pub fn rms_norm_pairwise(x: &Tensor, w: &[f32], eps: f32) -> Result<Tensor> {
+    norm(x, w, None, eps, Normalization::RmsPairwise, None)
 }
 
 pub fn rope(values: &mut [f32], head_dim: usize, position: usize, theta: f32) -> Result<()> {

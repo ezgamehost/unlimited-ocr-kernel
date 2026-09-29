@@ -1,8 +1,9 @@
 # Scoped unquantized-decoder RMS candidate
 
-Status: correctness and output validation complete; performance acceptance pending.
-The implementation patch is retained as source.patch. The worktree implementation
-is the candidate, not a new accepted benchmark baseline.
+Status: accepted as a scoped numerical correction after correctness/output checks
+and an isolated operator-cost check. Model-level timing remains inconclusive;
+the published full-page benchmark headline is unchanged. The initial implementation
+patch is retained as source.patch.
 
 Decoder input, post-attention, and final-output normalization select balanced FP32
 RMS reduction only when no quantized overlay is attached. Any overlay keeps the
@@ -37,7 +38,7 @@ digest verification added in response. validation/steps.json and logs record
 commands/exits. Candidate CLI SHA256:
 `0268d10cf8fb35c668282d3cbf68648e583bbdc30dd0f7fd4e96a0c5cda014b0`.
 The preserved candidate unit-test binary and hash are in candidate-unit.json.
-The accepted baseline remains CLI `05616a6d...` until performance assessment.
+CLI `05616a6d...` is the prior accepted baseline used in these comparisons.
 
 Run validate.py via the project Python environment and PYTHONPATH=. to repeat
 correctness gates, using fresh output directories. The Q8/hybrid checks use
@@ -69,6 +70,30 @@ All outliers remain in the summaries. The post-run host snapshot shows about
 deltas this does not attribute the stalls to paging. This is an exploratory battery
 screen, not comparable to the existing AC headline and not a speedup claim.
 
-Next investigation: isolate normalization cost with a small resident working set,
-then repeat the model-level comparison under stable host conditions. The candidate
-remains pending; the accepted runtime baseline has not changed.
+This screen did not justify accepting or rejecting the candidate on throughput.
+The following resident operator measurement resolves the narrower implementation
+cost question; model-level throughput still needs stable-host confirmation.
+
+## Resident operator-cost check and acceptance
+
+The ignored resident_rms_reduction_comparison test alternates both public RMS
+operators in one process, using 1280-wide rows, ten warmup calls per phase, and
+ABBA then BAAB order. It includes the same validation, output allocation and
+normalization in both paths; black_box consumes every result. All 24 phases finish.
+
+| Rows per call | Sequential median ns/row | Pairwise median ns/row |
+|---|---:|---:|
+| 1 | 2069.47 | 1800.27 |
+| 277 | 1651.97 | 1464.40 |
+| 1517 | 1732.82 | 1425.58 |
+
+All three observed ranges are non-overlapping in this battery-only operator run.
+This supports no intrinsic normalization-cost regression on the tested shapes;
+it does not establish model speed or explain the earlier model stalls. The
+11–18% lower operator times must not be extrapolated to whole-page throughput.
+
+Acceptance is for a numerical correction: unchanged logit tolerance now passes,
+36 OCR outputs remain exact, quantized full-logit digests remain exact, source
+review is clear, and isolated operator cost improves. The evidence does not claim
+a new llama.cpp win, a reliable model-level speedup, or closure of broader accuracy
+and performance requirements. A stable model-level rerun remains outstanding.

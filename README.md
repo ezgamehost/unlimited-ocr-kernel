@@ -183,12 +183,14 @@ check all eleven MoE layers across 277 prefill and 300 decode positions. Selecte
 expert IDs match exactly in both isolated-layer and full native trajectories;
 routing-weight errors and the diagnostic tolerance are reported separately.
 
-The full-decoder teacher-forced logit gate currently fails at prefill: 24 of
-129280 values exceed the existing per-layer tolerance, while all eight sampled
-decode rows and all nine top token IDs match their checks. It is explicitly
-marked as an open opt-in gate. A higher-precision normalization candidate
-removed those violations but slightly worsened synthetic layout accuracy and
-was rejected. See the [retained investigation](docs/benchmarks/2026-09-28-teacher-logits/README.md).
+The full-decoder teacher-forced logit gate now passes all nine sampled rows,
+including prefill and two cache-wrap boundaries, without changing tolerance.
+[Pairwise RMS reduction in the unquantized decoder](docs/benchmarks/2026-09-28-bf16-rms-integration/README.md)
+removes the previously observed 24 prefill violations while preserving all 36
+tested BF16/Q8/hybrid OCR outputs exactly. Quantized decoders retain their prior
+reduction order. This is a scoped numerical fix, not a new model-throughput claim
+or a general accuracy guarantee. Earlier rejected global-normalization trials
+remain in the [investigation record](docs/benchmarks/2026-09-28-teacher-logits/README.md).
 
 The [implementation plan](docs/superpowers/plans/2026-09-27-rust-unlimited-ocr.md)
 and [design](docs/superpowers/specs/2026-09-27-rust-unlimited-ocr-design.md) describe

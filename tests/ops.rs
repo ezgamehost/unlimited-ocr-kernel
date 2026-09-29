@@ -3,6 +3,48 @@ use uocr::{
     tensor::Tensor,
 };
 
+#[test]
+#[ignore = "resident RMS microbenchmark; reports operator cost, not model speed"]
+fn resident_rms_reduction_comparison() {
+    use std::{hint::black_box, time::Instant};
+    for rows in [1, 277, 1517] {
+        let width = 1280;
+        let x = Tensor::new(
+            vec![rows, width],
+            (0..rows * width)
+                .map(|i| ((i * 37 % 1009) as f32 - 504.) * 0.007)
+                .collect(),
+        )
+        .unwrap();
+        let weights = vec![1.; width];
+        let iterations = if rows == 1 { 100_000 } else { 100 };
+        for (phase, pairwise) in [false, true, true, false, true, false, false, true]
+            .into_iter()
+            .enumerate()
+        {
+            let operation = if pairwise {
+                ops::rms_norm_pairwise
+            } else {
+                ops::rms_norm
+            };
+            for _ in 0..10 {
+                black_box(operation(black_box(&x), black_box(&weights), 1e-6).unwrap());
+            }
+            let start = Instant::now();
+            for _ in 0..iterations {
+                black_box(operation(black_box(&x), black_box(&weights), 1e-6).unwrap());
+            }
+            let elapsed = start.elapsed().as_secs_f64();
+            eprintln!(
+                "{}",
+                serde_json::json!({"kind":"resident_rms", "rows":rows,
+                "width":width,"phase":phase,"pairwise":pairwise,"iterations":iterations,
+                "seconds":elapsed,"nanoseconds_per_row":elapsed * 1e9 / (iterations * rows) as f64})
+            );
+        }
+    }
+}
+
 fn tensor(shape: &[usize], values: &[f32]) -> Tensor {
     Tensor::new(shape.to_vec(), values.to_vec()).unwrap()
 }
@@ -37,6 +79,27 @@ fn softmax_is_stable_and_rejects_nonfinite_rows() {
     assert_eq!(x, [0.5, 0.5, 0.]);
     assert!(ops::softmax(&mut [f32::NAN, 0.]).is_err());
     assert!(ops::softmax(&mut [f32::NEG_INFINITY; 2]).is_err());
+}
+
+#[test]
+fn rmsnorm_retains_small_contributions_in_wide_rows() {
+    for width in [1279, 1280, 1281] {
+        for large_index in [0, width / 2, width - 1] {
+            let mut values = vec![1e-4_f32; width];
+            values[large_index] = 1.;
+            let variance = values.iter().map(|&v| f64::from(v).powi(2)).sum::<f64>() / width as f64;
+            let scale = (variance + f64::from(1e-6_f32)).sqrt().recip();
+            let input = Tensor::new(vec![1, width], values.clone()).unwrap();
+            let actual = ops::rms_norm_pairwise(&input, &vec![1.; width], 1e-6).unwrap();
+            for (&got, &value) in actual.data.iter().zip(&values) {
+                let expected = f64::from(value) * scale;
+                assert!(
+                    (f64::from(got) - expected).abs() <= 3e-7 * expected.abs(),
+                    "width={width} large_index={large_index}: {got} vs {expected}"
+                );
+            }
+        }
+    }
 }
 
 #[test]

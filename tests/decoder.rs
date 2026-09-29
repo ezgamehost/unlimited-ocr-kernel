@@ -32,7 +32,7 @@ fn actual_expert_scheduling_preserves_results_with_small_scratch() {
 }
 
 #[test]
-#[ignore = "open parity gate: current prefill has 24 logits outside per-layer tolerance; requires original fixtures"]
+#[ignore = "requires pinned original weights and exported decoder logit fixtures"]
 fn actual_decoder_teacher_forced_logits_match_upstream() {
     let weights = Checkpoint::open(Path::new(
         "artifacts/upstream/model-00001-of-000001.safetensors",

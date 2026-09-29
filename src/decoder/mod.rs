@@ -101,6 +101,16 @@ impl<'a> Decoder<'a> {
         self
     }
 
+    fn normalize(&self, x: &Tensor, weight: &[f32]) -> Result<Tensor> {
+        // Preserve the validated quantized trajectory. Unquantized projections
+        // use a more accurate reduction to limit accumulated prefill drift.
+        if self.quantized.is_none() {
+            ops::rms_norm_pairwise(x, weight, self.config.rms_norm_eps)
+        } else {
+            ops::rms_norm(x, weight, self.config.rms_norm_eps)
+        }
+    }
+
     fn projection(&self, x: &Tensor, name: &str, cpu: &mut CpuContext) -> Result<Tensor> {
         if let Some((weights, mode)) = self.quantized
             && let Some(matrix) = weights.get(name)
@@ -319,7 +329,7 @@ impl<'a> Decoder<'a> {
             .weights
             .tensor(&format!("{prefix}.input_layernorm.weight"))?
             .to_f32();
-        let normalized = ops::rms_norm(x, &norm, self.config.rms_norm_eps)?;
+        let normalized = self.normalize(x, &norm)?;
         let (mut q, mut k, v) = self.qkv(&normalized, &prefix, cpu)?;
         let heads = self.config.num_attention_heads;
         let dim = hidden / heads;
@@ -396,7 +406,7 @@ impl<'a> Decoder<'a> {
             .weights
             .tensor(&format!("{prefix}.post_attention_layernorm.weight"))?
             .to_f32();
-        let normalized = ops::rms_norm(&residual, &postnorm, self.config.rms_norm_eps)?;
+        let normalized = self.normalize(&residual, &postnorm)?;
         let mlp = if index < self.config.first_k_dense_replace {
             self.feed_forward(&normalized, &format!("{prefix}.mlp"), cpu)?
         } else {
@@ -418,7 +428,7 @@ impl<'a> Decoder<'a> {
             hidden.data[hidden.data.len() - width..].to_vec(),
         )?;
         let norm = self.weights.tensor("model.norm.weight")?.to_f32();
-        let normalized = ops::rms_norm(&last, &norm, self.config.rms_norm_eps)?;
+        let normalized = self.normalize(&last, &norm)?;
         self.projection(&normalized, "lm_head.weight", cpu)
     }
 

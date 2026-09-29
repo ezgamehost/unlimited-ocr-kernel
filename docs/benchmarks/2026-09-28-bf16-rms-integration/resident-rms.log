@@ -1,0 +1,33 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 3.31s
+     Running tests/ops.rs (target/release/deps/ops-65f1ecb30c7429c6)
+
+running 1 test
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":2145.32584,"pairwise":false,"phase":0,"rows":1,"seconds":0.214532584,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":1848.11125,"pairwise":true,"phase":1,"rows":1,"seconds":0.184811125,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":1784.3125,"pairwise":true,"phase":2,"rows":1,"seconds":0.17843125,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":2039.97958,"pairwise":false,"phase":3,"rows":1,"seconds":0.203997958,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":1785.77625,"pairwise":true,"phase":4,"rows":1,"seconds":0.178577625,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":1985.4225,"pairwise":false,"phase":5,"rows":1,"seconds":0.19854225,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":2098.9675,"pairwise":false,"phase":6,"rows":1,"seconds":0.20989675,"width":1280}
+{"iterations":100000,"kind":"resident_rms","nanoseconds_per_row":1814.76334,"pairwise":true,"phase":7,"rows":1,"seconds":0.181476334,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1798.137797833935,"pairwise":false,"phase":0,"rows":277,"seconds":0.049808417,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1501.9103610108302,"pairwise":true,"phase":1,"rows":277,"seconds":0.041602917,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1474.1215162454873,"pairwise":true,"phase":2,"rows":277,"seconds":0.040833166,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1647.108880866426,"pairwise":false,"phase":3,"rows":277,"seconds":0.045624916,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1454.672093862816,"pairwise":true,"phase":4,"rows":277,"seconds":0.040294417,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1607.172093862816,"pairwise":false,"phase":5,"rows":277,"seconds":0.044518667,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1656.8336462093862,"pairwise":false,"phase":6,"rows":277,"seconds":0.045894292,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1388.0370036101083,"pairwise":true,"phase":7,"rows":277,"seconds":0.038448625,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1667.1434871456822,"pairwise":false,"phase":0,"rows":1517,"seconds":0.252905667,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1415.5163744232036,"pairwise":true,"phase":1,"rows":1517,"seconds":0.214733834,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1390.5581212920238,"pairwise":true,"phase":2,"rows":1517,"seconds":0.210947667,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1693.8216875411997,"pairwise":false,"phase":3,"rows":1517,"seconds":0.25695275,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1513.2567040210943,"pairwise":true,"phase":4,"rows":1517,"seconds":0.229561042,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1958.2663150955834,"pairwise":false,"phase":5,"rows":1517,"seconds":0.297069,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1771.8240474620961,"pairwise":false,"phase":6,"rows":1517,"seconds":0.268785708,"width":1280}
+{"iterations":100,"kind":"resident_rms","nanoseconds_per_row":1435.6449176005274,"pairwise":true,"phase":7,"rows":1517,"seconds":0.217787334,"width":1280}
+test resident_rms_reduction_comparison ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 4.08s
+
