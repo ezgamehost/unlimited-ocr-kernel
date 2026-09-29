@@ -1,0 +1,4 @@
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-bf16-rms-integration/bf16_quality.py", line 62
+    precision=before['precision'] == after['precision'] == 'bf16_weights_fp32')))
+                                                                                ^
+SyntaxError: unmatched ')'

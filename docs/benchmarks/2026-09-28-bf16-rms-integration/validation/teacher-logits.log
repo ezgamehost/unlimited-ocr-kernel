@@ -1,0 +1,17 @@
+    Finished `release` profile [optimized] target(s) in 0.04s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 1 test
+{"actual_top1":128818,"kind":"teacher_forced_logits","max_abs":0.00011348724365234375,"outside_existing_tolerance":0,"position":276,"reference_top1":128818,"rms":0.00002345682279326678}
+{"actual_top1":201,"kind":"teacher_forced_logits","max_abs":0.00004100799560546875,"outside_existing_tolerance":0,"position":277,"reference_top1":201,"rms":8.794613241648276e-6}
+{"actual_top1":4066,"kind":"teacher_forced_logits","max_abs":0.000030517578125,"outside_existing_tolerance":0,"position":278,"reference_top1":4066,"rms":5.874474265184771e-6}
+{"actual_top1":625,"kind":"teacher_forced_logits","max_abs":0.00002384185791015625,"outside_existing_tolerance":0,"position":404,"reference_top1":625,"rms":3.5540874911720337e-6}
+{"actual_top1":223,"kind":"teacher_forced_logits","max_abs":0.000017642974853515625,"outside_existing_tolerance":0,"position":405,"reference_top1":223,"rms":2.4990386589748875e-6}
+{"actual_top1":10253,"kind":"teacher_forced_logits","max_abs":0.0000247955322265625,"outside_existing_tolerance":0,"position":406,"reference_top1":10253,"rms":4.4983335081194475e-6}
+{"actual_top1":270,"kind":"teacher_forced_logits","max_abs":0.0000324249267578125,"outside_existing_tolerance":0,"position":532,"reference_top1":270,"rms":8.416732708424152e-6}
+{"actual_top1":428,"kind":"teacher_forced_logits","max_abs":0.0000362396240234375,"outside_existing_tolerance":0,"position":533,"reference_top1":428,"rms":4.55700224844865e-6}
+{"actual_top1":548,"kind":"teacher_forced_logits","max_abs":0.0000247955322265625,"outside_existing_tolerance":0,"position":576,"reference_top1":548,"rms":4.259152680207706e-6}
+test actual_decoder_teacher_forced_logits_match_upstream ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 9.36s
+

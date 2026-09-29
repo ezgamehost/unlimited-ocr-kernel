@@ -1,0 +1,9 @@
+fmt passed
+rust-tests passed
+clippy passed
+expert-reference passed
+decoder-reference passed
+teacher-logits passed
+expert-routes passed
+q8-digest passed
+build passed

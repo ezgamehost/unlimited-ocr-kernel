@@ -1,0 +1,26 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+    Finished `release` profile [optimized] target(s) in 16.33s
+     Running tests/ops.rs (target/release/deps/ops-65f1ecb30c7429c6)
+
+running 18 tests
+test activations_match_known_values ... ok
+test layernorm_and_rmsnorm_have_distinct_mean_behavior ... ok
+test accelerated_softmax_matches_f64_oracle_for_masked_and_long_rows ... ok
+test layernorm_centers_nearly_constant_wide_rows ... ok
+test conv_nhwc_matches_hand_computed_patch_sums ... ok
+test causal_attention_excludes_future_values ... ok
+test convolution_preserves_channels_padding_stride_and_bias_at_budget_boundary ... ok
+test rejects_invalid_shapes_and_resource_limits ... ok
+test attention_shrinks_query_blocks_to_fit_scratch_budget ... ok
+test linear_uses_output_by_input_weights_and_bias ... ok
+test rotary_uses_split_halves_and_absolute_positions ... ok
+test rmsnorm_retains_small_contributions_in_wide_rows ... ok
+test causal_attention_masks_across_query_block_boundaries ... ok
+test softmax_is_stable_and_rejects_nonfinite_rows ... ok
+test vector_softmax_rejects_invalid_values_in_every_lane_and_tail ... ok
+test biased_attention_preserves_absolute_queries_with_large_and_small_scratch ... ok
+test parallel_softmax_rows_preserve_bits_and_causal_offsets ... ok
+test parallel_layernorm_preserves_scalar_bits_across_rows_and_worker_settings ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

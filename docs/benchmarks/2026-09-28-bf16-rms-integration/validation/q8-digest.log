@@ -1,0 +1,12 @@
+    Finished `release` profile [optimized] target(s) in 0.05s
+     Running unittests src/lib.rs (target/release/deps/uocr-17f9463a030211d5)
+
+running 1 test
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":3.253077625,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"logits_sha256":"3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_dynamic_activations","prefill_seconds":2.113255541,"prefix_tokens":1517,"repetition":0,"threads":8,"warmup":true}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":3.2114821669999998,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"logits_sha256":"3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_dynamic_activations","prefill_seconds":1.374844875,"prefix_tokens":1517,"repetition":1,"threads":8,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":3.2149755,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"logits_sha256":"3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_dynamic_activations","prefill_seconds":1.361269875,"prefix_tokens":1517,"repetition":2,"threads":8,"warmup":false}
+{"benchmark":"native_fixed_work_decoder","decode_steps":512,"decode_with_checksum_seconds":3.255525041,"input_policy":"recorded English tokens cycled; teacher forced; ignores EOS","logits_checksum":188943474296580907,"logits_sha256":"3e4fa2e2d048750fba24ad7cde61ccc7c92e1bc2c7436e0d387d867387c6c7da","overlay":"artifacts/unlimited-ocr-q8-block32.safetensors","precision":"int8_weights_dynamic_activations","prefill_seconds":1.367465416,"prefix_tokens":1517,"repetition":3,"threads":8,"warmup":false}
+test model::benchmark::fixed_work_decoder_benchmark ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 16 filtered out; finished in 26.56s
+

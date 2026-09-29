@@ -1,0 +1,68 @@
+    Finished `release` profile [optimized] target(s) in 0.04s
+     Running tests/decoder.rs (target/release/deps/decoder-7e6c900e0c6edda9)
+
+running 1 test
+test actual_decoder_layers_match_upstream_prefill_and_decode ... layer 0 position 0: max_abs=0.0000038146973, rms=0.00000005273757
+reference layer=0 head_major=false
+layer 0 position 277: max_abs=0.0000004172325, rms=0.00000008315661
+layer 0 position 278: max_abs=0.00000052154064, rms=0.0000001628084
+layer 0 position 404: max_abs=0.00000020861626, rms=0.00000004629751
+layer 0 position 405: max_abs=0.00000017881393, rms=0.00000004325495
+layer 0 position 406: max_abs=0.00000010430813, rms=0.00000002847148
+layer 0 position 532: max_abs=0.00000029802322, rms=0.000000053872032
+layer 0 position 533: max_abs=0.0000008940697, rms=0.0000001266544
+layer 0 position 576: max_abs=0.00000029802322, rms=0.0000000844229
+layer 0 position 0: max_abs=0.0000038146973, rms=0.00000005273757
+reference layer=0 head_major=true
+layer 0 position 277: max_abs=0.0000004172325, rms=0.00000008315661
+layer 0 position 278: max_abs=0.00000052154064, rms=0.0000001628084
+layer 0 position 404: max_abs=0.00000020861626, rms=0.00000004629751
+layer 0 position 405: max_abs=0.00000017881393, rms=0.00000004325495
+layer 0 position 406: max_abs=0.00000010430813, rms=0.00000002847148
+layer 0 position 532: max_abs=0.00000029802322, rms=0.000000053872032
+layer 0 position 533: max_abs=0.0000008940697, rms=0.0000001266544
+layer 0 position 576: max_abs=0.00000029802322, rms=0.0000000844229
+layer 1 position 0: max_abs=0.000045776367, rms=0.0000001219185
+reference layer=1 head_major=false
+layer 1 position 277: max_abs=0.00000014714897, rms=0.000000036200884
+layer 1 position 278: max_abs=0.00000040233135, rms=0.00000010936529
+layer 1 position 404: max_abs=0.00000023841858, rms=0.000000051493984
+layer 1 position 405: max_abs=0.00000047683716, rms=0.0000000932602
+layer 1 position 406: max_abs=0.00000023841858, rms=0.000000067924674
+layer 1 position 532: max_abs=0.00000035762787, rms=0.00000008852253
+layer 1 position 533: max_abs=0.00000059604645, rms=0.00000007355529
+layer 1 position 576: max_abs=0.00000035762787, rms=0.000000088639055
+layer 1 position 0: max_abs=0.000045776367, rms=0.0000001219185
+reference layer=1 head_major=true
+layer 1 position 277: max_abs=0.00000014714897, rms=0.000000036200884
+layer 1 position 278: max_abs=0.00000040233135, rms=0.00000010936529
+layer 1 position 404: max_abs=0.00000023841858, rms=0.000000051493984
+layer 1 position 405: max_abs=0.00000047683716, rms=0.0000000932602
+layer 1 position 406: max_abs=0.00000023841858, rms=0.000000067924674
+layer 1 position 532: max_abs=0.00000035762787, rms=0.00000008852253
+layer 1 position 533: max_abs=0.00000059604645, rms=0.00000007355529
+layer 1 position 576: max_abs=0.00000035762787, rms=0.000000088639055
+layer 11 position 0: max_abs=0.000030517578, rms=0.00000009120572
+reference layer=11 head_major=false
+layer 11 position 277: max_abs=0.0000038146973, rms=0.0000002148904
+layer 11 position 278: max_abs=0.0000019073486, rms=0.00000021783309
+layer 11 position 404: max_abs=0.0000019073486, rms=0.00000025544784
+layer 11 position 405: max_abs=0.0000038146973, rms=0.00000014420056
+layer 11 position 406: max_abs=0.0000038146973, rms=0.00000017881096
+layer 11 position 532: max_abs=0.0000038146973, rms=0.00000016401826
+layer 11 position 533: max_abs=0.0000019073486, rms=0.00000020066993
+layer 11 position 576: max_abs=0.000005722046, rms=0.00000025061263
+layer 11 position 0: max_abs=0.000030517578, rms=0.00000009120572
+reference layer=11 head_major=true
+layer 11 position 277: max_abs=0.0000038146973, rms=0.0000002148904
+layer 11 position 278: max_abs=0.0000019073486, rms=0.00000021783309
+layer 11 position 404: max_abs=0.0000019073486, rms=0.00000025544784
+layer 11 position 405: max_abs=0.0000038146973, rms=0.00000014420056
+layer 11 position 406: max_abs=0.0000038146973, rms=0.00000017881096
+layer 11 position 532: max_abs=0.0000038146973, rms=0.00000016401826
+layer 11 position 533: max_abs=0.0000019073486, rms=0.00000020066993
+layer 11 position 576: max_abs=0.000005722046, rms=0.00000025061263
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 2.44s
+
