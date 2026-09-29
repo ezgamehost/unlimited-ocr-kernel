@@ -1,0 +1,57 @@
+{
+  "1": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 2.682209014892578e-07
+  },
+  "2": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 6.556510925292969e-07
+  },
+  "3": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 5.662441253662109e-07
+  },
+  "4": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 5.513429641723633e-07
+  },
+  "5": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 1.6093254089355469e-06
+  },
+  "6": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 6.854534149169922e-07
+  },
+  "7": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 6.258487701416016e-07
+  },
+  "8": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 1.7285346984863281e-06
+  },
+  "9": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 1.3709068298339844e-06
+  },
+  "10": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 1.996755599975586e-06
+  },
+  "11": {
+    "selected_ids": 1662,
+    "id_mismatches": 0,
+    "max_weight_abs": 1.1920928955078125e-06
+  }
+}

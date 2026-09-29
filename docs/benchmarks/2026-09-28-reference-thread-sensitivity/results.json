@@ -1,0 +1,260 @@
+{
+  "10": {
+    "logits_vs_original": {
+      "max_abs": 2.2411346435546875e-05,
+      "rms": 2.6406368793759922e-06,
+      "unequal": 123490,
+      "violations_at_1e-4_plus_1e-4_abs_ref": 0
+    },
+    "layers_vs_original": {
+      "0": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "1": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "2": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "3": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "4": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "5": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "6": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "7": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "8": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "9": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "10": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "11": {
+        "max_abs": 0.0,
+        "rms": 0.0,
+        "unequal": 0,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      }
+    }
+  },
+  "1": {
+    "logits_vs_original": {
+      "max_abs": 0.0001226663589477539,
+      "rms": 2.6377858661717353e-05,
+      "unequal": 128763,
+      "violations_at_1e-4_plus_1e-4_abs_ref": 0
+    },
+    "layers_vs_original": {
+      "0": {
+        "max_abs": 4.76837158203125e-07,
+        "rms": 1.1737587104056522e-08,
+        "unequal": 98876,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "1": {
+        "max_abs": 9.5367431640625e-07,
+        "rms": 3.2360232066627924e-08,
+        "unequal": 161368,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "2": {
+        "max_abs": 9.5367431640625e-06,
+        "rms": 5.3991296331247976e-08,
+        "unequal": 167240,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "3": {
+        "max_abs": 9.5367431640625e-06,
+        "rms": 6.688492314417786e-08,
+        "unequal": 216896,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "4": {
+        "max_abs": 1.1444091796875e-05,
+        "rms": 9.999144318573695e-08,
+        "unequal": 236486,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "5": {
+        "max_abs": 3.814697265625e-05,
+        "rms": 1.6186733804674326e-07,
+        "unequal": 293438,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "6": {
+        "max_abs": 3.814697265625e-05,
+        "rms": 2.0423076294275268e-07,
+        "unequal": 303035,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "7": {
+        "max_abs": 4.57763671875e-05,
+        "rms": 2.4965959809337305e-07,
+        "unequal": 308670,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "8": {
+        "max_abs": 5.7220458984375e-05,
+        "rms": 3.9644602835508254e-07,
+        "unequal": 309089,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "9": {
+        "max_abs": 6.103515625e-05,
+        "rms": 4.452439365597937e-07,
+        "unequal": 310245,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "10": {
+        "max_abs": 6.4849853515625e-05,
+        "rms": 4.796483686769809e-07,
+        "unequal": 310696,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "11": {
+        "max_abs": 6.4849853515625e-05,
+        "rms": 5.270994805762995e-07,
+        "unequal": 309632,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      }
+    }
+  },
+  "one_vs_ten": {
+    "logits": {
+      "max_abs": 0.00012111663818359375,
+      "rms": 2.6258471390040004e-05,
+      "unequal": 128680,
+      "violations_at_1e-4_plus_1e-4_abs_ref": 0
+    },
+    "layers": {
+      "0": {
+        "max_abs": 4.76837158203125e-07,
+        "rms": 1.1737587104056522e-08,
+        "unequal": 98876,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "1": {
+        "max_abs": 9.5367431640625e-07,
+        "rms": 3.2360232066627924e-08,
+        "unequal": 161368,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "2": {
+        "max_abs": 9.5367431640625e-06,
+        "rms": 5.3991296331247976e-08,
+        "unequal": 167240,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "3": {
+        "max_abs": 9.5367431640625e-06,
+        "rms": 6.688492314417786e-08,
+        "unequal": 216896,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "4": {
+        "max_abs": 1.1444091796875e-05,
+        "rms": 9.999144318573695e-08,
+        "unequal": 236486,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "5": {
+        "max_abs": 3.814697265625e-05,
+        "rms": 1.6186733804674326e-07,
+        "unequal": 293438,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "6": {
+        "max_abs": 3.814697265625e-05,
+        "rms": 2.0423076294275268e-07,
+        "unequal": 303035,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "7": {
+        "max_abs": 4.57763671875e-05,
+        "rms": 2.4965959809337305e-07,
+        "unequal": 308670,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "8": {
+        "max_abs": 5.7220458984375e-05,
+        "rms": 3.9644602835508254e-07,
+        "unequal": 309089,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "9": {
+        "max_abs": 6.103515625e-05,
+        "rms": 4.452439365597937e-07,
+        "unequal": 310245,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "10": {
+        "max_abs": 6.4849853515625e-05,
+        "rms": 4.796483686769809e-07,
+        "unequal": 310696,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      },
+      "11": {
+        "max_abs": 6.4849853515625e-05,
+        "rms": 5.270994805762995e-07,
+        "unequal": 309632,
+        "violations_at_1e-4_plus_1e-4_abs_ref": 0
+      }
+    }
+  },
+  "identity": {
+    "torch": "2.10.0",
+    "revision": "07dea832e22aefee32ad281d4b80551282e1c168",
+    "precision": "Original BF16 weights expanded to FP32; unchanged upstream forwards",
+    "scope": "Prefill only; original fixture head has nine rows, this probe has one",
+    "files_sha256": {
+      "artifacts/reference-logo-f32/decoder.safetensors": "57764f4b353619b2c88eefb573037698d67fd6d8108183b02f434c1a721269ce",
+      "artifacts/reference-logo-f32/vision.safetensors": "4a4779555b788c768aeb58c893d8a791dcbe8362ca23ec90c86ac4ef48f38033",
+      "tools/reference.py": "85ed29ebe62be79d1d33db49e33339990cdece4c390325347b8bcaf67865567b",
+      "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-reference-thread-sensitivity/probe.py": "e2ec18e4753dbd103e7fc9f971a78d19f0bd245e16fb33687f2af82499dedbd9"
+    }
+  }
+}
