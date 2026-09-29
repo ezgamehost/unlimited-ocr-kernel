@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-final-review/quality.py", line 102, in <module>
+    main()
+  File "/Users/matthewzhao/vibe/unlimited-ocr-kernel/docs/benchmarks/2026-09-28-final-review/quality.py", line 96, in main
+    assert all(all(row[k] for k in ['exact_text', 'exact_tokens', 'eos', 'image_tokens_equal', 'precision_equal'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

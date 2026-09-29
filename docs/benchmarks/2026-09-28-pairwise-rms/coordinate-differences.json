@@ -1,0 +1,1025 @@
+[
+  {
+    "case": "corpus-english-original",
+    "boxes": 9,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-english-matched",
+    "boxes": 9,
+    "changed_boxes": 1,
+    "max_coordinate_delta": 1,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 2,
+        "before": [
+          41,
+          105,
+          775,
+          177
+        ],
+        "after": [
+          41,
+          106,
+          775,
+          177
+        ],
+        "maximum_coordinate_delta": 1
+      }
+    ]
+  },
+  {
+    "case": "corpus-chinese-original",
+    "boxes": 12,
+    "changed_boxes": 5,
+    "max_coordinate_delta": 2,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 0,
+        "before": [
+          43,
+          36,
+          252,
+          57
+        ],
+        "after": [
+          43,
+          36,
+          252,
+          59
+        ],
+        "maximum_coordinate_delta": 2
+      },
+      {
+        "box": 3,
+        "before": [
+          45,
+          155,
+          542,
+          175
+        ],
+        "after": [
+          45,
+          155,
+          542,
+          176
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 4,
+        "before": [
+          45,
+          178,
+          617,
+          199
+        ],
+        "after": [
+          45,
+          179,
+          617,
+          199
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 5,
+        "before": [
+          45,
+          201,
+          567,
+          223
+        ],
+        "after": [
+          45,
+          202,
+          567,
+          223
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 9,
+        "before": [
+          45,
+          319,
+          465,
+          340
+        ],
+        "after": [
+          45,
+          320,
+          465,
+          340
+        ],
+        "maximum_coordinate_delta": 1
+      }
+    ]
+  },
+  {
+    "case": "corpus-chinese-matched",
+    "boxes": 12,
+    "changed_boxes": 3,
+    "max_coordinate_delta": 1,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 3,
+        "before": [
+          43,
+          155,
+          542,
+          175
+        ],
+        "after": [
+          43,
+          155,
+          542,
+          176
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 8,
+        "before": [
+          43,
+          296,
+          491,
+          316
+        ],
+        "after": [
+          43,
+          296,
+          491,
+          317
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 10,
+        "before": [
+          43,
+          343,
+          440,
+          364
+        ],
+        "after": [
+          43,
+          342,
+          440,
+          364
+        ],
+        "maximum_coordinate_delta": 1
+      }
+    ]
+  },
+  {
+    "case": "corpus-table-original",
+    "boxes": 5,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-table-matched",
+    "boxes": 5,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "corpus-dense-original",
+    "boxes": 57,
+    "changed_boxes": 27,
+    "max_coordinate_delta": 1,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 17,
+        "before": [
+          43,
+          316,
+          530,
+          330
+        ],
+        "after": [
+          43,
+          317,
+          530,
+          331
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 18,
+        "before": [
+          43,
+          332,
+          546,
+          346
+        ],
+        "after": [
+          43,
+          333,
+          546,
+          347
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 19,
+        "before": [
+          43,
+          347,
+          530,
+          361
+        ],
+        "after": [
+          43,
+          348,
+          530,
+          362
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 20,
+        "before": [
+          43,
+          363,
+          546,
+          377
+        ],
+        "after": [
+          43,
+          364,
+          546,
+          378
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 23,
+        "before": [
+          43,
+          410,
+          530,
+          424
+        ],
+        "after": [
+          43,
+          411,
+          530,
+          425
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 24,
+        "before": [
+          43,
+          426,
+          546,
+          440
+        ],
+        "after": [
+          43,
+          427,
+          546,
+          441
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 26,
+        "before": [
+          43,
+          457,
+          546,
+          471
+        ],
+        "after": [
+          43,
+          458,
+          546,
+          472
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 27,
+        "before": [
+          43,
+          473,
+          530,
+          487
+        ],
+        "after": [
+          43,
+          474,
+          530,
+          488
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 29,
+        "before": [
+          43,
+          504,
+          540,
+          518
+        ],
+        "after": [
+          43,
+          505,
+          540,
+          519
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 30,
+        "before": [
+          43,
+          520,
+          546,
+          534
+        ],
+        "after": [
+          43,
+          521,
+          546,
+          535
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 31,
+        "before": [
+          43,
+          536,
+          540,
+          549
+        ],
+        "after": [
+          43,
+          537,
+          540,
+          550
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 32,
+        "before": [
+          43,
+          551,
+          546,
+          565
+        ],
+        "after": [
+          43,
+          552,
+          546,
+          566
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 33,
+        "before": [
+          43,
+          567,
+          540,
+          581
+        ],
+        "after": [
+          43,
+          568,
+          540,
+          582
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 34,
+        "before": [
+          43,
+          583,
+          546,
+          597
+        ],
+        "after": [
+          43,
+          584,
+          546,
+          598
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 35,
+        "before": [
+          43,
+          599,
+          540,
+          613
+        ],
+        "after": [
+          43,
+          600,
+          540,
+          614
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 37,
+        "before": [
+          43,
+          631,
+          540,
+          644
+        ],
+        "after": [
+          43,
+          631,
+          540,
+          645
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 38,
+        "before": [
+          43,
+          646,
+          546,
+          660
+        ],
+        "after": [
+          43,
+          647,
+          546,
+          661
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 41,
+        "before": [
+          43,
+          694,
+          540,
+          707
+        ],
+        "after": [
+          43,
+          694,
+          540,
+          708
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 42,
+        "before": [
+          43,
+          709,
+          546,
+          723
+        ],
+        "after": [
+          43,
+          710,
+          546,
+          724
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 43,
+        "before": [
+          43,
+          725,
+          540,
+          739
+        ],
+        "after": [
+          43,
+          726,
+          540,
+          739
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 45,
+        "before": [
+          43,
+          757,
+          540,
+          770
+        ],
+        "after": [
+          43,
+          757,
+          540,
+          771
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 46,
+        "before": [
+          43,
+          772,
+          546,
+          786
+        ],
+        "after": [
+          43,
+          773,
+          546,
+          787
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 47,
+        "before": [
+          43,
+          788,
+          540,
+          802
+        ],
+        "after": [
+          43,
+          789,
+          540,
+          802
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 53,
+        "before": [
+          43,
+          883,
+          540,
+          897
+        ],
+        "after": [
+          43,
+          883,
+          540,
+          896
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 54,
+        "before": [
+          43,
+          899,
+          546,
+          913
+        ],
+        "after": [
+          43,
+          898,
+          546,
+          912
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 55,
+        "before": [
+          43,
+          915,
+          540,
+          928
+        ],
+        "after": [
+          43,
+          914,
+          540,
+          928
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 56,
+        "before": [
+          43,
+          930,
+          546,
+          944
+        ],
+        "after": [
+          43,
+          929,
+          546,
+          943
+        ],
+        "maximum_coordinate_delta": 1
+      }
+    ]
+  },
+  {
+    "case": "corpus-dense-matched",
+    "boxes": 2,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "heldout-receipt-original",
+    "boxes": 8,
+    "changed_boxes": 3,
+    "max_coordinate_delta": 3,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 4,
+        "before": [
+          58,
+          400,
+          735,
+          551
+        ],
+        "after": [
+          58,
+          400,
+          738,
+          551
+        ],
+        "maximum_coordinate_delta": 3
+      },
+      {
+        "box": 6,
+        "before": [
+          60,
+          635,
+          606,
+          667
+        ],
+        "after": [
+          60,
+          636,
+          606,
+          667
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 7,
+        "before": [
+          60,
+          674,
+          586,
+          706
+        ],
+        "after": [
+          60,
+          675,
+          586,
+          706
+        ],
+        "maximum_coordinate_delta": 1
+      }
+    ]
+  },
+  {
+    "case": "heldout-wide_report-original",
+    "boxes": 11,
+    "changed_boxes": 0,
+    "max_coordinate_delta": 0,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": []
+  },
+  {
+    "case": "heldout-bilingual_notice-original",
+    "boxes": 16,
+    "changed_boxes": 1,
+    "max_coordinate_delta": 1,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 13,
+        "before": [
+          37,
+          775,
+          350,
+          805
+        ],
+        "after": [
+          37,
+          776,
+          350,
+          806
+        ],
+        "maximum_coordinate_delta": 1
+      }
+    ]
+  },
+  {
+    "case": "heldout-archive_register-original",
+    "boxes": 54,
+    "changed_boxes": 16,
+    "max_coordinate_delta": 2,
+    "normalized_text_equal": true,
+    "equal_token_count": true,
+    "eos": true,
+    "changes": [
+      {
+        "box": 9,
+        "before": [
+          53,
+          188,
+          493,
+          201
+        ],
+        "after": [
+          53,
+          188,
+          495,
+          201
+        ],
+        "maximum_coordinate_delta": 2
+      },
+      {
+        "box": 11,
+        "before": [
+          53,
+          221,
+          491,
+          235
+        ],
+        "after": [
+          53,
+          221,
+          493,
+          235
+        ],
+        "maximum_coordinate_delta": 2
+      },
+      {
+        "box": 13,
+        "before": [
+          53,
+          254,
+          487,
+          267
+        ],
+        "after": [
+          53,
+          254,
+          488,
+          267
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 14,
+        "before": [
+          37,
+          270,
+          430,
+          284
+        ],
+        "after": [
+          37,
+          271,
+          430,
+          284
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 15,
+        "before": [
+          53,
+          286,
+          486,
+          300
+        ],
+        "after": [
+          53,
+          287,
+          486,
+          300
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 29,
+        "before": [
+          53,
+          514,
+          488,
+          528
+        ],
+        "after": [
+          53,
+          514,
+          488,
+          527
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 30,
+        "before": [
+          37,
+          531,
+          429,
+          544
+        ],
+        "after": [
+          37,
+          530,
+          429,
+          544
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 31,
+        "before": [
+          53,
+          547,
+          484,
+          560
+        ],
+        "after": [
+          53,
+          546,
+          484,
+          560
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 34,
+        "before": [
+          37,
+          595,
+          442,
+          609
+        ],
+        "after": [
+          37,
+          595,
+          442,
+          608
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 35,
+        "before": [
+          53,
+          612,
+          488,
+          626
+        ],
+        "after": [
+          53,
+          611,
+          488,
+          625
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 38,
+        "before": [
+          37,
+          661,
+          426,
+          675
+        ],
+        "after": [
+          37,
+          661,
+          426,
+          674
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 39,
+        "before": [
+          53,
+          677,
+          487,
+          691
+        ],
+        "after": [
+          53,
+          677,
+          485,
+          691
+        ],
+        "maximum_coordinate_delta": 2
+      },
+      {
+        "box": 40,
+        "before": [
+          37,
+          694,
+          421,
+          707
+        ],
+        "after": [
+          37,
+          693,
+          421,
+          707
+        ],
+        "maximum_coordinate_delta": 1
+      },
+      {
+        "box": 42,
+        "before": [
+          37,
+          726,
+          442,
+          739
+        ],
+        "after": [
+          37,
+          726,
+          440,
+          739
+        ],
+        "maximum_coordinate_delta": 2
+      },
+      {
+        "box": 47,
+        "before": [
+          53,
+          808,
+          487,
+          821
+        ],
+        "after": [
+          53,
+          807,
+          485,
+          821
+        ],
+        "maximum_coordinate_delta": 2
+      },
+      {
+        "box": 53,
+        "before": [
+          53,
+          905,
+          492,
+          919
+        ],
+        "after": [
+          53,
+          905,
+          490,
+          919
+        ],
+        "maximum_coordinate_delta": 2
+      }
+    ]
+  }
+]

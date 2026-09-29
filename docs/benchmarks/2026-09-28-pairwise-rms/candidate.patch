@@ -1,0 +1,61 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index 892ea2e..087068d 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -401,6 +401,15 @@ where
+     Tensor::new(q.shape.clone(), output)
+ }
+ 
++fn pairwise_square_sum(input: &[f32]) -> f32 {
++    if input.len() <= 16 {
++        input.iter().map(|v| v * v).sum()
++    } else {
++        let (left, right) = input.split_at(input.len() / 2);
++        pairwise_square_sum(left) + pairwise_square_sum(right)
++    }
++}
++
+ fn norm(
+     x: &Tensor,
+     weight: &[f32],
+@@ -449,7 +458,7 @@ fn norm(
+             return;
+         }
+         let mean = 0.;
+-        let variance = input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / width as f32;
++        let variance = pairwise_square_sum(input) / width as f32;
+         let scale = (variance + eps).sqrt().recip();
+         for i in 0..width {
+             output[i] = (input[i] - mean) * scale * weight[i] + bias.map_or(0., |b| b[i]);
+diff --git a/tests/ops.rs b/tests/ops.rs
+index e51bcf7..af28320 100644
+--- a/tests/ops.rs
++++ b/tests/ops.rs
+@@ -39,6 +39,27 @@ fn softmax_is_stable_and_rejects_nonfinite_rows() {
+     assert!(ops::softmax(&mut [f32::NEG_INFINITY; 2]).is_err());
+ }
+ 
++#[test]
++fn rmsnorm_retains_small_contributions_in_wide_rows() {
++    for width in [1279, 1280, 1281] {
++        for large_index in [0, width / 2, width - 1] {
++            let mut values = vec![1e-4_f32; width];
++            values[large_index] = 1.;
++            let variance = values.iter().map(|&v| f64::from(v).powi(2)).sum::<f64>() / width as f64;
++            let scale = (variance + f64::from(1e-6_f32)).sqrt().recip();
++            let input = Tensor::new(vec![1, width], values.clone()).unwrap();
++            let actual = ops::rms_norm(&input, &vec![1.; width], 1e-6).unwrap();
++            for (&got, &value) in actual.data.iter().zip(&values) {
++                let expected = f64::from(value) * scale;
++                assert!(
++                    (f64::from(got) - expected).abs() <= 3e-7 * expected.abs(),
++                    "width={width} large_index={large_index}: {got} vs {expected}"
++                );
++            }
++        }
++    }
++}
++
+ #[test]
+ fn layernorm_and_rmsnorm_have_distinct_mean_behavior() {
+     let x = tensor(&[1, 2], &[1., 3.]);
