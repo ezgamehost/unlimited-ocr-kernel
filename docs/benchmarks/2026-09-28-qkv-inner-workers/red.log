@@ -1,0 +1,12 @@
+   Compiling uocr v0.1.0 (/Users/matthewzhao/vibe/unlimited-ocr-kernel)
+error[E0599]: no method named `balanced_worker` found for struct `cpu::CpuContext` in the current scope
+   --> src/cpu/mod.rs:109:30
+    |
+ 23 | pub struct CpuContext {
+    | --------------------- method `balanced_worker` not found for this struct
+...
+109 |             let worker = cpu.balanced_worker(3);
+    |                              ^^^^^^^^^^^^^^^ method not found in `cpu::CpuContext`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `uocr` (lib test) due to 1 previous error

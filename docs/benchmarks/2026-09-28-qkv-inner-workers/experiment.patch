@@ -1,0 +1,57 @@
+diff --git a/src/cpu/mod.rs b/src/cpu/mod.rs
+index 6eb9a5d..b014c1c 100644
+--- a/src/cpu/mod.rs
++++ b/src/cpu/mod.rs
+@@ -68,6 +68,15 @@ impl CpuContext {
+         }
+     }
+ 
++    /// Divide existing worker capacity equally among concurrent projection tasks.
++    /// As with serial_worker, the caller reserves aggregate scratch and passes
++    /// a nonzero task count. The shared pool bounds actual worker creation.
++    pub(crate) fn balanced_worker(&self, concurrent_tasks: usize) -> Self {
++        let mut worker = self.serial_worker(concurrent_tasks);
++        worker.threads = (self.threads / concurrent_tasks).max(1);
++        worker
++    }
++
+     /// Give a wider shared expert spare capacity in the existing pool.
+     /// Other expert tasks retain one worker each; aggregate scratch is unchanged.
+     pub(crate) fn shared_expert_worker(
+@@ -102,6 +111,19 @@ impl CpuContext {
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn balanced_worker_shares_pool_and_partitions_thread_and_scratch_budgets() {
++        for (threads, expected) in [(1, 1), (3, 1), (4, 1), (6, 2), (8, 2), (10, 3), (14, 4)] {
++            let cpu = CpuContext::new(Backend::Auto, threads, 3 * 1024).unwrap();
++            let worker = cpu.balanced_worker(3);
++            assert_eq!(worker.threads(), expected);
++            assert_eq!(worker.backend, cpu.backend);
++            assert!(Arc::ptr_eq(&worker.pool, &cpu.pool));
++            assert!(worker.check_elements(256).is_ok());
++            assert!(worker.check_elements(257).is_err());
++        }
++    }
++
+     #[test]
+     fn shared_expert_uses_spare_workers_with_same_memory_partition() {
+         for (threads, expected) in [(1, 1), (4, 1), (8, 2), (10, 2)] {
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index d56c964..b90c489 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -134,9 +134,9 @@ impl<'a> Decoder<'a> {
+             && cpu.threads() >= 3
+             && scratch.is_some_and(|n| cpu.check_elements(n).is_ok())
+         {
+-            let mut q_cpu = cpu.serial_worker(3);
+-            let mut k_cpu = cpu.serial_worker(3);
+-            let mut v_cpu = cpu.serial_worker(3);
++            let mut q_cpu = cpu.balanced_worker(3);
++            let mut k_cpu = cpu.balanced_worker(3);
++            let mut v_cpu = cpu.balanced_worker(3);
+             let pool = std::sync::Arc::clone(&cpu.pool);
+             let (q, (k, v)) = pool.install(|| {
+                 rayon::join(
