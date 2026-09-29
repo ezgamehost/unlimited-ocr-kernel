@@ -1,0 +1,92 @@
+{
+  "phase": 1,
+  "variant": "candidate",
+  "command": [
+    "/Users/matthewzhao/vibe/unlimited-ocr-kernel/artifacts/bf16-rms-integration/candidate-unit",
+    "model::benchmark::fixed_work_decoder_benchmark",
+    "--ignored",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "resources": {
+    "exit_code": 0,
+    "forced_kill": false,
+    "peak_rss_bytes": 6806028288,
+    "user_cpu_seconds": 108.126829,
+    "system_cpu_seconds": 20.694288,
+    "major_faults": 247682,
+    "minor_faults": 555859
+  },
+  "power_before": {
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=6226019)\t82%; discharging; 2:35 remaining present: true\n",
+    "profile": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "process_wall_seconds": 35.51106466600322,
+  "power_after": {
+    "battery": "Now drawing from 'Battery Power'\n -InternalBattery-0 (id=6226019)\t82%; discharging; 2:35 remaining present: true\n",
+    "profile": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 0\n displaysleep         2\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n ttyskeepawake        1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                1\n tcpkeepalive         1\n disksleep            10\n"
+  },
+  "samples": [
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 6.805797417,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188954351345165500,
+      "logits_sha256": "911625c820dc975918a76f15f2c2c60847c191a47dd016b1edaadd8bc4d8f7d6",
+      "overlay": null,
+      "precision": "bf16_weights_fp32",
+      "prefill_seconds": 2.319809416,
+      "prefix_tokens": 1517,
+      "repetition": 0,
+      "threads": 8,
+      "warmup": true
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 7.343593458,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188954351345165500,
+      "logits_sha256": "911625c820dc975918a76f15f2c2c60847c191a47dd016b1edaadd8bc4d8f7d6",
+      "overlay": null,
+      "precision": "bf16_weights_fp32",
+      "prefill_seconds": 1.57776775,
+      "prefix_tokens": 1517,
+      "repetition": 1,
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 5.124367042,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188954351345165500,
+      "logits_sha256": "911625c820dc975918a76f15f2c2c60847c191a47dd016b1edaadd8bc4d8f7d6",
+      "overlay": null,
+      "precision": "bf16_weights_fp32",
+      "prefill_seconds": 2.969342333,
+      "prefix_tokens": 1517,
+      "repetition": 2,
+      "threads": 8,
+      "warmup": false
+    },
+    {
+      "benchmark": "native_fixed_work_decoder",
+      "decode_steps": 512,
+      "decode_with_checksum_seconds": 5.9482803749999995,
+      "input_policy": "recorded English tokens cycled; teacher forced; ignores EOS",
+      "logits_checksum": 188954351345165500,
+      "logits_sha256": "911625c820dc975918a76f15f2c2c60847c191a47dd016b1edaadd8bc4d8f7d6",
+      "overlay": null,
+      "precision": "bf16_weights_fp32",
+      "prefill_seconds": 1.51605175,
+      "prefix_tokens": 1517,
+      "repetition": 3,
+      "threads": 8,
+      "warmup": false
+    }
+  ]
+}

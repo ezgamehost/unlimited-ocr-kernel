@@ -44,3 +44,31 @@ correctness gates, using fresh output directories. The Q8/hybrid checks use
 ../2026-09-28-final-review/quality.py --output-root pointing into this directory.
 bf16_quality.py compares the scoped CLI against the completed, hash-identified
 accepted BF16 baseline from ../2026-09-28-pairwise-rms/bf16-quality.
+
+## Battery-only ABBA regression screen
+
+run.py completed baseline/candidate/candidate/baseline with four repetitions per
+process, the first designated warmup. Power remained battery, charge above 50%,
+and power modes zero at every before/after check. Both binaries use the same
+fixed-work fixture and test-only route-capture harness. All four children exited
+normally, and each variant's full-logit digest was stable across its eight runs.
+Different BF16 digests between variants are expected from the accuracy change;
+correctness is established by the separate reference/output gates above.
+
+| Measured samples (six each) | Baseline | Candidate |
+|---|---:|---:|
+| Decode median seconds | 4.955708 | 5.972002 |
+| Decode min–max seconds | 4.610451–41.183333 | 4.814905–35.565091 |
+| Prefill median seconds | 1.826261 | 2.452786 |
+| Prefill min–max seconds | 1.423682–8.390955 | 1.516052–9.371330 |
+
+These raw results do not establish performance acceptance. The final baseline
+phase also develops severe stalls, and the measured ranges are extremely broad.
+All outliers remain in the summaries. The post-run host snapshot shows about
+10.9 GiB swap in use and no reported thermal warning, but without start/end memory
+deltas this does not attribute the stalls to paging. This is an exploratory battery
+screen, not comparable to the existing AC headline and not a speedup claim.
+
+Next investigation: isolate normalization cost with a small resident working set,
+then repeat the model-level comparison under stable host conditions. The candidate
+remains pending; the accepted runtime baseline has not changed.

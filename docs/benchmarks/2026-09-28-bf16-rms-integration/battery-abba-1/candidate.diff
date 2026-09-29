@@ -1,0 +1,165 @@
+diff --git a/src/cpu/ops.rs b/src/cpu/ops.rs
+index 892ea2e..e42c683 100644
+--- a/src/cpu/ops.rs
++++ b/src/cpu/ops.rs
+@@ -401,12 +401,28 @@ where
+     Tensor::new(q.shape.clone(), output)
+ }
+ 
++#[derive(Clone, Copy)]
++enum Normalization {
++    Layer,
++    RmsSequential,
++    RmsPairwise,
++}
++
++fn pairwise_square_sum(input: &[f32]) -> f32 {
++    if input.len() <= 16 {
++        input.iter().map(|v| v * v).sum()
++    } else {
++        let (left, right) = input.split_at(input.len() / 2);
++        pairwise_square_sum(left) + pairwise_square_sum(right)
++    }
++}
++
+ fn norm(
+     x: &Tensor,
+     weight: &[f32],
+     bias: Option<&[f32]>,
+     eps: f32,
+-    center: bool,
++    kind: Normalization,
+     cpu: Option<&CpuContext>,
+ ) -> Result<Tensor> {
+     x.validate()?;
+@@ -432,7 +448,7 @@ fn norm(
+     }
+     let mut data = vec![0.; x.data.len()];
+     let normalize = |(input, output): (&[f32], &mut [f32])| {
+-        if center {
++        if matches!(kind, Normalization::Layer) {
+             // Wide, nearly constant rows lose their mean under sequential FP32
+             // summation. Retain precision through centering and variance.
+             let mean = input.iter().map(|&v| v as f64).sum::<f64>() / width as f64;
+@@ -449,7 +465,12 @@ fn norm(
+             return;
+         }
+         let mean = 0.;
+-        let variance = input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / width as f32;
++        let sum = if matches!(kind, Normalization::RmsPairwise) {
++            pairwise_square_sum(input)
++        } else {
++            input.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>()
++        };
++        let variance = sum / width as f32;
+         let scale = (variance + eps).sqrt().recip();
+         for i in 0..width {
+             output[i] = (input[i] - mean) * scale * weight[i] + bias.map_or(0., |b| b[i]);
+@@ -476,7 +497,7 @@ fn norm(
+ }
+ 
+ pub fn layer_norm(x: &Tensor, w: &[f32], b: Option<&[f32]>, eps: f32) -> Result<Tensor> {
+-    norm(x, w, b, eps, true, None)
++    norm(x, w, b, eps, Normalization::Layer, None)
+ }
+ /// Distribute independent rows without changing each row's reduction order.
+ pub fn layer_norm_parallel(
+@@ -486,10 +507,16 @@ pub fn layer_norm_parallel(
+     eps: f32,
+     cpu: &CpuContext,
+ ) -> Result<Tensor> {
+-    norm(x, w, b, eps, true, Some(cpu))
++    norm(x, w, b, eps, Normalization::Layer, Some(cpu))
+ }
+ pub fn rms_norm(x: &Tensor, w: &[f32], eps: f32) -> Result<Tensor> {
+-    norm(x, w, None, eps, false, None)
++    norm(x, w, None, eps, Normalization::RmsSequential, None)
++}
++
++/// RMS normalization with a balanced FP32 reduction for wide unquantized rows.
++/// The sequential variant remains available for quantized output compatibility.
++pub fn rms_norm_pairwise(x: &Tensor, w: &[f32], eps: f32) -> Result<Tensor> {
++    norm(x, w, None, eps, Normalization::RmsPairwise, None)
+ }
+ 
+ pub fn rope(values: &mut [f32], head_dim: usize, position: usize, theta: f32) -> Result<()> {
+diff --git a/src/decoder/mod.rs b/src/decoder/mod.rs
+index b1926e2..3bea5a1 100644
+--- a/src/decoder/mod.rs
++++ b/src/decoder/mod.rs
+@@ -101,6 +101,16 @@ impl<'a> Decoder<'a> {
+         self
+     }
+ 
++    fn normalize(&self, x: &Tensor, weight: &[f32]) -> Result<Tensor> {
++        // Preserve the validated quantized trajectory. Unquantized projections
++        // use a more accurate reduction to limit accumulated prefill drift.
++        if self.quantized.is_none() {
++            ops::rms_norm_pairwise(x, weight, self.config.rms_norm_eps)
++        } else {
++            ops::rms_norm(x, weight, self.config.rms_norm_eps)
++        }
++    }
++
+     fn projection(&self, x: &Tensor, name: &str, cpu: &mut CpuContext) -> Result<Tensor> {
+         if let Some((weights, mode)) = self.quantized
+             && let Some(matrix) = weights.get(name)
+@@ -319,7 +329,7 @@ impl<'a> Decoder<'a> {
+             .weights
+             .tensor(&format!("{prefix}.input_layernorm.weight"))?
+             .to_f32();
+-        let normalized = ops::rms_norm(x, &norm, self.config.rms_norm_eps)?;
++        let normalized = self.normalize(x, &norm)?;
+         let (mut q, mut k, v) = self.qkv(&normalized, &prefix, cpu)?;
+         let heads = self.config.num_attention_heads;
+         let dim = hidden / heads;
+@@ -396,7 +406,7 @@ impl<'a> Decoder<'a> {
+             .weights
+             .tensor(&format!("{prefix}.post_attention_layernorm.weight"))?
+             .to_f32();
+-        let normalized = ops::rms_norm(&residual, &postnorm, self.config.rms_norm_eps)?;
++        let normalized = self.normalize(&residual, &postnorm)?;
+         let mlp = if index < self.config.first_k_dense_replace {
+             self.feed_forward(&normalized, &format!("{prefix}.mlp"), cpu)?
+         } else {
+@@ -418,7 +428,7 @@ impl<'a> Decoder<'a> {
+             hidden.data[hidden.data.len() - width..].to_vec(),
+         )?;
+         let norm = self.weights.tensor("model.norm.weight")?.to_f32();
+-        let normalized = ops::rms_norm(&last, &norm, self.config.rms_norm_eps)?;
++        let normalized = self.normalize(&last, &norm)?;
+         self.projection(&normalized, "lm_head.weight", cpu)
+     }
+ 
+diff --git a/tests/ops.rs b/tests/ops.rs
+index e51bcf7..bfb20ce 100644
+--- a/tests/ops.rs
++++ b/tests/ops.rs
+@@ -39,6 +39,27 @@ fn softmax_is_stable_and_rejects_nonfinite_rows() {
+     assert!(ops::softmax(&mut [f32::NEG_INFINITY; 2]).is_err());
+ }
+ 
++#[test]
++fn rmsnorm_retains_small_contributions_in_wide_rows() {
++    for width in [1279, 1280, 1281] {
++        for large_index in [0, width / 2, width - 1] {
++            let mut values = vec![1e-4_f32; width];
++            values[large_index] = 1.;
++            let variance = values.iter().map(|&v| f64::from(v).powi(2)).sum::<f64>() / width as f64;
++            let scale = (variance + f64::from(1e-6_f32)).sqrt().recip();
++            let input = Tensor::new(vec![1, width], values.clone()).unwrap();
++            let actual = ops::rms_norm_pairwise(&input, &vec![1.; width], 1e-6).unwrap();
++            for (&got, &value) in actual.data.iter().zip(&values) {
++                let expected = f64::from(value) * scale;
++                assert!(
++                    (f64::from(got) - expected).abs() <= 3e-7 * expected.abs(),
++                    "width={width} large_index={large_index}: {got} vs {expected}"
++                );
++            }
++        }
++    }
++}
++
+ #[test]
+ fn layernorm_and_rmsnorm_have_distinct_mean_behavior() {
+     let x = tensor(&[1, 2], &[1., 3.]);
